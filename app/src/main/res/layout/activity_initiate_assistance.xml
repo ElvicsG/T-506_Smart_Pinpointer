@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.kehui.www.testapp.ui.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_assist_list"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_heightPercent="10%">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/iv_assist_list_text" />
+    </LinearLayout>
+
+    <com.kehui.www.testapp.ui.PercentLinearLayout
+        android:id="@+id/ll_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="2.6%"></LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="50dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_test_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_assist_no_reply"
+                        android:drawablePadding="5dp"
+                        android:text="@string/test_time"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_colon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" : "
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_test_time_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/tv_colon"
+                        android:text="2018-2-5"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_test_name_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_toRightOf="@id/tv_test_time_value"
+                        android:drawableLeft="@drawable/ic_assist_no_reply"
+                        android:drawablePadding="5dp"
+                        android:text="@string/test_name2"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_colon2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text=" : "
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/et_test_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_toRightOf="@id/tv_colon2"
+                        android:imeOptions="actionDone"
+                        android:background="@drawable/bg_input_initate_assistance"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.fang.dashview.DashView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/ll_container"
+                app:dashOrientation="0"
+                app:dashWidth="2dp"
+                app:lineColor="@color/blue4"
+                app:lineHeight="0.5dp"
+                app:lineWidth="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_test_position_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_test_time_value"
+                    android:drawableLeft="@drawable/ic_assist_no_reply"
+                    android:drawablePadding="5dp"
+                    android:text="@string/test_position"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tv_colon3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_test_time_value"
+                    android:layout_toRightOf="@id/tv_test_position_text"
+                    android:text=" : "
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/et_test_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/tv_test_time_value"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:imeOptions="actionDone"
+                    android:layout_toRightOf="@id/tv_colon3"
+                    android:background="@drawable/bg_input_initate_assistance"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <com.fang.dashview.DashView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/ll_container"
+                app:dashOrientation="0"
+                app:dashWidth="2dp"
+                app:lineColor="@color/blue4"
+                app:lineHeight="0.5dp"
+                app:lineWidth="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_cable_length_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_test_position_text"
+                        android:drawableLeft="@drawable/ic_assist_no_reply"
+                        android:drawablePadding="5dp"
+                        android:text="@string/cable_length"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_colon4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_test_position_text"
+                        android:layout_toRightOf="@id/tv_cable_length_text"
+                        android:text=" : "
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/et_cable_length"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:inputType="number"
+                        android:imeOptions="actionDone"
+                        android:background="@drawable/bg_input_initate_assistance"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_cable_type_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_test_position_text"
+                        android:layout_toRightOf="@id/et_cable_length"
+                        android:drawableLeft="@drawable/ic_assist_no_reply"
+                        android:drawablePadding="5dp"
+                        android:text="@string/cable_type2"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_colon5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_test_position_text"
+                        android:layout_toRightOf="@id/tv_cable_type_text"
+                        android:text=" : "
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/et_cable_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/tv_test_position_text"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:imeOptions="actionDone"
+                        android:layout_toRightOf="@id/tv_colon5"
+                        android:background="@drawable/bg_input_initate_assistance"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.fang.dashview.DashView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/ll_container"
+                app:dashOrientation="0"
+                app:dashWidth="2dp"
+                app:lineColor="@color/blue4"
+                app:lineHeight="0.5dp"
+                app:lineWidth="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/tv_fault_type_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_cable_length_text"
+                        android:layout_gravity="center_vertical"
+                        android:drawableLeft="@drawable/ic_assist_no_reply"
+                        android:drawablePadding="5dp"
+                        android:text="@string/fault_type"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_colon6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_cable_length_text"
+                        android:layout_gravity="center_vertical"
+                        android:layout_toRightOf="@id/tv_fault_type_text"
+                        android:text=" : "
+                        android:textColor="@color/white"
+
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/et_fault_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/bg_input_initate_assistance"
+                        android:textColor="@color/white"
+                        android:drawableRight="@drawable/ic_initate_assistance_down"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/tv_fault_length_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_cable_length_text"
+                        android:layout_gravity="center_vertical"
+                        android:layout_toRightOf="@id/et_fault_type"
+                        android:drawableLeft="@drawable/ic_assist_no_reply"
+                        android:drawablePadding="5dp"
+                        android:text="@string/fault_length"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_colon7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_cable_length_text"
+                        android:layout_gravity="center_vertical"
+                        android:layout_toRightOf="@id/tv_fault_length_text"
+                        android:text=" : "
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/et_fault_length"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:inputType="number"
+                        android:imeOptions="actionDone"
+                        android:background="@drawable/bg_input_initate_assistance"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.fang.dashview.DashView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/ll_container"
+                app:dashOrientation="0"
+                app:dashWidth="2dp"
+                app:lineColor="@color/blue4"
+                app:lineHeight="0.5dp"
+                app:lineWidth="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/tv_short_note_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_fault_type_text"
+                    android:drawableLeft="@drawable/ic_assist_no_reply"
+                    android:drawablePadding="5dp"
+                    android:text="@string/short_note"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tv_colon8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_fault_type_text"
+                    android:layout_toRightOf="@id/tv_short_note_text"
+                    android:text=" : "
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/et_short_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:imeOptions="actionDone"
+                    android:background="@drawable/bg_input_initate_assistance"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <com.fang.dashview.DashView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/ll_container"
+                app:dashOrientation="0"
+                app:dashWidth="2dp"
+                app:lineColor="@color/blue4"
+                app:lineHeight="0.5dp"
+                app:lineWidth="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:id="@+id/tv_data_collection_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_short_note_text"
+                    android:drawableLeft="@drawable/ic_assist_no_reply"
+                    android:drawablePadding="5dp"
+                    android:text="@string/data_collection"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tv_colon9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_short_note_text"
+                    android:layout_toRightOf="@id/tv_data_collection_text"
+                    android:text=" : "
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:id="@+id/pb_data_collection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_short_note_text"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@id/tv_colon9"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/pg_style" />
+
+                <TextView
+                    android:id="@+id/tv_data_collection_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_short_note_text"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/pb_data_collection"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="2.6%"></LinearLayout>
+    </com.kehui.www.testapp.ui.PercentLinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_heightPercent="11%">
+
+        <Button
+            android:id="@+id/btn_commit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/btn_assist_selector"
+            android:drawableLeft="@drawable/ic_initate_assistance_commit"
+            android:drawablePadding="5dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/commit"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_btn_assist_list"
+            android:drawableLeft="@drawable/ic_assist_list_back"
+            android:drawablePadding="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/back"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</com.kehui.www.testapp.ui.PercentLinearLayout>

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.kehui.www.testapp.ui.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_assist_list"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_heightPercent="10%">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/iv_assist_list_text" />
+    </LinearLayout>
+
+    <com.kehui.www.testapp.ui.PercentLinearLayout
+        android:id="@+id/ll_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="2.1%"></LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/black2"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            app:layout_heightPercent="12%">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:text="@string/test_time"
+                    android:textColor="@color/white"
+                    android:textSize="12dp" />
+
+                <RelativeLayout
+                    android:id="@+id/rl_test_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_round_border"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_choose_test_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text=""
+                        android:layout_marginLeft="5dp"
+                        android:textColor="@color/gray4"
+                        android:textSize="12dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_assist_list_calendar" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:text="@string/report_status"
+
+                    android:textColor="@color/white"
+                    android:textSize="12dp" />
+
+                <RelativeLayout
+                    android:id="@+id/rl_report_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_round_border"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_choose_report_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:text="@string/please_choose"
+                        android:textColor="@color/gray4"
+                        android:textSize="12dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="22dp"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/ic_assist_list_down_arrow"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:id="@+id/imageView" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:text="@string/reply_status"
+                    android:textColor="@color/white"
+                    android:textSize="12dp" />
+
+                <RelativeLayout
+                    android:id="@+id/rl_reply_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_round_border"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_choose_reply_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:text="@string/please_choose"
+                        android:textColor="@color/gray4"
+                        android:textSize="12dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="22dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/ic_assist_list_down_arrow" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_search"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/btn_searche_assist_selector"
+                android:drawableLeft="@drawable/ic_search_white"
+                android:drawablePadding="5dp"
+                android:text="@string/search"
+                android:paddingLeft="10dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="12dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_widthPercent="2.1%"></LinearLayout>
+    </com.kehui.www.testapp.ui.PercentLinearLayout>
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/ll_exception"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_exception"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_no_net"
+                android:visibility="visible" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/no_net"
+                android:id="@+id/tv_exception"
+                android:textColor="@color/blue11"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_space"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_widthPercent="2.6%"></LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_space2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="horizontal"
+            app:layout_widthPercent="2.6%"></LinearLayout>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/srl_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/ll_space2"
+            android:layout_toRightOf="@id/ll_space">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.percent.PercentRelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_heightPercent="11%">
+
+        <Button
+            android:id="@+id/btn_initiate_assistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/bg_btn_assist_list"
+            android:drawableLeft="@drawable/ic_assist_list_initiate"
+            android:drawablePadding="5dp"
+            android:padding="10dp"
+            android:text="@string/initiate_assistance"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_upload_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/btn_assist_selector"
+            android:drawableLeft="@drawable/ic_assist_list_upload"
+            android:drawablePadding="5dp"
+            android:padding="10dp"
+            android:text="@string/upload_data"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_btn_assist_list"
+            android:drawableLeft="@drawable/ic_assist_list_back"
+            android:drawablePadding="10dp"
+            android:padding="10dp"
+            android:text="@string/back"
+            android:textAlignment="textStart"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</com.kehui.www.testapp.ui.PercentLinearLayout>

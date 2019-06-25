@@ -1,0 +1,67 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+    defaultConfig {
+        applicationId "com.kehui.www.testapp"
+        minSdkVersion 19
+        targetSdkVersion 24
+        versionCode 5
+        versionName "2.01.004"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    testCompile 'junit:junit:4.12'
+    compile files('src/main/libs/hellocharts-library-1.5.8.jar')
+    compile 'org.greenrobot:greendao:3.0.1'
+    compile 'org.greenrobot:greendao-generator:3.0.0'
+    compile 'net.zetetic:android-database-sqlcipher:3.5.2'
+    compile 'com.akexorcist:bluetoothspp:1.0.0'
+    compile 'cn.pedant.sweetalert:library:1.3'
+    compile 'me.drakeet.materialdialog:library:1.3.1'
+    compile 'com.github.markzhai:blockcanary-android:1.4.1'
+    compile 'com.robinhood.spark:spark:1.1.2'
+    compile 'me.grantland:autofittextview:0.2.+'
+    compile files('libs/libsvm.jar')
+    //使用注解需要添加下面两句话
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    compile 'com.android.support:recyclerview-v7:24.0.2'
+    compile 'com.android.support:design:24.0.2'
+    //网络框架
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    //gson格式
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    //表单格式
+    compile 'com.squareup.retrofit2:converter-scalars:2.0.0-beta4'
+    compile files('libs/sun.misc.BASE64Decoder.jar')
+    compile 'com.android.support:percent:25.3.1'
+    //虚线的引用
+    compile 'com.fang:dashview:v1.0.0'
+    compile files('libs/xUtils-2.6.14.jar')
+    //eventbus
+    compile 'org.greenrobot:eventbus:3.1.1'
+}
+greendao {
+    targetGenDir 'src/main/java'
+    daoPackage 'com.XXXX.dao.db'
+}
+

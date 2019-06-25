@@ -1,0 +1,108 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:datePickerDialogTheme">@style/MyDatePickerDialogTheme</item>
+    </style>
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:datePickerDialogTheme">@style/MyDatePickerDialogTheme</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CustomDialogStyle" parent="@android:style/Theme.Dialog">
+        <!-- 边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 无标题 -->
+        <item name="android:windowNoTitle">true</item>
+
+        <!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsFloating">true</item>
+
+        <!-- 半透明 -->
+        <item name="android:windowIsTranslucent">false</item>
+
+        <!-- 背景模糊 -->
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <!-- 允许对话框的背景变暗 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:background">@drawable/bg_round_border_1</item><!--背景透明--></style>
+
+
+        <style name="Widget.SeekBar.Normal" parent="@android:style/Widget.Material.SeekBar">
+            <item name="android:maxHeight">8dip</item>
+
+            <item name="android:indeterminateOnly">false</item>
+
+            <item name="android:progressDrawable">@drawable/po_seekbar</item>
+            <item name="android:minHeight">8dip</item>
+            <item name="android:thumb">@drawable/seek_bar_thumb3</item>
+            <item name="android:thumbOffset">5dp</item>
+            <item name="android:splitTrack">false</item>
+        </style>
+
+    <style name="AVLoadingIndicatorView">
+        <item name="minWidth">48dip</item>
+        <item name="maxWidth">48dip</item>
+        <item name="minHeight">48dip</item>
+        <item name="maxHeight">48dip</item>
+        <item name="indicatorName">BallPulseIndicator</item>
+    </style>
+
+    <style name="AVLoadingIndicatorView.Large">
+        <item name="minWidth">76dip</item>
+        <item name="maxWidth">76dip</item>
+        <item name="minHeight">76dip</item>
+        <item name="maxHeight">76dip</item>
+        <item name="indicatorName">BallPulseIndicator</item>
+    </style>
+
+    <style name="AVLoadingIndicatorView.Small">
+        <item name="minWidth">24dip</item>
+        <item name="maxWidth">24dip</item>
+        <item name="minHeight">24dip</item>
+        <item name="maxHeight">24dip</item>
+        <item name="indicatorName">BallPulseIndicator</item>
+    </style>
+    <style name="bg80FFDialog" parent="android:style/Theme.Dialog">
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFrame">@null</item> <!--边框-->
+        <item name="android:windowIsFloating">true</item> <!--是否浮现在activity之上-->
+        <item name="android:windowIsTranslucent">true</item><!--半透明-->
+        <item name="android:windowBackground">@color/black3</item>
+        <item name="android:backgroundDimEnabled">true</item> <!--蒙版- 模糊 -->
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
+    <!--DatePickerDialog.THEME_DEVICE_DEFAULT_LIGHT-->
+    <!--<style name="MyDatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog">-->
+        <!--&lt;!&ndash;<item name="android:windowIsTranslucent">true</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:windowBackground">@android:color/transparent</item>&ndash;&gt;-->
+        <!--<item name="android:windowContentOverlay">@null</item>-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--<item name="android:windowIsFloating">true</item>-->
+        <!--<item name="android:backgroundDimEnabled">true</item>-->
+        <!--<item name="android:headerBackground">@color/blue2</item>-->
+        <!--&lt;!&ndash;<item name="android:textColor">@color/red</item>&ndash;&gt;-->
+    <!--</style>-->
+    <style name="MyDatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">@color/blue4</item>
+    </style>
+</resources>

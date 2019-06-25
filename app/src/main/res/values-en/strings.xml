@@ -1,0 +1,186 @@
+<resources>
+    <string name="app_name">T-506 PINPOINTER</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="cichang_name">Magnetic</string>
+    <string name="shengyin_name">Acoustic</string>
+    <string name="add">Connect the Bluetooth device</string>
+    <string name="delete">Disconnect the Bluetooth device</string>
+    <string name="block_canary_display_activity_label">Blocks</string>
+    <string name="start_to_use">start</string>
+    <string name="version_code">version : </string>
+    <string name="does_not_find_device">The machine does not find Bluetooth hardware or drivers</string>
+    <string name="open_bluetooth_ing">Open in Bluetooth</string>
+    <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">Waiting for Bluetooth to open, re-try after 5s!</string>
+    <string name="Automatically_open_Bluetooth_failure_please_manually_open_the_Bluetooth">Automatically open Bluetooth failure, please manually open the Bluetooth!</string>
+    <string name="The_line_has_been_disconnected_please_re_connect">The line has been disconnected,please re-connect!</string>
+    <string name="Connection_failed_unable_to_get_Socket">Connection failed, unable to get Socket!</string>
+    <string name="connect">Connection to</string>
+    <string name="success">succcessful!</string>
+    <string name="Connection_failed">Connection failed!</string>
+    <string name="Device_address">Device address</string>
+    <string name="Automatic_connection_please_wait">Automatic connection, please wait ...</string>
+    <string name="Find_the_device">Find the device ...</string>
+    <string name="Select_the_device_to_connect_to">Select the device to connect to</string>
+    <string name="No_new_equipment_found">No new equipment found</string>
+    <string name="Find_a_Bluetooth_device">Find a Bluetooth device</string>
+    <string name="t_506">SOFTWARE : T-506 CABLE FAULT PINPOINTER</string>
+    <string name="company_name">COMPANY NAME: KEHUI POWER AUTOMATION CO. LTD.</string>
+    <string name="company_name2">Kehui International Ltd.</string>
+    <string name="company_website">WEBSITE:：www.kehui.cn</string>
+    <string name="ok">ok</string>
+    <string name="confirm">Confirm</string>
+    <string name="find_device">Find the device</string>
+    <string name="cancle">cancel</string>
+    <string name="left">left</string>
+    <string name="right">right</string>
+    <string name="tishi">prompt</string>
+    <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
+    <string name="Exit_application">exit</string>
+    <string name="The_sending_data_failed_and_was_being_resent">The sending data failed and was being resent</string>
+    <string name="Sound_field_delay">Time Delay :</string>
+    <string name="Sound_field_delay2">Time Delay</string>
+    <string name="Can_not_get_input_stream_via_Bluetooth_socket">Can not get input stream via
+        Bluetooth socket, please reopen the application to connect</string>
+    <string name="You_have_no_memory_data_can_not_compare">You have no memory data, can not compare</string>
+    <string name="Bluetooth_is_not_connected">Bluetooth is not connected</string>
+    <string name="Send_content_is_empty">Send content is empty</string>
+    <string name="shengciyanshi_0">Sound/field delay:0ms</string>
+    <string name="synchronization">Trigger</string>
+    <string name="instructions">instructions</string>
+    <string name="Please_re_adjust_the_gain">Please re-adjust the gain</string>
+    <string name="gain">Gain</string>
+    <!--新增翻译-->
+    <string name="language">Language</string>
+    <string name="language2">Language</string>
+    <string name="back2">Return</string>
+    <string name="software_upgrade">Upgrade</string>
+    <string name="about_us">About Us</string>
+    <string name="back">Return</string>
+    <string name="current_version">Current Version</string>
+    <string name="check_updates">Check for new version</string>
+    <string name="test_time">Date</string>
+    <string name="test_name">Name of tester</string>
+    <string name="test_name2">Name of tester</string>
+    <string name="test_position">Test location</string>
+    <string name="report_status">Upload</string>
+    <string name="reply_status">Response</string>
+    <string name="reply_content">Response information</string>
+    <string name="initiate_assistance">Initiate remote help</string>
+    <string name="upload_data">Upload data</string>
+    <string name="upload_success">Upload successful</string>
+    <string name="search">Search</string>
+    <string name="cable_length">Cable length</string>
+    <string name="cable_type2">Voltage level</string>
+    <string name="fault_type">Fault Type</string>
+    <string name="fault_length">Location of fault</string>
+    <string name="short_note">Notes</string>
+    <string name="short_note_info">Notes</string>
+    <string name="data_collection">Collect data</string>
+    <string name="commit">Submit</string>
+    <string name="magnetic_field">Magnetic</string>
+    <string name="app_name2">Kehui Smart Pinpointer V2.0</string>
+    <string name="setting">Setup</string>
+    <string name="cancel">Cancel</string>
+    <string name="company">Kehui International Ltd.</string>
+    <string name="company_address">Address : Studio 206, Mill Studio Business Centre, Crane Mead, Ware, Hertfordshire SQ12 9PY, UK</string>
+    <string name="company_phone">Tel : 0533-3179631</string>
+    <string name="zh">中文</string>
+    <string name="en">English</string>
+    <string name="de">Deutsch</string>
+    <string name="fr">Français</string>
+    <string name="es">Español</string>
+    <string name="check_net_retry">Please check the network and try again!</string>
+    <string name="test_time_is_empty">Please fill in the date!</string>
+    <string name="test_name_is_empty">The tester name cannot be empty!</string>
+    <string name="test_position_is_empty">The test location cannot be empty!</string>
+    <string name="test_data_time_no_finish">Please wait 35 seconds for the data to be taken before you submit it.</string>
+    <string name="loading_more">Desperately loading...</string>
+    <string name="no_load_more">Already in the end!</string>
+    <string name="reported">Uploaded already</string>
+    <string name="no_report">To be uploaded</string>
+    <string name="replied">Responded already</string>
+    <string name="no_reply">Not yet respond</string>
+    <string name="no_net_wait_uploader">Successfully saved locally for uploading when the network is available</string>
+    <string name="confirm_cancel_assist">Are you sure you want to cancel remote help?</string>
+    <string name="switch_text">Change</string>
+    <string name="switch_language_success_restart_app">Language change successful. Restart the APP to apply the new language.Restart now?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="software_new">Your software is the latest version!</string>
+    <string name="synchronize_light">Trigger</string>
+    <string name="status">Status</string>
+    <string name="play">Resume</string>
+    <string name="mute">Mute</string>
+    <string name="pause">Hold/run</string>
+    <string name="memory">Memory</string>
+    <string name="compare">Compare</string>
+    <string name="filter">Filter</string>
+    <string name="assist">Assist</string>
+    <string name="user_mode">Operator</string>
+    <string name="expert_mode">Waveform</string>
+    <string name="ditong">Low pass</string>
+    <string name="daitong">Band pass</string>
+    <string name="gaotong">High pass</string>
+    <string name="quantong">No filter</string>
+    <string name="choose_filter_mode">Select a sound filter</string>
+    <string name="version_update">Whether to update the version immediately?</string>
+    <string name="latest_version">Your software is the latest version!</string>
+    <string name="download_success">download successful!</string>
+    <string name="download_failure">The download failed, please check if the permission is enabled!</string>
+    <string name="checking_update">Detecting updates...</string>
+    <string name="this_update">This update</string>
+    <string name="wait_downloading">M\nPlease wait while downloading...</string>
+
+    <string name="over_20_notice">Offline storage assistance data can not exceed 20, please upload un-uploaded assistance data when there is a network!</string>
+    <string name="no_report_data">No unreported data！</string>
+    <string name="uploading_waiting">Uploading, please wait</string>
+    <string name="paired_device">Paired device</string>
+    <string name="no_paired_device">Unpaired device</string>
+    <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
+    <string name="please_find_device">Please find a device!</string>
+    <string name="min_delay">Minimum delay</string>
+
+    <string name="pinpointer_position">Pinpointer Position</string>
+    <!--<string name="Yes">Fault detected</string>-->
+    <!--<string name="NO">Fault not detected</string>-->
+    <!--<string name="searching">Searching</string>-->
+    <!--&lt;!&ndash; 搜索故障放电声音词条 &ndash;&gt;-->
+    <!--&lt;!&ndash; 搜索故障放电声音，但之前曾经发现过故障放电声 &ndash;&gt;-->
+    <!--<string name="Search_for_fault_discharge_sound">Searching for acoustic signal</string>-->
+    <!--&lt;!&ndash; 第一次发现故障声音 &ndash;&gt;-->
+    <!--<string name="the_first_found_acoustic_signal">Acoustic signal found, move forward</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，前后两次声磁延时相同 &ndash;&gt;-->
+    <!--<string name="the_second_found_fault_distance_same">Distance from fault unchanged</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小且为历史最小值 &ndash;&gt;-->
+    <!--<string name="the_second_fault_smallest">Closest to fault so far. Move forward</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小但大于历史最小值 &ndash;&gt;-->
+    <!--<string name="closest_fault_move">Closer to the fault, Move forward</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时大 &ndash;&gt;-->
+    <!--<string name="away_from_fault">Away from the fault, turn back</string>-->
+    <string name="connecting_waite">Connecting, please wait...</string>
+    <string name="please_choose">Please select</string>
+
+    <string name="fault_type_1">Low impedance</string>
+    <string name="fault_type_2">High impedance</string>
+    <string name="fault_type_3">Flashing</string>
+    <string name="fault_type_4">Open conductor</string>
+
+    <string name="message_notice_1">Increase the sound gain</string>
+    <string name="message_notice_2">Increase the magnetic field gain</string>
+    <string name="message_notice_3">Reduce the sound gain</string>
+    <string name="message_notice_4">Reduce the magnetic field gain</string>
+    <string name="message_notice_5">Test in progress</string>
+    <string name="message_notice_6">Fault not detected</string>
+    <string name="message_notice_7">Fault detected</string>
+    <string name="message_notice_8">Getting close to fault position</string>
+    <string name="message_notice_9">Moving away from fault position</string>
+    <string name="year">year</string>
+    <string name="month">month</string>
+    <string name="day">day</string>
+    <string name="no_data">No data</string>
+    <string name="no_net">No network</string>
+    <string name="follow_sys">Auto</string>
+    <string name="demo_notice">Eingegebenen Demo-Modus!</string>
+
+</resources>

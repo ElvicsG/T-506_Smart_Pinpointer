@@ -1,0 +1,183 @@
+<resources>
+    <string name="app_name">T-506定点仪</string>
+    <string name="cichang_name">磁场</string>
+    <string name="shengyin_name">声音</string>
+    <string name="add">连接蓝牙设备</string>
+    <string name="block_canary_display_activity_label">Blocks</string>
+    <string name="start_to_use">开始使用</string>
+    <string name="version_code">版本号 :</string>
+    <string name="does_not_find_device">本机没有找到蓝牙硬件或驱动</string>
+    <string name="open_bluetooth_ing">打开蓝牙中</string>
+    <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">等待蓝牙打开，5秒后，尝试连接！
+    </string>
+    <string name="Automatically_open_Bluetooth_failure_please_manually_open_the_Bluetooth">
+        自动打开蓝牙失败，请手动打开蓝牙！
+    </string>
+    <string name="The_line_has_been_disconnected_please_re_connect">线路已断开，请重新连接！</string>
+    <string name="Connection_failed_unable_to_get_Socket">连接失败,无法得到Socket！</string>
+    <string name="connect">连接</string>
+    <string name="success">成功!</string>
+    <string name="Connection_failed">连接失败!</string>
+    <string name="Device_address">设备地址</string>
+    <string name="Automatic_connection_please_wait">自动连接中，请稍等......</string>
+    <string name="Find_the_device">查找设备中...</string>
+    <string name="Select_the_device_to_connect_to">选择要连接的设备</string>
+    <string name="No_new_equipment_found">没有找到新设备</string>
+    <string name="Find_a_Bluetooth_device">查找蓝牙设备</string>
+    <string name="t_506">软件名称：T—506电缆故障定点仪</string>
+    <string name="company_name">公司名称：山东科汇电力自动化股份有限公司</string>
+    <string name="company_name2">山东科汇电力自动化股份有限公司</string>
+    <string name="company_website">公司网址：www.kehui.cn</string>
+    <string name="confirm">确认</string>
+    <string name="find_device">查找设备</string>
+    <string name="cancle">取消</string>
+    <string name="left">左</string>
+    <string name="right">右</string>
+    <string name="tishi">提示</string>
+    <string name="Bluetooth_disconnected_please_reconnect">蓝牙断开,请重新连接</string>
+    <string name="Exit_application">退出应用</string>
+    <string name="The_sending_data_failed_and_was_being_resent">发送数据失败，正在重新发送</string>
+    <string name="Sound_field_delay">声磁延时 : </string>
+    <string name="Sound_field_delay2">声磁延时</string>
+    <string name="Can_not_get_input_stream_via_Bluetooth_socket">不能通过蓝牙socket获得输入流,请重新打开应用进行连接
+    </string>
+    <string name="You_have_no_memory_data_can_not_compare">你还没有记忆数据，无法比较</string>
+    <string name="Bluetooth_is_not_connected">未连接蓝牙</string>
+    <string name="Send_content_is_empty">发送内容为空</string>
+    <string name="shengciyanshi_0">声磁延时:0ms</string>
+    <string name="synchronization">同步</string>
+    <string name="instructions">指示</string>
+    <!--新增翻译-->
+    <string name="language">语言</string>
+    <string name="language2">语&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;言</string>
+    <string name="back2">返&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;回</string>
+    <string name="software_upgrade">软件升级</string>
+    <string name="about_us">关于我们</string>
+    <string name="back">返回</string>
+    <string name="current_version">当前版本</string>
+    <string name="check_updates">检查更新</string>
+    <string name="test_time">测试时间</string>
+    <string name="test_name">测试者</string>
+    <string name="test_name2">测试人员</string>
+    <string name="test_position">测试地点</string>
+    <string name="report_status">上报状态</string>
+    <string name="reply_status">回复状态</string>
+    <string name="reply_content">回复内容</string>
+    <string name="initiate_assistance">发起协助</string>
+    <string name="upload_data">上传数据</string>
+    <string name="upload_success">上传成功</string>
+    <string name="search">搜索</string>
+    <string name="cable_length">电缆长度</string>
+    <string name="cable_type2">电压等级</string>
+    <string name="fault_type">故障类型</string>
+    <string name="fault_length">故障长度</string>
+    <string name="short_note">简注</string>
+    <string name="short_note_info">简注信息</string>
+    <string name="data_collection">数据收集</string>
+    <string name="notifyTitle">提示</string>
+    <string name="commit">提交</string>
+    <string name="magnetic_field">磁场</string>
+    <string name="app_name2">科汇定点仪V2.0</string>
+    <string name="notifyMsg">当前应用缺少必要权限。\n\n请点击\"设置\"-\"权限\"-打开所需权限。</string>
+    <string name="gpsNotifyMsg">当前应用需要打开定位功能。\n\n请点击\"设置\"-\"定位服务\"-打开定位功能。</string>
+    <string name="setting">设置</string>
+    <string name="cancel">取消</string>
+    <string name="company">山东科汇电力自动化股份有限公司</string>
+    <string name="company_address">地址 : 山东省淄博市张店区三赢路16号山东科汇科技园</string>
+    <string name="company_phone">电话 : 0533-3179631</string>
+    <string name="zh">中文</string>
+    <string name="en">English</string>
+    <string name="de">Deutsch</string>
+    <string name="fr">Français</string>
+    <string name="es">Español</string>
+    <string name="check_net_retry">请检查网络后重试!</string>
+    <string name="test_time_is_empty">请填写测试时间!</string>
+    <string name="test_name_is_empty">测试人名称不能为空!</string>
+    <string name="test_position_is_empty">测试地点不能为空!</string>
+    <string name="test_data_time_no_finish">请等待35秒数据录取完成后再提交!</string>
+    <string name="loading_more">拼命加载中...</string>
+    <string name="no_load_more">已经到底啦!</string>
+    <string name="reported">已上报</string>
+    <string name="no_report">未上报</string>
+    <string name="replied">已回复</string>
+    <string name="no_reply">未回复</string>
+    <string name="no_net_wait_uploader">成功保存到本地,可等待网络可用时上传</string>
+    <string name="confirm_cancel_assist">确定要取消协助请求吗?</string>
+    <string name="switch_text">切换</string>
+    <string name="switch_language_success_restart_app">语言切换成功,重启App后生效是否立即重启?</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="software_new">您的软件已是最新版本!</string>
+    <string name="synchronize_light">同步指示灯</string>
+    <string name="status">状态</string>
+    <string name="play">播放</string>
+    <string name="mute">声音</string>
+    <string name="pause">暂停</string>
+    <string name="memory">记忆</string>
+    <string name="compare">比较</string>
+    <string name="filter">滤波</string>
+    <string name="assist">协助</string>
+    <string name="user_mode">用户模式</string>
+    <string name="expert_mode">专家模式</string>
+    <string name="ditong">低通</string>
+    <string name="daitong">带通</string>
+    <string name="gaotong">高通</string>
+    <string name="quantong">全通</string>
+    <string name="choose_filter_mode">请选择滤波模式</string>
+    <string name="version_update">是否立即更新版本?</string>
+    <string name="latest_version">已是最新版本!</string>
+    <string name="download_success">下载成功!</string>
+    <string name="download_failure">下载失败，请检查权限是否开启!</string>
+    <string name="checking_update">正在检测更新...</string>
+    <string name="this_update">本次更新共</string>
+    <string name="wait_downloading">M\n下载中,请稍等...</string>
+    <string name="gain">增益</string>
+    <string name="over_20_notice">离线存储协助数据不能超过20条，请有网络时即时上传未上传的协助数据!</string>
+    <string name="no_report_data">无未上报数据！</string>
+    <string name="uploading_waiting">上传中,请稍后</string>
+    <string name="paired_device">已配对设备</string>
+    <string name="no_paired_device">未配对设备</string>
+    <string name="no_paired_device_find_device">未有配对设备,请查找设备!</string>
+    <string name="please_find_device">请查找设备!</string>
+    <string name="min_delay">最小延迟</string>
+
+    <string name="pinpointer_position">探头位置</string>
+    <!--<string name="searching">正在搜索</string>-->
+    <!--&lt;!&ndash; 搜索故障放电声音词条 &ndash;&gt;-->
+    <!--&lt;!&ndash; 搜索故障放电声音，但之前曾经发现过故障放电声 &ndash;&gt;-->
+    <!--<string name="Search_for_fault_discharge_sound">寻找声音信号</string>-->
+    <!--&lt;!&ndash; 第一次发现故障声音 &ndash;&gt;-->
+    <!--<string name="the_first_found_acoustic_signal">发现声音信号,向前移动</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，前后两次声磁延时相同 &ndash;&gt;-->
+    <!--<string name="the_second_found_fault_distance_same">故障的距离保持不变</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小且为历史最小值 &ndash;&gt;-->
+    <!--<string name="the_second_fault_smallest">到目前为止最接近故障。前进</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小但大于历史最小值 &ndash;&gt;-->
+    <!--<string name="closest_fault_move">靠近故障，继续前进</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时大 &ndash;&gt;-->
+    <!--<string name="away_from_fault">远离故障，掉头</string>-->
+    <string name="connecting_waite">正在连接,请稍后...</string>
+    <string name="please_choose">请选择</string>
+
+    <string name="fault_type_1">低阻</string>
+    <string name="fault_type_2">高阻</string>
+    <string name="fault_type_3">闪络</string>
+    <string name="fault_type_4">开路</string>
+    <string name="message_notice_1">请增大声音增益</string>
+    <string name="message_notice_2">请增大磁场增益</string>
+    <string name="message_notice_3">请减小声音增益</string>
+    <string name="message_notice_4">请减小磁场增益</string>
+    <string name="message_notice_5">正在测试中</string>
+    <string name="message_notice_6">未发现故障</string>
+    <string name="message_notice_7">已发现故障</string>
+    <string name="message_notice_8">接近故障点</string>
+    <string name="message_notice_9">远离故障点</string>
+    <string name="year">年</string>
+    <string name="month">月</string>
+    <string name="day">日</string>
+    <string name="no_data">无数据</string>
+    <string name="no_net">无网络</string>
+    <string name="follow_sys">跟随系统</string>
+    <string name="demo_notice">已进入演示模式!</string>
+
+</resources>

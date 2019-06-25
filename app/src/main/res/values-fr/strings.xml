@@ -1,0 +1,192 @@
+<resources>
+    <string name="app_name">PINPOINTER T-506</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="cichang_name">Champ magnétique</string>
+    <string name="shengyin_name">Son</string>
+    <string name="cichang_value_min">0</string>
+    <string name="cichang_value_max">32</string>
+    <string name="shengyin_value_min">0</string>
+    <string name="shengyin_value_max">32</string>
+    <string name="add">连接蓝牙设备</string>
+    <string name="delete">断开蓝牙设备</string>
+    <string name="block_canary_display_activity_label">Blocks</string>
+    <string name="start_to_use">Démarrage</string>
+    <string name="version_code">版本号：</string>
+    <string name="does_not_find_device">本机没有找到蓝牙硬件或驱动</string>
+    <string name="open_bluetooth_ing">打开蓝牙中</string>
+    <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">En attente du signal Bluetooth, veuillez réessayer dans 5 s!
+    </string>
+    <string name="Automatically_open_Bluetooth_failure_please_manually_open_the_Bluetooth">
+        自动打开蓝牙失败，请手动打开蓝牙！
+    </string>
+    <string name="The_line_has_been_disconnected_please_re_connect">线路已断开，请重新连接！</string>
+    <string name="Connection_failed_unable_to_get_Socket">连接失败,无法得到Socket！</string>
+    <string name="connect">Connexion au </string>
+    <string name="success">réussie!</string>
+    <string name="Connection_failed">连接失败!</string>
+    <string name="Device_address">设备地址</string>
+    <string name="Automatic_connection_please_wait">自动连接中，请稍等......</string>
+    <string name="Find_the_device">查找设备中...</string>
+    <string name="Select_the_device_to_connect_to">选择要连接的设备</string>
+    <string name="No_new_equipment_found">没有找到新设备</string>
+    <string name="Find_a_Bluetooth_device">Rechercher un appareil Bluetooth </string>
+    <string name="t_506">logiciel ：T—506电缆故障定点仪</string>
+    <string name="company_name">Nom de la société ：Kehui International Ltd.</string>
+    <string name="company_name2">Kehui International Ltd.</string>
+    <string name="company_website">Site Internet de la société：www.kehui.cn</string>
+    <string name="ok">确定</string>
+    <string name="confirm">Confirmer</string>
+    <string name="find_device">查找设备</string>
+    <string name="cancle">Annuler</string>
+    <string name="left">gauche</string>
+    <string name="right">droite</string>
+    <string name="tishi">提示</string>
+    <string name="Bluetooth_disconnected_please_reconnect">蓝牙断开,请重新连接</string>
+    <string name="Exit_application">Quitter</string>
+    <string name="The_sending_data_failed_and_was_being_resent">发送数据失败，正在重新发送</string>
+    <string name="Sound_field_delay">Délai sonore : </string>
+    <string name="Sound_field_delay2">Délai sonore</string>
+    <string name="Can_not_get_input_stream_via_Bluetooth_socket">不能通过蓝牙socket获得输入流,请重新打开应用进行连接
+    </string>
+    <string name="You_have_no_memory_data_can_not_compare">你还没有记忆数据，无法比较</string>
+    <string name="Bluetooth_is_not_connected">未连接蓝牙</string>
+    <string name="Send_content_is_empty">发送内容为空</string>
+    <string name="shengciyanshi_0">Délai sonore:0ms</string>
+    <string name="synchronization">Démarreur</string>
+    <string name="instructions"></string>
+    <!--新增翻译-->
+    <string name="language">语言</string>
+    <string name="language2">语&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;言</string>
+    <string name="back2">Retour</string>
+    <string name="software_upgrade">Mise à jour </string>
+    <string name="about_us">À propos de nous</string>
+    <string name="back">Retour</string>
+    <string name="current_version">Version actuelle</string>
+    <string name="check_updates">Rechercher des mises à jour</string>
+    <string name="test_time">Durée du test</string>
+    <string name="test_name">Nom du testeur</string>
+    <string name="test_name2">Nom du testeur</string>
+    <string name="test_position">Localisation du test</string>
+    <string name="report_status">Statut du téléchargement</string>
+    <string name="reply_status">Statut de la réponse</string>
+    <string name="reply_content">Données de réponse</string>
+    <string name="initiate_assistance">Démarrer l\'aide à </string>
+    <string name="upload_data">Télécharger des données</string>
+    <string name="upload_success">Téléchargement effectué avec succès</string>
+    <string name="search">Recherche</string>
+    <string name="cable_length">Longueur du câble</string>
+    <string name="cable_type2">Niveau de tension</string>
+    <string name="fault_type">Type de défaut</string>
+    <string name="fault_length">Localisation du défaut</string>
+    <string name="short_note">Remarques</string>
+    <string name="short_note_info">Remarques</string>
+    <string name="data_collection">Collecter des données</string>
+    <string name="notifyTitle">提示</string>
+    <string name="commit">Soumettre</string>
+    <string name="magnetic_field">Champ magnétique</string>
+    <string name="app_name2">Kehui Pinpointer V2.0</string>
+    <string name="notifyMsg">当前应用缺少必要权限。\n\n请点击\"设置\"-\"权限\"-打开所需权限。</string>
+    <string name="gpsNotifyMsg">当前应用需要打开定位功能。\n\n请点击\"设置\"-\"定位服务\"-打开定位功能。</string>
+    <string name="setting">Configuration</string>
+    <string name="cancel">Annuler</string>
+    <string name="company">Kehui International Ltd.</string>
+    <string name="company_address">地址 : Studio 206, Mill Studio Business Centre, Crane Mead, Ware, Hertfordshire SQ12 9PY, Royaume-Uni</string>
+    <string name="company_phone">电话 : 0533-3179631</string>
+    <string name="zh">中文</string>
+    <string name="en">English</string>
+    <string name="de">Deutsch</string>
+    <string name="fr">Français</string>
+    <string name="es">Español</string>
+    <string name="check_net_retry">请检查网络后重试!</string>
+    <string name="test_time_is_empty">请填写测试时间!</string>
+    <string name="test_name_is_empty">测试人名称不能为空!</string>
+    <string name="test_position_is_empty">测试地点不能为空!</string>
+    <string name="test_data_time_no_finish">请等待35秒数据录取完成后再提交!</string>
+    <string name="loading_more">拼命加载中...</string>
+    <string name="no_load_more">已经到底啦!</string>
+    <string name="reported">Déjà téléchargé</string>
+    <string name="no_report">À télécharger</string>
+    <string name="replied">Déjà répondu</string>
+    <string name="no_reply">Pas encore répondu</string>
+    <string name="no_net_wait_uploader">成功保存到本地,可等待网络可用时上传</string>
+    <string name="confirm_cancel_assist">Souhaitez-vous réellement annuler l\'aide à distance ?</string>
+    <string name="switch_text">Modifier</string>
+    <string name="switch_language_success_restart_app">Modification de la langue effectuée avec succès. Redémarrez l\'application pour appliquer la nouvelle langue?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="software_new">Vous utilisez la dernière version du logiciel!</string>
+    <string name="synchronize_light">Démarreur</string>
+    <string name="status">状态</string>
+    <string name="play">Reprendre</string>
+    <string name="mute">Muet</string>
+    <string name="pause">Arrêt</string>
+    <string name="memory">Stocker</string>
+    <string name="compare">Comparer</string>
+    <string name="filter">Filtre</string>
+    <string name="assist">Aide</string>
+    <string name="user_mode">Page Interface opérateur</string>
+    <string name="expert_mode"> Écran Analyse des formes d\'ondes</string>
+    <string name="ditong">Passe-bas</string>
+    <string name="daitong">Passe-bande</string>
+    <string name="gaotong">Passe-haut</string>
+    <string name="quantong">Pas de filtre</string>
+    <string name="choose_filter_mode">Sélectionner un filtre</string>
+    <string name="version_update">是否立即更新版本?</string>
+    <string name="latest_version">Vous utilisez la dernière version du logiciel!</string>
+    <string name="download_success">Téléchargement effectué avec succès!</string>
+    <string name="download_failure">下载失败，请检查权限是否开启!</string>
+    <string name="checking_update">正在检测更新...</string>
+    <string name="this_update">本次更新共</string>
+    <string name="wait_downloading">M\n下载中,请稍等...</string>
+    <string name="magnetic_field_gain_setting">磁场增益设置</string>
+    <string name="gain">增益</string>
+    <string name="voice_gain_setting">声音增益设置</string>
+    <string name="over_20_notice">离线存储协助数据不能超过20条，请有网络时即时上传未上传的协助数据!</string>
+    <string name="no_report_data">无未上报数据！</string>
+    <string name="uploading_waiting">上传中,请稍后</string>
+    <string name="paired_device">已配对设备</string>
+    <string name="no_paired_device">未配对设备</string>
+    <string name="no_paired_device_find_device">未有配对设备,请查找设备!</string>
+    <string name="please_find_device">请查找设备!</string>
+    <string name="min_delay">最小延迟</string>
+    <string name="pinpointer_position">探头位置</string>
+    <!--&lt;!&ndash; 搜索故障放电声音词条 &ndash;&gt;-->
+    <!--&lt;!&ndash; 搜索故障放电声音，但之前曾经发现过故障放电声 &ndash;&gt;-->
+    <!--<string name="Search_for_fault_discharge_sound">寻找声音信号</string>-->
+    <!--&lt;!&ndash; 第一次发现故障声音 &ndash;&gt;-->
+    <!--<string name="the_first_found_acoustic_signal">发现声音信号,向前移动</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，前后两次声磁延时相同 &ndash;&gt;-->
+    <!--<string name="the_second_found_fault_distance_same">故障的距离保持不变</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小且为历史最小值 &ndash;&gt;-->
+    <!--<string name="the_second_fault_smallest">到目前为止最接近故障。前进</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小但大于历史最小值 &ndash;&gt;-->
+    <!--<string name="closest_fault_move">La localisation du défaut se rapproche，继续前进</string>-->
+    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时大 &ndash;&gt;-->
+    <!--<string name="away_from_fault">La localisation du défaut s\'éloigne,Revenir</string>-->
+    <string name="connecting_waite">正在连接,请稍后...</string>
+    <string name="please_choose">Veuillez sélectionner</string>
+
+
+    <string name="fault_type_1">低阻</string>
+    <string name="fault_type_2">高阻</string>
+    <string name="fault_type_3">闪络</string>
+    <string name="fault_type_4">开路</string>
+
+    <string name="message_notice_1">Increase the sound gain</string>
+    <string name="message_notice_2">Increase the magnetic field gain</string>
+    <string name="message_notice_3">Reduce the sound gain</string>
+    <string name="message_notice_4">Reduce the magnetic field gain</string>
+    <string name="message_notice_5">Test in progress</string>
+    <string name="message_notice_6">Fault not detected</string>
+    <string name="message_notice_7">Fault detected</string>
+    <string name="message_notice_8">Getting close to fault position</string>
+    <string name="message_notice_9">Moving away from fault position</string>
+    <string name="year">Années</string>
+    <string name="month">Mois</string>
+    <string name="day">Jour</string>
+    <string name="no_data">No data</string>
+    <string name="no_net">No network</string>
+    <string name="follow_sys">Auto</string>
+    <string name="demo_notice">Eingegebenen Demo-Modus!</string>
+</resources>

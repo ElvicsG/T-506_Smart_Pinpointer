@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.kehui.www.testapp.ui.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_splash"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_heightPercent="16%"></LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_splash_logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/app_name2"
+            android:layout_margin="10dp"
+            android:textColor="@color/blue2"
+            android:id="@+id/tv_app_name"
+            android:textSize="35dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:text="@string/company_name2"
+            android:textColor="@color/blue2"
+            android:textSize="18dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:src="@drawable/ic_mark" />
+
+
+        <TextView
+            android:id="@+id/tv_version2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/version_code"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="20sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bt_startuse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/btn_start_selector"
+        android:onClick="clickSplash"
+        android:layout_marginBottom="15dp"
+        android:text="@string/start_to_use"
+        android:textColor="@color/blue3"
+        android:textSize="18sp" />
+</com.kehui.www.testapp.ui.PercentLinearLayout>
