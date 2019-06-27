@@ -428,10 +428,10 @@ public class BaseActivity extends AppCompatActivity {
                         //GC20171129 在没有处理蓝牙数据时缓存数个输入流用做后续蓝牙数据处理
                         if (mTempcount >= 5 && !handleBDataThread) {
                             if (sendCommand){
-                                //超过590滤除   //GC2.01.006 蓝牙重连功能优化
+                                /*//超过590滤除   //GC2.01.006 蓝牙重连功能优化
                                 if (mTempLength > 590) {
                                     mTempLength = 590;
-                                }
+                                }*/     //GC20190625 触发灯闪烁bug原因
                                 for (int i = 0; i < mTempLength; i++) {
                                     mTemp2[i] = mTemp[i];
                                 }
@@ -1689,7 +1689,7 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190307 词条跳动效果
 
 //GN20190407 硬件关闭重连功能添加
-//GN20190408 故障提示音功能添加
+//GC20190422 "发现故障"提示音添加
 
 //GN去掉
 //GC2.01.005 界面无缝切换

@@ -40,6 +40,7 @@ import com.kehui.www.testapp.ui.WaterWaveView;
 import com.kehui.www.testapp.util.PrefUtils;
 import com.kehui.www.testapp.util.ShowProgressDialog;
 import com.kehui.www.testapp.util.Utils;
+import com.kehui.www.testapp.util.SoundUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -65,6 +66,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  */
 public class MainActivity extends BaseActivity {
 
+    private SoundUtils soundSystem; //GC20190422
     //浮动层   //GC2.01.005 界面无缝切换
     @BindView(R.id.mainUI)
     LinearLayout llMainUI;
@@ -211,7 +213,8 @@ public class MainActivity extends BaseActivity {
         getShengyinData();  //初始化声音数据
         getCichangData();   //初始化磁场数据
         setChartListenner();
-        /*readAlarm();    //GN20190408 读取发现故障提示音*/
+        //GC20190422 读取提示音
+        soundSystem = new SoundUtils(this);
 //        showProgressDialog();
 
     }
@@ -969,7 +972,10 @@ public class MainActivity extends BaseActivity {
             //GC20190123 相关为是的状态，判断“已发现故障”，显示动画2
             tvNotice.setText(getString(R.string.message_notice_7));
             tvNoticeU.setText(getString(R.string.message_notice_7));    //GC201901232
-            //GN20190408 播放提示音 mAudioTrack.write(alarmByte,0,alarmByte.length);
+
+            //GC20190422 播放提示音
+            soundSystem.play(soundSystem.SONAR);
+
             //GN 去动画1
             rlWaveU.removeView(v);               //GN 波纹
             tvScanU.setVisibility(View.GONE);    //GN 正在测试中
