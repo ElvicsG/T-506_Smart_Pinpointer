@@ -32,13 +32,14 @@
                 android:padding="5dp"
                 android:text="@string/synchronize_light"
                 android:textColor="@color/blue7"
+                android:visibility="gone"
                 android:textSize="14dp" />
 
             <ImageView
                 android:id="@+id/iv_synchronize_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_synchronize_status_22" />
+                android:src="@drawable/light_gray"/>
 
             <LinearLayout
                 android:layout_width="match_parent"

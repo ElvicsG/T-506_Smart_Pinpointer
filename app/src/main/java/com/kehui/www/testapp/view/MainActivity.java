@@ -59,7 +59,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * 界面无缝切换思路：
  * 将用户界面和专家界面用布局封装，放到一个activity中，
  * 点击模式切换时，控制布局的隐藏和显示。
- * */
+ */
 /**
  * 专家模式页面
  */
@@ -119,7 +119,6 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.ll_min_delay_u)
     LinearLayout llMinDelayU;
 
-
     //专家界面控件
     @BindView(R.id.ll_silence)
     LinearLayout llSilence;
@@ -172,7 +171,6 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.tv_position)
     TextView tvPosition;
 
-
     //用户界面变量
     //public static UserMainActivity instance;
     private ValueAnimator valueAnimator;    //GN 动画绘制1
@@ -201,10 +199,8 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //保持亮屏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager
-                .LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
-        //绑定控件
         ButterKnife.bind(this);
 //        EventBus.getDefault().register(this);
         instance = this;
@@ -213,7 +209,6 @@ public class MainActivity extends BaseActivity {
         getShengyinData();  //初始化声音数据
         getCichangData();   //初始化磁场数据
         setChartListenner();
-//        linechartShengyin.setStartPoint(50);
 //        showProgressDialog();
 
     }
@@ -602,6 +597,7 @@ public class MainActivity extends BaseActivity {
                 llFilter.setClickable(true);
                 seekbarCichang.setEnabled(true);
                 seekbarShengyin.setEnabled(true);
+                llFilterU.setClickable(true);   //GC2.01.005 界面无缝切换
                 voiceGainControlU.setEnabled(true);
                 magneticFieldGainControlU.setEnabled(true);
                 hasSendMessage = false;
@@ -626,6 +622,7 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void run() {
                     llFilter.setClickable(true);
+                    llFilterU.setClickable(true);   //GC2.01.005 界面无缝切换
                 }
             }, 500);
         }
@@ -636,6 +633,9 @@ public class MainActivity extends BaseActivity {
                     llFilter.setClickable(true);
                     seekbarCichang.setEnabled(true);
                     seekbarShengyin.setEnabled(true);
+                    llFilterU.setClickable(true);   //GC2.01.005 界面无缝切换
+                    voiceGainControlU.setEnabled(true);
+                    magneticFieldGainControlU.setEnabled(true);
 
                 }
             }, 500);
@@ -683,13 +683,13 @@ public class MainActivity extends BaseActivity {
         }
 
         if (event.status == WHAT_LIGHT) {
-            ivSynchronizeStatus.setImageResource(R.drawable.ic_synchronize_status_33);
+            ivSynchronizeStatus.setImageResource(R.drawable.light_red);
             tvNotice.setText("");   //GC20190307 词条跳动效果
             tvNoticeU.setText("");
             tvPosition.setText("");
         }
         if (event.status == CICHANG_CHANGE_OVER) {
-            ivSynchronizeStatus.setImageResource(R.drawable.ic_synchronize_status_22);
+            ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
         }
         if (event.status == WHAT_REFRESH) {
             if (isDraw) {
