@@ -266,15 +266,19 @@ public class SeekDeviceActivity extends BaseActivity {
     }
 
     private void showMain() {
-        if (PrefUtils.getString(SeekDeviceActivity.this, AppConfig.CURRENT_MODE, "user").equals("expert")) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivityForResult(intent, 100);
-            finish();
-        } else {
-            Intent intent = new Intent(this, UserMainActivity.class);
-            startActivityForResult(intent, 100);
-            finish();
-        }
+//        if (PrefUtils.getString(SeekDeviceActivity.this, AppConfig.CURRENT_MODE, "user").equals("expert")) {
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivityForResult(intent, 100);
+//            finish();
+//        } else {
+//            Intent intent = new Intent(this, UserMainActivity.class);
+//            startActivityForResult(intent, 100);
+//            finish();
+//        }
+
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivityForResult(intent, 100);
+        finish();   //GC201901231 模式切换更改
     }
 
     //是否尝试连接

@@ -1,7 +1,10 @@
 package com.kehui.www.testapp.base;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -46,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Random;
+import java.util.UUID;
 
 import libsvm.svm;
 import libsvm.svm_model;
@@ -57,6 +61,15 @@ import libsvm.svm_problem;
  * 是专家模式和用户模式基类
  */
 public class BaseActivity extends AppCompatActivity {
+    //蓝牙相关
+    BluetoothDevice _device = null; // 蓝牙设备
+    BluetoothSocket _socket = null; // 蓝牙通信socket
+    private BluetoothAdapter _bluetooth = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备
+    private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // SPP服务UUID号
+    //是否尝试连接
+    public boolean isFlag;
+
+
     /*声音播放*/
     public AudioManager audioManager;
     public AudioTrack mAudioTrack;
@@ -82,7 +95,7 @@ public class BaseActivity extends AppCompatActivity {
     public boolean hasLeft;     //GN 将蓝牙数据分包后，是否有剩余数据的标志
     public int hasLeftLen = 0;  //GN 将蓝牙数据分包后(每包59个字节)，剩余数据的数组长度
     public int[] mTempLeft = new int[59];    //GN 将蓝牙数据分包后有剩余数据时的临时数组
-    public int seekbarType;     //GN??
+    public int seekbarType;     //GN 磁场（1）或声音（2）控制的选择
     public int[] shengyinSeekbarInts;
     public int[] cichangSeekbarInts;
     public int crcNum;
@@ -153,6 +166,7 @@ public class BaseActivity extends AppCompatActivity {
 
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,6 +181,7 @@ public class BaseActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
 
     }
+
     //初始化
     private void initData() {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -195,6 +210,7 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 0;   //初始化滤波方式为全通
 
     }
+
     //设置音频播放工具
     public void setAudioTrack() {
         int minBufferSize = AudioTrack.getMinBufferSize(8000,
@@ -223,6 +239,7 @@ public class BaseActivity extends AppCompatActivity {
         mAudioTrack.play();
 
     }
+
     //GC20180504 从assets文件夹中获取声音特征的数据
     private void getFeaturexData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "feature.txt");
@@ -247,6 +264,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     //GC20180504 训练声音特征的线程
     Thread svmTrain = new Thread(new Runnable() {
         @Override
@@ -257,6 +275,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
     });
+
     //GC20180504 训练声音特征生成model
     private void voiceSvmTrain(double[] readFeature) {
         svm_problem sp = new svm_problem();
@@ -331,6 +350,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StartReadThreadEvent event) {
         Toast.makeText(this, getResources().getString(R.string.connect) + " " + event.device + " " + getResources().getString(R.string.success),
@@ -339,6 +359,7 @@ public class BaseActivity extends AppCompatActivity {
         startThread();          //GN 获取蓝牙数据
 
     }
+
     //GN 获取蓝牙数据
     private void startThread() {
         try {
@@ -363,6 +384,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     //GN 获取蓝牙数据的线程
     Runnable getBluetoothData = new Runnable() {
         @Override
@@ -390,9 +412,7 @@ public class BaseActivity extends AppCompatActivity {
                         mTempcount++;
                         //GC20171129 在没有处理蓝牙数据时缓存数个输入流用做后续蓝牙数据处理
                         if (mTempcount >= 5 && !handleBDataThread) {
-                            //GC20190121 磁场增益初始化设置
                             if (sendCommand){
-                            //if ( (sendCommand) || (PrefUtils.getString(BaseActivity.this, AppConfig.CLICK_MODE, "click_mode").equals("clicked")) ){
                                 for (int i = 0; i < mTempLength; i++) {
                                     mTemp2[i] = mTemp[i];
                                 }
@@ -424,10 +444,67 @@ public class BaseActivity extends AppCompatActivity {
                         e1.printStackTrace();
                     }
                     mInputStream = null;
+
+                    //启动重连  //GC2.01.005 蓝牙重连
+                    isFlag = false;
+                    mHandleReconnect.sendEmptyMessage(0);
                 }
             }
         }
     };
+    //蓝牙重连handler
+    public Handler mHandleReconnect = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 0) {
+                while (!isFlag) {
+                    Log.e("蓝牙测试", "connectThread线程，尝试连接");
+                    reconnect();
+                }
+            }
+        }
+    };
+
+
+    /**
+     * 尝试连接蓝牙
+     */
+    public void reconnect() {
+        // 读取设置数据
+        SharedPreferences sharedata1 = getSharedPreferences("Add", 0);
+        String address = sharedata1.getString(String.valueOf(1), null);
+        // 得到蓝牙设备句柄
+        _device = _bluetooth.getRemoteDevice(address);
+
+        // 用服务号得到socket
+        try {
+            _socket = _device.createRfcommSocketToServiceRecord(UUID
+                    .fromString(MY_UUID));
+
+            MyApplication.getInstances().set_socket(_socket);
+            MyApplication.getInstances().set_device(_device);
+            MyApplication.getInstances().set_bluetooth(_bluetooth);
+
+        } catch (IOException e) {
+
+        }
+        // 连接socket
+        try {
+            _socket.connect();
+            isFlag = true;
+            EventBus.getDefault().post(new StartReadThreadEvent(_device.getName()));
+
+        } catch (IOException e) {
+            try {
+                _socket.close();
+                _socket = null;
+                Log.e("蓝牙测试", "connectThread线程，走到异常");
+                Thread.sleep(10000);
+            } catch (Exception ee) {
+            }
+            return;
+        }
+    }
 
     /*蓝牙控制命令——客户端发送：共7个字节
     Device：设备地址，T-506为0x60  十进制96
@@ -482,6 +559,7 @@ public class BaseActivity extends AppCompatActivity {
         sendString(request);
 
     }
+
     //GN 发送磁场初始化控制命令
     public void sendCichangInitData() {
         int[] ints = {96, 0, 128 + 22}; //GN （控制命令前三个字节的十进制数值）  设备地址：96；增益调整功能：0；控制增益：声音1、阶数22。
@@ -517,11 +595,13 @@ public class BaseActivity extends AppCompatActivity {
         sendString(request);
 
     }
+
     //对发送的控制命令进行CRC校验
     public long getRequestCrcByte(int[] bytes) {
         return testCrc(bytes);
 
     }
+
     //GN 控制命令发送
     public void sendString(byte[] request) {
         if (!hasSendMessage) {
@@ -560,6 +640,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     });
+
     //GN 处理蓝牙数据
     private void domTemp2(int[] mTemp, int mTempLength) {
         int i = 0;
@@ -593,14 +674,14 @@ public class BaseActivity extends AppCompatActivity {
                                     }
                                 }
                                 boolean isCrc2 = doTempCrc2(tempints2);
-                                if (isCrc2) {
+                                if (isCrc2) {   //GN接收到命令
                                     hasSendMessage = false;
                                     i1 += 6;
-                                    if (tempints2[2] != 1) {    //GN Respond：响应值，命令未响应
+                                    if (tempints2[2] != 1) {    //GN Respond：响应值为0，命令未响应
                                         mHandle.sendEmptyMessage(SEND_ERROR);
                                         EventBus.getDefault().post(new HandleReceiveDataEvent());
                                         seekbarType = 0;
-                                    } else if (tempints2[1] == tempRequest[1]) {
+                                    } else if (tempints2[1] == tempRequest[1]) {    //GN 接受命令内容与要发送命令一致
                                         seekbarType = 0;
                                         mHandle.sendEmptyMessage(SEND_SUCCESS);
                                     }
@@ -674,6 +755,7 @@ public class BaseActivity extends AppCompatActivity {
         return isCrc(ints, ints2);
 
     }
+
     //GN 对接收的控制命令进行CRC校验
     public boolean doTempCrc2(int[] tempcrc) {
         int[] ints = new int[3];
@@ -687,6 +769,7 @@ public class BaseActivity extends AppCompatActivity {
         return isCrc(ints, ints2);
 
     }
+
     //测试CRC
     public long testCrc(int[] ints) {
         crcNum++;
@@ -719,6 +802,7 @@ public class BaseActivity extends AppCompatActivity {
         return nReg;
 
     }
+
     //判断Crc校验的结果
     public boolean isCrc(int[] ints, int[] ints2) {
         long l = testCrc(ints);
@@ -766,6 +850,7 @@ public class BaseActivity extends AppCompatActivity {
         doPackageBean(packageBean);
 
     }
+
     //每当解析完生成一个packageBean,对其进行相应的操作
     public void doPackageBean(PackageBean packageBean) {
 //        Log.e("FILE", "packageBean:" + packageBean.toString());
@@ -865,6 +950,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     //解密数据
     public int[] decodeData(PackageBean bean1) {
         int index = bean1.getIndex();
@@ -886,6 +972,7 @@ public class BaseActivity extends AppCompatActivity {
         return decodeDataSecond(index, pred, dateArray);
 
     }
+
     //二次解密
     public int[] decodeDataSecond(int index, int pred, int[] dateArray) {
         int prevsample = pred;
@@ -923,12 +1010,14 @@ public class BaseActivity extends AppCompatActivity {
         return result;
 
     }
+
     //判断二进制的最高位是否是1
     public boolean binaryStartsWithOne(int tByte) {
         String tString = Integer.toBinaryString((tByte & 0xFF) + 0x100).substring(1);
         return tString.startsWith("1");
 
     }
+
     //获取mark的后7位
     public Integer getMarkLastSeven(int mark) {
         String tString = Integer.toBinaryString((mark & 0xFF) + 0x100).substring(1);
@@ -953,6 +1042,7 @@ public class BaseActivity extends AppCompatActivity {
 //        String str = formatter.format(curDate);
 //        Log.e("TAG4playSound", str);    //GT20171129
     }
+
     //short转byte
     public static byte[] shortToByte(short number) {
         int temp = number;
@@ -1058,6 +1148,7 @@ public class BaseActivity extends AppCompatActivity {
         featurex[3] = Math.abs(featurex[3] - 7) / (4871 - 7);
 
     }
+
     //GC20180412 使用模型去预测获得的声音
     private void voiceSvmPredict(double[] featurex) {
         svm_node[] test = new svm_node[]{new svm_node(), new svm_node(), new svm_node(), new svm_node()};
@@ -1101,9 +1192,9 @@ public class BaseActivity extends AppCompatActivity {
                     //GC20181204
                     autoLocate();
                     userDelay = timeDelay;  //GN 只传递相关通过后的声磁延时值
-                    EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,true));
+                    EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,true,position));    //GC20190218 虚光标位置传递
                 }else{
-                    EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,false));
+                    EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,false,position));
                 }
             }
             for (int i = 0; i < 800; i++) {
@@ -1117,6 +1208,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     //GC20180613 计算出光标的位置和相应的声磁延时值
     private void autoLocate() {
         //GC20181204
@@ -1169,6 +1261,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     //GC20181119 计算相关系数
     private void related() {
         //分母1
@@ -1213,6 +1306,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
     }
+
     //点击比较按钮执行的方法
     public void clickCompare() {
         if (isClickRem) {
@@ -1228,6 +1322,7 @@ public class BaseActivity extends AppCompatActivity {
         //refreshUi(false, 10);
 
     }
+
     //弹出滤波对话框   //GN 滤波方式选择， *低通1 *带通2 *高通3 *全通0
     protected void showFilterDialog(final LinearLayout llView) {
         customDialog = new CustomDialog(BaseActivity.this);
@@ -1319,6 +1414,7 @@ public class BaseActivity extends AppCompatActivity {
         });
 
     }
+
     //发送低通控制命令
     public void clickDitong() {
         clickTongNum = 1;
@@ -1355,6 +1451,7 @@ public class BaseActivity extends AppCompatActivity {
         sendString(request);
 
     }
+
     //发送带通控制命令
     public void clickDaitong() {
         clickTongNum = 2;
@@ -1391,6 +1488,7 @@ public class BaseActivity extends AppCompatActivity {
         sendString(request);
 
     }
+
     //发送高通控制命令
     public void clickGaotong() {
         clickTongNum = 3;
@@ -1427,6 +1525,7 @@ public class BaseActivity extends AppCompatActivity {
         sendString(request);
 
     }
+
     //发送全通控制命令
     public void clickQuantong() {
         clickTongNum = 0;
@@ -1463,6 +1562,7 @@ public class BaseActivity extends AppCompatActivity {
         sendString(request);
 
     }
+
     //GN 增益数值和百分比的转化 100转32
     public int b2s(int b) {
         int s = 0;
@@ -1471,6 +1571,7 @@ public class BaseActivity extends AppCompatActivity {
         s = (int) v1;
         return s;
     }
+
     //32转100
     public int s2b(int s) {
         int b = 0;
@@ -1526,4 +1627,12 @@ public class BaseActivity extends AppCompatActivity {
 //GC20181201 自动定位算法优化
 //GC20181204 信号迭加平均处理
 
-//GC20190121 磁场增益初始化设置
+//GC20190123 智能识别提示优化
+//GC201901231 去掉启动APP读取内存记录的模式操作
+//GC201901232 用户模式提示框文字添加
+//GC20190216 红色虚光标绘制情况修改
+//GC20190218 专家界面延时值显示和相关结果一致起来（通过相关后计时自动定位数值不一致也不刷新延时值）
+//GC20190307 词条跳动效果
+
+//GC2.01.005 蓝牙重连
+//GC2.01.005 界面无缝切换

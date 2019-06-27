@@ -356,7 +356,7 @@
                     android:layout_height="wrap_content"
                     android:text="开启用户模式"
                     android:textSize="18sp"
-                    android:id="@+id/tv_mode"
+                    android:id="@+id/tv_mode_u"
                     android:padding="@dimen/base_dimen_5"
                     android:layout_gravity="center"/>
 

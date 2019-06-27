@@ -46,51 +46,51 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * 用户模式页面
  */
 public class UserMainActivity extends BaseActivity {
-    @BindView(R.id.magnetic_field_gain_control)
+    @BindView(R.id.magnetic_field_gain_control_u)
     TempControlView magneticFieldGainControl;
-    @BindView(R.id.iv_magnetic_field_gain)
+    @BindView(R.id.iv_magnetic_field_gain_u)
     ImageView ivMagneticFieldGain;
-    @BindView(R.id.voice_gain_control)
+    @BindView(R.id.voice_gain_control_u)
     TempControlView voiceGainControl;
-    @BindView(R.id.iv_voice_gain)
+    @BindView(R.id.iv_voice_gain_u)
     ImageView ivVoiceGain;
-    @BindView(R.id.tv_notice)
+    @BindView(R.id.tv_notice_u)
     TextView tvNotice;
-    @BindView(R.id.iv_position)
+    @BindView(R.id.iv_position_u)
     ImageView ivPosition;
-    @BindView(R.id.ll_voice)
+    @BindView(R.id.ll_voice_u)
     PercentLinearLayout llVoice;
-    @BindView(R.id.ll_filter)
+    @BindView(R.id.ll_filter_u)
     PercentLinearLayout llFilter;
-    @BindView(R.id.ll_assist)
+    @BindView(R.id.ll_assist_u)
     PercentLinearLayout llAssist;
-    @BindView(R.id.ll_settings)
+    @BindView(R.id.ll_settings_u)
     PercentLinearLayout llSettings;
-    @BindView(R.id.iv_mode)
+    @BindView(R.id.iv_mode_u)
     ImageView ivMode;
-    @BindView(R.id.tv_mode)
+    @BindView(R.id.tv_mode_u)
     TextView tvMode;
-    @BindView(R.id.ll_mode)
+    @BindView(R.id.ll_mode_u)
     LinearLayout llMode;
-    @BindView(R.id.iv_silence)
+    @BindView(R.id.iv_silence_u)
     ImageView ivSilence;
-    @BindView(R.id.rl_wave)
+    @BindView(R.id.rl_wave_u)
     RelativeLayout rlWave;
-    @BindView(R.id.tv_scan)
+    @BindView(R.id.tv_scan_u)
     TextView tvScan;
-    @BindView(R.id.ccv_first)
+    @BindView(R.id.ccv_first_u)
     CustomCircleView ccvFirst;
-    @BindView(R.id.ccv_second)
+    @BindView(R.id.ccv_second_u)
     CustomCircleView ccvSecond;
-    @BindView(R.id.iv_scan)
+    @BindView(R.id.iv_scan_u)
     ImageView ivScan;
-    @BindView(R.id.tv_last_delay)
+    @BindView(R.id.tv_last_delay_u)
     TextView tvLastDelay;
-    @BindView(R.id.tv_current_delay)
+    @BindView(R.id.tv_current_delay_u)
     TextView tvCurrentDelay;
-    @BindView(R.id.tv_min_delay_value)
+    @BindView(R.id.tv_min_delay_value_u)
     TextView tvMinDelayValue;
-    @BindView(R.id.ll_min_delay)
+    @BindView(R.id.ll_min_delay_u)
     LinearLayout llMinDelay;
 
     public static UserMainActivity instance;
@@ -688,25 +688,25 @@ public class UserMainActivity extends BaseActivity {
 
     }
 
-    @OnClick({R.id.ll_voice, R.id.ll_filter, R.id.ll_assist, R.id.ll_settings, R.id.ll_mode})
+    @OnClick({R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u})
     public void onViewClicked(View view) {
         Intent intent = new Intent();
         switch (view.getId()) {
-            case R.id.ll_voice:
+            case R.id.ll_voice_u:
                 clickSilence();
                 break;
-            case R.id.ll_filter:
+            case R.id.ll_filter_u:
                 clickFilter();
                 break;
-            case R.id.ll_assist:
+            case R.id.ll_assist_u:
                 intent.setClass(UserMainActivity.this, AssistListActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.ll_settings:
+            case R.id.ll_settings_u:
                 intent.setClass(UserMainActivity.this, SettingActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.ll_mode:
+            case R.id.ll_mode_u:
                 PrefUtils.setString(UserMainActivity.this, AppConfig.CURRENT_MODE, "expert");
                 PrefUtils.setString(UserMainActivity.this, AppConfig.CLICK_MODE, "clicked");   //GC20181116
                 intent.setAction("restartapp");

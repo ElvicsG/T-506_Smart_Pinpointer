@@ -179,5 +179,6 @@
     <string name="no_net">无网络</string>
     <string name="follow_sys">跟随系统</string>
     <string name="demo_notice">已进入演示模式!</string>
+    <string name="triggered">磁场触发</string>
 
 </resources>

@@ -61,7 +61,7 @@ public class CustomDialog extends Dialog {
         hintTv = (TextView) findViewById(R.id.tv_notice_text);
         doubleLeftBtn = (Button) findViewById(R.id.btn_confirm);
         doubleRightBtn = (Button) findViewById(R.id.btn_cancel);
-        llFilter = (LinearLayout) findViewById(R.id.ll_filter);
+        llFilter = (LinearLayout) findViewById(R.id.ll_filter_u);
         rgFilter1 = (RadioGroup) findViewById(R.id.rg_filter1);
         rgFilter2 = (RadioGroup) findViewById(R.id.rg_filter2);
         rbDiTong = (RadioButton) findViewById(R.id.rb_di);

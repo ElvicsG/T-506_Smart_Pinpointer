@@ -7,9 +7,11 @@ package com.kehui.www.testapp.event;
 public class AcousticMagneticDelay2 {
     public double delayValue;
     public boolean isRelated;
-    public AcousticMagneticDelay2(double delayValue,boolean isRelated) {
+    public int position;    //GC20190218 虚光标位置传递
+    public AcousticMagneticDelay2(double delayValue,boolean isRelated,int position) {
         this.delayValue = delayValue;
         this.isRelated = isRelated;
+        this.position = position;
     }
 
 }

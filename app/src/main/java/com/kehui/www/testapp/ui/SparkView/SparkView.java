@@ -24,6 +24,7 @@ import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
@@ -73,6 +74,8 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
 
     private final Path baseLinePath = new Path();
     private final Path scrubLinePath = new Path();
+//    private final Path scrubLinePath2 = new Path();
+    //虚线
     private final Path scrubLinePath2 = new Path();
 
     // adapter
@@ -98,6 +101,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
     private float scX;
     private int scY;
     public int startPoint;
+    private boolean startMove;  //GC20190216
 
 
     public SparkView(Context context) {
@@ -124,6 +128,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        startMove=false;    //GC20190216
         TypedArray a = context.obtainStyledAttributes(attrs, com.robinhood.spark.R.styleable
                         .spark_SparkView,
                 defStyleAttr, defStyleRes);
@@ -163,10 +168,13 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
 
         scrubLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         scrubLinePaint.setStyle(Paint.Style.STROKE);
+        scrubLinePaint.setAntiAlias(true);  //GC20190216
         scrubLinePaint.setStrokeWidth(scrubLineWidth);
 //        scrubLinePaint.setColor(scrubLineColor);
         scrubLinePaint.setColor(Color.RED);
-        scrubLinePaint.setStrokeCap(Paint.Cap.ROUND);
+//        scrubLinePaint.setStrokeCap(Paint.Cap.ROUND);
+        scrubLinePaint.setStrokeCap(Paint.Cap.SQUARE);  //GC20190216
+        scrubLinePaint.setPathEffect(new DashPathEffect(new float[]{6,20},0));
 
         scrubLinePaint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
         scrubLinePaint2.setStyle(Paint.Style.STROKE);
@@ -360,6 +368,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
 
     //红色光标定位
     public void setScrubLine3(int position) {
+        startMove = true; //GC20190216
         scrubLinePath.reset();
         scrubLinePath.moveTo(xPoints.get(position), getPaddingTop());
         scrubLinePath.lineTo(xPoints.get(position), getHeight() - getPaddingBottom());
@@ -390,6 +399,13 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         canvas.drawPath(renderPath2, baseLinePaint);
         canvas.drawPath(scrubLinePath2, scrubLinePaint2);
         canvas.drawPath(scrubLinePath, scrubLinePaint);
+
+        //GC20190216 判断紫光标的绘制情况
+        if(scrubEnabled)
+            setScrubLine2(50);
+        //setScrubLine3(70);
+        if(!startMove&&scrubEnabled)
+            setScrubLine(283);
 
         setScrubLine2(50);
         drawTria(canvas, xPoints.get(startPoint), getHeight() - getPaddingBottom(), xPoints.get(startPoint), getPaddingTop(), 30, 10);
@@ -841,6 +857,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
 
     @Override
     public void onScrubbed(float x, float y) {
+        startMove = true; //GC20190216
         scX = x;
         if (adapter == null || adapter.getCount() == 0) return;
         if (scrubListener != null) {
@@ -894,4 +911,3 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         }
     };
 }
-

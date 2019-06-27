@@ -22,7 +22,18 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main2"/>
+    <LinearLayout android:id="@+id/mainUI" android:visibility="visible"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content">
+        <include layout="@layout/content_main2"/>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/userUI" android:visibility="invisible"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content">
+
+        <include layout="@layout/content_user_main" />
+    </LinearLayout>
+
 
 
 </android.support.design.widget.CoordinatorLayout>

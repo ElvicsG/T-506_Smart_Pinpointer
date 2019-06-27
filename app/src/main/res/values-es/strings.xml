@@ -188,5 +188,6 @@
     <string name="no_net">No network</string>
     <string name="follow_sys">Auto</string>
     <string name="demo_notice">Eingegebenen Demo-Modus!</string>
+    <string name="triggered">Activado</string>
 
 </resources>
