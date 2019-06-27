@@ -66,9 +66,8 @@ public class BaseActivity extends AppCompatActivity {
     BluetoothSocket _socket = null; // 蓝牙通信socket
     private BluetoothAdapter _bluetooth = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备
     private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // SPP服务UUID号
-    //是否尝试连接
+    //GN20190407 是否尝试连接
     public boolean isFlag;
-
 
     /*声音播放*/
     public AudioManager audioManager;
@@ -143,6 +142,7 @@ public class BaseActivity extends AppCompatActivity {
     public int WHAT_LIGHT = 1;             //GN“同步指示” 灯变红
     public int CICHANG_CHANGE_OVER = 2;    //GN“同步指示” 灯变灰
     public int WHAT_REFRESH = 3;   //子线程通知主线程刷新UI的what
+    public int LINK_LOST = 11;      //GN20190407
     public int SEND_SUCCESS = 100;     //GN平板命令下发成功
     public int SEND_ERROR = 200;       //GN平板命令下发失败
     public int BLUETOOTH_DISCONNECTED = 300;   //GN蓝牙设备未连接
@@ -256,7 +256,10 @@ public class BaseActivity extends AppCompatActivity {
             String s = baos.toString();         //Log.e("FILE", s);
             String[] split = s.split("\\s+");   //Log.e("FILE","splitSize:"+split.length);
             for (int i = 0; i < split.length; i++) {
-                readFeature[i] = Double.parseDouble(split[i]);    // Log.e("FILE","crcTable[i]:"+mCrcTable[i]);
+                try {
+                    readFeature[i] = Double.parseDouble(split[i]);    // Log.e("FILE","crcTable[i]:"+mCrcTable[i]);
+                } catch (Exception l_ex) {
+                }
             }
             //GC20180504 注意读取文本文件的编码格式为ANSI  Log.e("FILE",""+readFeature);
         } catch (IOException e) {
@@ -379,8 +382,20 @@ public class BaseActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         if (!getBDataThread) {
+
+            //重连后下发参数
+            if(Constant.CurrentVoiceParam!=null)
+                sendString(Constant.CurrentVoiceParam);
+            if(Constant.CurrentFilterParam!=null)
+                sendString(Constant.CurrentFilterParam);
+            if(Constant.CurrentMagParam!=null)
+                sendString(Constant.CurrentMagParam);
+
+            //当前连接状态为连接
+            Constant.BluetoothState = true;
             new Thread(getBluetoothData).start();  //GN 启动获取蓝牙数据的线程
             getBDataThread = true;
+
         }
 
     }
@@ -413,12 +428,17 @@ public class BaseActivity extends AppCompatActivity {
                         //GC20171129 在没有处理蓝牙数据时缓存数个输入流用做后续蓝牙数据处理
                         if (mTempcount >= 5 && !handleBDataThread) {
                             if (sendCommand){
+                                //超过590滤除   //GC2.01.006 蓝牙重连功能优化
+                                if (mTempLength > 590) {
+                                    mTempLength = 590;
+                                }
                                 for (int i = 0; i < mTempLength; i++) {
                                     mTemp2[i] = mTemp[i];
                                 }
                                 mTempLength2 = mTempLength;
                                 //Log.e("stream", "lenSum:" + mTempLength2);  //GT20180321 要处理的蓝牙数据的长度
                                 handleBDataThread = true;
+
                             } else {
                                 sendCichangInitData();
                                 mHandle.postDelayed(new Runnable() {
@@ -445,14 +465,45 @@ public class BaseActivity extends AppCompatActivity {
                     }
                     mInputStream = null;
 
-                    //启动重连  //GC2.01.005 蓝牙重连
+                    //当前连接状态为断开 //GC2.01.006 蓝牙重连功能优化
+                    Constant.BluetoothState = false;
+                    //重置变量
+                    mTemp = null;
+                    mTemp = new int[1024000];
+                    mTemp2 = null;
+                    mTemp2 = new int[1024000];
+                    mTempLength2 = 0;
+                    mTempLength = 0;
+                    mTempcount = 0;
+                    hasLeftLen = 0;
+                    mTempLeft = null;
+                    mTempLeft = new int[59];
+                    handleBDataThread = false;
+                    hasLeft = false;
+
+
+                    //GN20190407 启动重连
                     isFlag = false;
-                    mHandleReconnect.sendEmptyMessage(0);
+                    Message message = new Message();
+                    message.what = LINK_LOST;
+                    mHandle.sendMessage(message);
+//                    mHandleReconnect.sendEmptyMessage(0);
+                    //启动重连线程，是否需要单独线程控制，需要观察
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while (!isFlag) {
+                                //Log.e("蓝牙测试", "connectThread线程，尝试连接");
+                                reconnect();
+                            }
+                        }
+                    }).start();
+                    return;
                 }
             }
         }
     };
-    //蓝牙重连handler
+    //蓝牙重连handler //GN去掉
     public Handler mHandleReconnect = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -1189,7 +1240,6 @@ public class BaseActivity extends AppCompatActivity {
             if(svmPredictCount > 0){    //GN 从连续判断为是的第二组开始做相关
                 related();
                 if(p > 0.9){        //GC20181201
-                    //GC20181204
                     autoLocate();
                     userDelay = timeDelay;  //GN 只传递相关通过后的声磁延时值
                     EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,true,position));    //GC20190218 虚光标位置传递
@@ -1213,7 +1263,7 @@ public class BaseActivity extends AppCompatActivity {
     private void autoLocate() {
         //GC20181204
         for (int i = 0; i < 800; i++) {
-            mSVMLocate[i] = ( mSVMLocate[i] + mSVMLocate2[i] ) / 2;     //GC20181204
+            mSVMLocate[i] = ( mSVMLocate[i] + mSVMLocate2[i] ) / 2;
         }
         //求均值
         double ave = 0;
@@ -1448,6 +1498,7 @@ public class BaseActivity extends AppCompatActivity {
         request[4] = (byte) integer2.intValue();
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
+        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
         sendString(request);
 
     }
@@ -1485,6 +1536,7 @@ public class BaseActivity extends AppCompatActivity {
         request[4] = (byte) integer2.intValue();
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
+        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
         sendString(request);
 
     }
@@ -1522,6 +1574,7 @@ public class BaseActivity extends AppCompatActivity {
         request[4] = (byte) integer2.intValue();
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
+        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
         sendString(request);
 
     }
@@ -1559,6 +1612,7 @@ public class BaseActivity extends AppCompatActivity {
         request[4] = (byte) integer2.intValue();
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
+        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
         sendString(request);
 
     }
@@ -1634,5 +1688,9 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190218 专家界面延时值显示和相关结果一致起来（通过相关后计时自动定位数值不一致也不刷新延时值）
 //GC20190307 词条跳动效果
 
-//GC2.01.005 蓝牙重连
+//GN20190407 硬件关闭重连功能添加
+//GN20190408 故障提示音功能添加
+
+//GN去掉
 //GC2.01.005 界面无缝切换
+//GC2.01.006 蓝牙重连功能优化

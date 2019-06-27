@@ -246,6 +246,12 @@ public class InitiateAssistanceActivity extends BaseActivity {
                 if (i == 34) {
                     handler.sendEmptyMessage(0);
                 }
+                //GC2.01.006 蓝牙重连功能优化
+                if (Constant.BluetoothState == false) {
+                    handler.sendEmptyMessage(2);
+                    return;
+                }
+
             }
 
 
@@ -271,6 +277,15 @@ public class InitiateAssistanceActivity extends BaseActivity {
                 }
                 pbDataCollection.setProgress(counter);
                 tvDataCollectionProgress.setText(counter + "%");
+            }else if (msg.what == 2) {  //GC2.01.006 蓝牙重连功能优化
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Utils.showToast(InitiateAssistanceActivity.this,getResources().getString(R.string
+                        .Link_Lost_Reconnect));
+                finish();
             }
             super.handleMessage(msg);
         }

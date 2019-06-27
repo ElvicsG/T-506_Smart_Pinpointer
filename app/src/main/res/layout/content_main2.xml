@@ -540,9 +540,9 @@
                     android:id="@+id/tv_yan_shi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0ms"
+                    android:text="2.5ms"
                     android:textColor="@color/blue3"
-                    android:textSize="@dimen/activity_vertical_margin" />
+                    android:textSize="@dimen/activity_vertical_margin"/>
             </LinearLayout>
         </RelativeLayout>
 

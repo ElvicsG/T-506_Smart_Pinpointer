@@ -180,5 +180,6 @@
     <string name="follow_sys">跟随系统</string>
     <string name="demo_notice">已进入演示模式!</string>
     <string name="triggered">磁场触发</string>
+    <string name="Link_Lost_Reconnect">T-506已断开，请检查主机状态！</string>
 
 </resources>

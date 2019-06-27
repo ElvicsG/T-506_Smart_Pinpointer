@@ -183,5 +183,6 @@
     <string name="follow_sys">Auto</string>
     <string name="demo_notice">Eingegebenen Demo-Modus!</string>
     <string name="triggered">Triggered</string>
+    <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrumnet!</string>
 
 </resources>

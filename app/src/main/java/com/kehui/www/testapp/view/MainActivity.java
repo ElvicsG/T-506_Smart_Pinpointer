@@ -194,6 +194,8 @@ public class MainActivity extends BaseActivity {
     private int lastPosition = 50;  //GC20190218
     private int positionState = -1;  //故障点状态远离还是接近
     private int isRelatedCount = 0; //GC20181119 相关次数计数
+    private byte[] alarmByte;
+    private int alarmLen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,9 +211,29 @@ public class MainActivity extends BaseActivity {
         getShengyinData();  //初始化声音数据
         getCichangData();   //初始化磁场数据
         setChartListenner();
+        /*readAlarm();    //GN20190408 读取发现故障提示音*/
 //        showProgressDialog();
 
     }
+
+    //GN20190408 读取发现故障提示音
+    private void readAlarm() {
+
+        InputStream in = null;
+        try {
+            in = getResources().getAssets().open("8407.wav");
+            //获取文件的字节数
+            alarmLen = in.available();
+            //创建byte数组
+            alarmByte = new byte[alarmLen];
+            //将文件中的数据读到byte数组中
+            in.read(alarmByte);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     //初始化试图
     private void initView() {
         seekbarCichang.setMax(100);
@@ -294,6 +316,7 @@ public class MainActivity extends BaseActivity {
                 request[4] = (byte) integer2.intValue();
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
+                Constant.CurrentMagParam = request; //GC2.01.006 蓝牙重连功能优化
                 sendString(request);
 
             }
@@ -347,12 +370,14 @@ public class MainActivity extends BaseActivity {
                 request[4] = (byte) integer2.intValue();
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
+                Constant.CurrentVoiceParam = request;   //GC2.01.006 蓝牙重连功能优化
                 sendString(request);
 
             }
         });
 
     }
+
     //设置seekBar的回掉S
     private void setSeekBar() {
         //磁场seekbar数值改变执行的回掉方法
@@ -406,6 +431,7 @@ public class MainActivity extends BaseActivity {
                 request[4] = (byte) integer2.intValue();
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
+                Constant.CurrentMagParam = request; //GC2.01.006 蓝牙重连功能优化
                 sendString(request);
             }
 
@@ -459,6 +485,7 @@ public class MainActivity extends BaseActivity {
                 request[4] = (byte) integer2.intValue();
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
+                Constant.CurrentVoiceParam = request;   //GC2.01.006 蓝牙重连功能优化
                 sendString(request);
 
             }
@@ -466,6 +493,7 @@ public class MainActivity extends BaseActivity {
         });
 
     }
+
     //获得初始化磁场数据
     private void getCichangData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "cichang.txt");
@@ -509,6 +537,7 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
     //获得初始化声音数据
     private void getShengyinData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" +
@@ -562,6 +591,7 @@ public class MainActivity extends BaseActivity {
 
 
     }
+
     //监听声音光标位置
     private void setChartListenner() {
         linechartShengyin.setScrubListener(new SparkView.OnScrubListener() {
@@ -604,6 +634,7 @@ public class MainActivity extends BaseActivity {
             }
         }, 500);
     }
+
     //GN 接收控制命令
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(HandleReceiveDataEvent event) {
@@ -615,6 +646,7 @@ public class MainActivity extends BaseActivity {
             shengyinSeekbarInts[1] = shengyinSeekbarInts[0];
         }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(UINoticeEvent event) {
         if (event.status == SEND_SUCCESS) {
@@ -687,6 +719,7 @@ public class MainActivity extends BaseActivity {
             tvNotice.setText("");   //GC20190307 词条跳动效果
             tvNoticeU.setText("");
             tvPosition.setText("");
+            //GN20190408 播放提示音 mAudioTrack.write(alarmByte,0,alarmByte.length);
         }
         if (event.status == CICHANG_CHANGE_OVER) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
@@ -704,8 +737,18 @@ public class MainActivity extends BaseActivity {
             handleGainView(maxShengYin, ivVoiceGainU, 1);    //GC20181113 上下语句顺序调整，否则影响进度条回落功能
             handleGainView(maxCiChang, ivMagneticFieldGainU, 0);
         }
+        //GN20190407
+        if (event.status == LINK_LOST) {
+            Utils.showToast(this, getResources().getString(R.string
+                    .Link_Lost_Reconnect));
+            tvNoticeU.setText(getResources().getString(R.string
+                    .Link_Lost_Reconnect));
+            tvNotice.setText(getResources().getString(R.string
+                    .Link_Lost_Reconnect));
+        }
 
     }
+
     //GN 控制增益进度条
     private void handleGainView(int maxValue, ImageView imageView, final int type) {
         double a = maxValue / 2048.00;  //GC20181113 最大值重新计算
@@ -768,6 +811,7 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
     public void changeMagneticFieldGainView(ImageView imageView, int position) {
         switch (position) {
             case 0:
@@ -806,6 +850,7 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
     public void changeVoiceGainView(ImageView imageView, int position) {
         switch (position) {
             case 0:
@@ -844,6 +889,7 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
     public Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -856,6 +902,7 @@ public class MainActivity extends BaseActivity {
             return false;
         }
     });
+
     //GC20190123 智能算法识别声音的结果
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(OperationGuideEvent event) {
@@ -914,6 +961,7 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
     //GC20181119 信息框提示2
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(AcousticMagneticDelay2 event) {
@@ -921,6 +969,7 @@ public class MainActivity extends BaseActivity {
             //GC20190123 相关为是的状态，判断“已发现故障”，显示动画2
             tvNotice.setText(getString(R.string.message_notice_7));
             tvNoticeU.setText(getString(R.string.message_notice_7));    //GC201901232
+            //GN20190408 播放提示音 mAudioTrack.write(alarmByte,0,alarmByte.length);
             //GN 去动画1
             rlWaveU.removeView(v);               //GN 波纹
             tvScanU.setVisibility(View.GONE);    //GN 正在测试中
@@ -1191,6 +1240,7 @@ public class MainActivity extends BaseActivity {
         }*/
 
     }
+
     //自动计算声音信号的光标位置和声磁延时值（仪器触发，发现是故障声音时）
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(AcousticMagneticDelayEvent event) {
@@ -1323,12 +1373,14 @@ public class MainActivity extends BaseActivity {
         startActivity(intent);
 
     }
+
     //点击设置
     public void clickSetting() {
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
         startActivity(intent);
 
     }
+
     //点击用户模式
     public void clickMode() {
 //        Intent intent = new Intent();
@@ -1359,7 +1411,12 @@ public class MainActivity extends BaseActivity {
             isExit = true;
             mAudioTrack.release();// 关闭并释放资源
             finish();
+            /**
+             * 按键返回bug  //GC2.01.006 蓝牙重连功能优化
+             */
+            System.exit(0);
             MyApplication.getInstances().get_bluetooth().disable();
+            return true;
 
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             mHandle.postDelayed(new Runnable() {
@@ -1398,6 +1455,7 @@ public class MainActivity extends BaseActivity {
         return false;
 
     }
+
     public void checkVoice() {
         int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         if (streamVolume <= 0) {
@@ -1409,10 +1467,12 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
     @Override
     protected void onStop() {
         super.onStop();
     }
+
     //显示等待的弹窗
     public void showProgressDialog() {
         if (dialog != null) {
@@ -1421,6 +1481,7 @@ public class MainActivity extends BaseActivity {
         dialog = ShowProgressDialog.createLoadingDialog(MainActivity.this);
         dialog.show();
     }
+
     @Override
     protected void onDestroy() {
         try {
