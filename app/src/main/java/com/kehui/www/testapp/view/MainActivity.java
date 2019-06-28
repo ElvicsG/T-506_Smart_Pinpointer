@@ -193,6 +193,7 @@ public class MainActivity extends BaseActivity {
     private CustomDialog customDialog;
     private Dialog dialog;
     private double lastDelayValue = -1;         //上次的声磁延时值
+    private double currentDelayValue = 0;      //当前的声磁延时值   //GC20190625
     private int lastPosition = 50;  //GC20190218
     private int positionState = -1;  //故障点状态远离还是接近
     private int isRelatedCount = 0; //GC20181119 相关次数计数
@@ -981,7 +982,13 @@ public class MainActivity extends BaseActivity {
             //GC20190422 播放提示音
             soundSystem.play(soundSystem.SONAR);
 
-            //GN 去动画1
+
+
+            //GC20190625
+            currentDelayValue = event.delayValue;
+            drawCircle();
+
+            /*//GN 去动画1
             rlWaveU.removeView(v);               //GN 波纹
             tvScanU.setVisibility(View.GONE);    //GN 正在测试中
             ivScanU.setVisibility(View.GONE);    //GN ...
@@ -1005,7 +1012,7 @@ public class MainActivity extends BaseActivity {
                     }
                 });
             }
-            valueAnimator2.start();
+            valueAnimator2.start();*/   //GC20190625
             //GC20190123 延时值显示
             if (isRelatedCount == 0) {   //GN 第一次相关
                 //GN 显示上次延时值
@@ -1250,6 +1257,68 @@ public class MainActivity extends BaseActivity {
 
         }*/
 
+    }
+
+    //GC20190625
+    public void drawCircle() {
+        //GN 去动画1
+        rlWaveU.removeView(v);               //GN 波纹
+        tvScanU.setVisibility(View.GONE);    //GN 正在测试中
+        ivScanU.setVisibility(View.GONE);    //GN ...
+        //GN 显示动画2
+        if ( (currentDelayValue > 0) && (currentDelayValue <= 1) ){
+            ccvFirstU.updateView("#555555", 8, 5);
+            ccvSecondU.updateView("#e1de04", 8, 5);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 2) ){
+            ccvFirstU.updateView("#555555", 8, 19);
+            ccvSecondU.updateView("#e1de04", 8, 19);
+        }else if ( (currentDelayValue > 2) && (currentDelayValue <= 3) ){
+            ccvFirstU.updateView("#555555", 8, 33);
+            ccvSecondU.updateView("#e1de04", 8, 33);
+        }else if ( (currentDelayValue > 3) && (currentDelayValue <= 4) ){
+            ccvFirstU.updateView("#555555", 8, 47);
+            ccvSecondU.updateView("#e1de04", 8, 47);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 5) ){
+            ccvFirstU.updateView("#555555", 8, 61);
+            ccvSecondU.updateView("#e1de04", 8, 61);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 6) ){
+            ccvFirstU.updateView("#555555", 8, 75);
+            ccvSecondU.updateView("#e1de04", 8, 75);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 7) ){
+            ccvFirstU.updateView("#555555", 8, 89);
+            ccvSecondU.updateView("#e1de04", 8, 89);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 8) ){
+            ccvFirstU.updateView("#555555", 8, 103);
+            ccvSecondU.updateView("#e1de04", 8, 103);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 9) ){
+            ccvFirstU.updateView("#555555", 8, 117);
+            ccvSecondU.updateView("#e1de04", 8, 117);
+        }else if ( (currentDelayValue > 1) && (currentDelayValue <= 10) ){
+            ccvFirstU.updateView("#555555", 8, 131);
+            ccvSecondU.updateView("#e1de04", 8, 131);
+        }else if (currentDelayValue > 10){
+            ccvFirstU.updateView("#555555", 8, 145);
+            ccvSecondU.updateView("#e1de04", 8, 145);
+        }
+
+        if (valueAnimator2 == null) {
+            valueAnimator2 = ValueAnimator.ofInt(0, 2).setDuration(1000);
+            valueAnimator2.setRepeatCount(ValueAnimator.INFINITE);
+            valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    int i = (int) animation.getAnimatedValue();
+                    if (i == 0) {
+                        ccvSecondU.setVisibility(View.VISIBLE);
+                        ccvFirstU.setVisibility(View.GONE);
+                    } else if (i == 1) {
+                        ccvSecondU.setVisibility(View.GONE);
+                        ccvFirstU.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        }
+        valueAnimator2.start();
     }
 
     //自动计算声音信号的光标位置和声磁延时值（仪器触发，发现是故障声音时）

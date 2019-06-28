@@ -368,7 +368,7 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //获取蓝牙数据
+    //取蓝牙数据
     private void startThread() {
         try {
             mSocket = MyApplication.getInstances().get_socket();    //GN 进入演示模式后打开仪器依旧可以正常连接
@@ -1697,9 +1697,10 @@ public class BaseActivity extends AppCompatActivity {
 //GN20190407 硬件关闭重连功能添加
 //GC20190422 "发现故障"提示音添加
 //GC20190613 重连主提示框提示
+//GC20190625 用户界面发现故障UI提示更改 （去掉上次延时值，显示刻度圆圈大小）
 //GC20190627 触发灯闪烁bug原因
 
 //GN去掉
 //GC2.01.005 界面无缝切换
 //GC2.01.006 蓝牙重连功能优化
-//GC2.01.007 蓝牙重连提示优化
+//GC2.01.007 提示音改进和蓝牙重连提示优化
