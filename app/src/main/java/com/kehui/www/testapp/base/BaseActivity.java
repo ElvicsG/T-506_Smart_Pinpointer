@@ -143,6 +143,7 @@ public class BaseActivity extends AppCompatActivity {
     public int CICHANG_CHANGE_OVER = 2;    //GN“同步指示” 灯变灰
     public int WHAT_REFRESH = 3;   //子线程通知主线程刷新UI的what
     public int LINK_LOST = 11;      //GN20190407
+    public int LINK_RECONNECT = 22;     //GC20190613
     public int SEND_SUCCESS = 100;     //GN平板命令下发成功
     public int SEND_ERROR = 200;       //GN平板命令下发失败
     public int BLUETOOTH_DISCONNECTED = 300;   //GN蓝牙设备未连接
@@ -356,14 +357,18 @@ public class BaseActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StartReadThreadEvent event) {
+        //GC20190613
+        Message message = new Message();
+        message.what = LINK_RECONNECT;
+        mHandle.sendMessage(message);
         Toast.makeText(this, getResources().getString(R.string.connect) + " " + event.device + " " + getResources().getString(R.string.success),
                 Toast.LENGTH_SHORT).show();
         getBDataThread = false;
-        startThread();          //GN 获取蓝牙数据
+        startThread();
 
     }
 
-    //GN 获取蓝牙数据
+    //获取蓝牙数据
     private void startThread() {
         try {
             mSocket = MyApplication.getInstances().get_socket();    //GN 进入演示模式后打开仪器依旧可以正常连接
@@ -431,7 +436,7 @@ public class BaseActivity extends AppCompatActivity {
                                 /*//超过590滤除   //GC2.01.006 蓝牙重连功能优化
                                 if (mTempLength > 590) {
                                     mTempLength = 590;
-                                }*/     //GC20190625 触发灯闪烁bug原因
+                                }*/     //GC20190627 触发灯闪烁bug原因
                                 for (int i = 0; i < mTempLength; i++) {
                                     mTemp2[i] = mTemp[i];
                                 }
@@ -539,17 +544,19 @@ public class BaseActivity extends AppCompatActivity {
         } catch (IOException e) {
 
         }
-        // 连接socket
+        //连接socket
         try {
-            _socket.connect();
-            isFlag = true;
-            EventBus.getDefault().post(new StartReadThreadEvent(_device.getName()));
+            if (_socket != null) {  //GC2.01.007
+                _socket.connect();
+                isFlag = true;
+                EventBus.getDefault().post(new StartReadThreadEvent(_device.getName()));
+            }
 
         } catch (IOException e) {
             try {
                 _socket.close();
                 _socket = null;
-                Log.e("蓝牙测试", "connectThread线程，走到异常");
+                //Log.e("蓝牙测试", "connectThread线程，走到异常");
                 Thread.sleep(10000);
             } catch (Exception ee) {
             }
@@ -1307,7 +1314,7 @@ public class BaseActivity extends AppCompatActivity {
         if (n > 0) {
             position = n - 50;
             timeDelay = (position - 50) * 0.125;
-            EventBus.getDefault().post(new AcousticMagneticDelayEvent(position, timeDelay));    //GC20181106
+            //GC20190218 EventBus.getDefault().post(new AcousticMagneticDelayEvent(position, timeDelay));    //GC20181106
         }
 
     }
@@ -1686,11 +1693,13 @@ public class BaseActivity extends AppCompatActivity {
 //GC201901232 用户模式提示框文字添加
 //GC20190216 红色虚光标绘制情况修改
 //GC20190218 专家界面延时值显示和相关结果一致起来（通过相关后计时自动定位数值不一致也不刷新延时值）
-//GC20190307 词条跳动效果
-
+//GC20190307 词条和延时跳动效果
 //GN20190407 硬件关闭重连功能添加
 //GC20190422 "发现故障"提示音添加
+//GC20190613 重连主提示框提示
+//GC20190627 触发灯闪烁bug原因
 
 //GN去掉
 //GC2.01.005 界面无缝切换
 //GC2.01.006 蓝牙重连功能优化
+//GC2.01.007 蓝牙重连提示优化

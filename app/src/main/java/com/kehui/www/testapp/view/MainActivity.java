@@ -719,10 +719,10 @@ public class MainActivity extends BaseActivity {
 
         if (event.status == WHAT_LIGHT) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_red);
-            tvNotice.setText("");   //GC20190307 词条跳动效果
+            tvNotice.setText("");   //GC20190307 词条和延时跳动效果
             tvNoticeU.setText("");
             tvPosition.setText("");
-            //GN20190408 播放提示音 mAudioTrack.write(alarmByte,0,alarmByte.length);
+
         }
         if (event.status == CICHANG_CHANGE_OVER) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
@@ -748,6 +748,11 @@ public class MainActivity extends BaseActivity {
                     .Link_Lost_Reconnect));
             tvNotice.setText(getResources().getString(R.string
                     .Link_Lost_Reconnect));
+        }
+        //GC20190613
+        if (event.status == LINK_RECONNECT) {
+            tvNotice.setText(getString(R.string.message_notice_5));
+            tvNoticeU.setText(getString(R.string.message_notice_5));
         }
 
     }
@@ -1255,7 +1260,7 @@ public class MainActivity extends BaseActivity {
         tvYanShi.setText((event.delayValue) + "ms");
     }
 
-    @OnClick({R.id.ll_silence, R.id.ll_pause, R.id.ll_memory, R.id.ll_compare, R.id.ll_filter, R.id.ll_assist, R.id.ll_settings, R.id.ll_mode,R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u})
+    @OnClick({R.id.ll_silence, R.id.ll_pause, R.id.ll_memory, R.id.ll_compare, R.id.ll_filter, R.id.ll_assist, R.id.ll_settings, R.id.ll_mode, R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u})
     public void onViewClicked(View view) {
         Intent intent = new Intent();
         switch (view.getId()) {
