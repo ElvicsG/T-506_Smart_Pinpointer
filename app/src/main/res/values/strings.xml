@@ -21,7 +21,7 @@
     <string name="Connection_failed">连接失败!</string>
     <string name="Device_address">设备地址</string>
     <string name="Automatic_connection_please_wait">自动连接中，请稍等......</string>
-    <string name="Find_the_device">查找设备中...</string>
+    <string name="Find_the_device">查找设备中…</string>
     <string name="Select_the_device_to_connect_to">选择要连接的设备</string>
     <string name="No_new_equipment_found">没有找到新设备</string>
     <string name="Find_a_Bluetooth_device">查找蓝牙设备</string>
@@ -31,10 +31,9 @@
     <string name="company_website">公司网址：www.kehui.cn</string>
     <string name="confirm">确认</string>
     <string name="find_device">查找设备</string>
-    <string name="cancle">取消</string>
     <string name="left">左</string>
     <string name="right">右</string>
-    <string name="tishi">提示</string>
+    <string name="note">提示</string>
     <string name="Bluetooth_disconnected_please_reconnect">蓝牙断开,请重新连接</string>
     <string name="Exit_application">退出应用</string>
     <string name="The_sending_data_failed_and_was_being_resent">发送数据失败，正在重新发送</string>
@@ -85,7 +84,7 @@
     <string name="cancel">取消</string>
     <string name="company">山东科汇电力自动化股份有限公司</string>
     <string name="company_address">地址 : 山东省淄博市张店区三赢路16号山东科汇科技园</string>
-    <string name="company_phone">电话 : 0533-3179631</string>
+    <string name="company_phone">电话 : 0533–3179631</string>
     <string name="zh">中文</string>
     <string name="en">English</string>
     <string name="de">Deutsch</string>
@@ -96,7 +95,7 @@
     <string name="test_name_is_empty">测试人名称不能为空!</string>
     <string name="test_position_is_empty">测试地点不能为空!</string>
     <string name="test_data_time_no_finish">请等待35秒数据录取完成后再提交!</string>
-    <string name="loading_more">拼命加载中...</string>
+    <string name="loading_more">拼命加载中…</string>
     <string name="no_load_more">已经到底啦!</string>
     <string name="reported">已上报</string>
     <string name="no_report">未上报</string>
@@ -129,9 +128,9 @@
     <string name="latest_version">已是最新版本!</string>
     <string name="download_success">下载成功!</string>
     <string name="download_failure">下载失败，请检查权限是否开启!</string>
-    <string name="checking_update">正在检测更新...</string>
+    <string name="checking_update">正在检测更新…</string>
     <string name="this_update">本次更新共</string>
-    <string name="wait_downloading">M\n下载中,请稍等...</string>
+    <string name="wait_downloading">M\n下载中,请稍等…</string>
     <string name="gain">增益</string>
     <string name="over_20_notice">离线存储协助数据不能超过20条，请有网络时即时上传未上传的协助数据!</string>
     <string name="no_report_data">无未上报数据！</string>
@@ -141,25 +140,9 @@
     <string name="no_paired_device_find_device">未有配对设备,请查找设备!</string>
     <string name="please_find_device">请查找设备!</string>
     <string name="min_delay">最小延迟</string>
-
     <string name="pinpointer_position">探头位置</string>
-    <!--<string name="searching">正在搜索</string>-->
-    <!--&lt;!&ndash; 搜索故障放电声音词条 &ndash;&gt;-->
-    <!--&lt;!&ndash; 搜索故障放电声音，但之前曾经发现过故障放电声 &ndash;&gt;-->
-    <!--<string name="Search_for_fault_discharge_sound">寻找声音信号</string>-->
-    <!--&lt;!&ndash; 第一次发现故障声音 &ndash;&gt;-->
-    <!--<string name="the_first_found_acoustic_signal">发现声音信号,向前移动</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，前后两次声磁延时相同 &ndash;&gt;-->
-    <!--<string name="the_second_found_fault_distance_same">故障的距离保持不变</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小且为历史最小值 &ndash;&gt;-->
-    <!--<string name="the_second_fault_smallest">到目前为止最接近故障。前进</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小但大于历史最小值 &ndash;&gt;-->
-    <!--<string name="closest_fault_move">靠近故障，继续前进</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时大 &ndash;&gt;-->
-    <!--<string name="away_from_fault">远离故障，掉头</string>-->
-    <string name="connecting_waite">正在连接,请稍后...</string>
+    <string name="connecting_waite">正在连接,请稍后…</string>
     <string name="please_choose">请选择</string>
-
     <string name="fault_type_1">低阻</string>
     <string name="fault_type_2">高阻</string>
     <string name="fault_type_3">闪络</string>
@@ -181,5 +164,15 @@
     <string name="follow_sys">跟随系统</string>
     <string name="demo_notice">已进入演示模式!</string>
     <string name="triggered">磁场触发</string>
+    <string name="ok">确定</string>
+    <string name="action_settings">设置</string>
+    <string name="Please_re_adjust_the_gain">请重新调节增益</string>
+    <string name="cichang_value_max">32</string>
+    <string name="cichang_value_min">0</string>
+    <string name="delete">与蓝牙设备断开</string>
+    <string name="magnetic_field_gain_setting">磁场增益设置</string>
+    <string name="voice_gain_setting">声音增益设置</string>
+    <string name="shengyin_value_max">32</string>
+    <string name="shengyin_value_min">0</string>
 
 </resources>

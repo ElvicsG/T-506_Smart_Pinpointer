@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/btn_seek_device"
             android:onClick="OnCancel"
-            android:text="@string/cancle"
+            android:text="@string/cancel"
             android:layout_marginRight="10dp"
             android:textColor="@color/blue2"
             android:textSize="14dp" />

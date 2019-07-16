@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">T-506 PINPOINTER</string>
-
     <string name="action_settings">Settings</string>
     <string name="cichang_name">Magnetic</string>
     <string name="shengyin_name">Acoustic</string>
@@ -10,7 +9,7 @@
     <string name="start_to_use">start</string>
     <string name="version_code">version : </string>
     <string name="does_not_find_device">The machine does not find Bluetooth hardware or drivers</string>
-    <string name="open_bluetooth_ing">Open in Bluetooth</string>
+    <string name="open_bluetooth_ing">Opening Bluetooth</string>
     <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">Waiting for Bluetooth to open, re-try after 5s!</string>
     <string name="Automatically_open_Bluetooth_failure_please_manually_open_the_Bluetooth">Automatically open Bluetooth failure, please manually open the Bluetooth!</string>
     <string name="The_line_has_been_disconnected_please_re_connect">The line has been disconnected,please re-connect!</string>
@@ -19,8 +18,8 @@
     <string name="success">succcessful!</string>
     <string name="Connection_failed">Connection failed!</string>
     <string name="Device_address">Device address</string>
-    <string name="Automatic_connection_please_wait">Automatic connection, please wait ...</string>
-    <string name="Find_the_device">Find the device ...</string>
+    <string name="Automatic_connection_please_wait">Automatic connection, please wait …</string>
+    <string name="Find_the_device">Finding the device …</string>
     <string name="Select_the_device_to_connect_to">Select the device to connect to</string>
     <string name="No_new_equipment_found">No new equipment found</string>
     <string name="Find_a_Bluetooth_device">Find a Bluetooth device</string>
@@ -28,13 +27,12 @@
     <string name="company_name">COMPANY NAME: KEHUI POWER AUTOMATION CO. LTD.</string>
     <string name="company_name2">Kehui International Ltd.</string>
     <string name="company_website">WEBSITE:：www.kehui.cn</string>
-    <string name="ok">ok</string>
+    <string name="ok">OK</string>
     <string name="confirm">Confirm</string>
     <string name="find_device">Find the device</string>
-    <string name="cancle">cancel</string>
     <string name="left">left</string>
     <string name="right">right</string>
-    <string name="tishi">prompt</string>
+    <string name="note">prompt</string>
     <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
     <string name="Exit_application">exit</string>
     <string name="The_sending_data_failed_and_was_being_resent">The sending data failed and was being resent</string>
@@ -47,7 +45,7 @@
     <string name="Send_content_is_empty">Send content is empty</string>
     <string name="shengciyanshi_0">Sound/field delay:0ms</string>
     <string name="synchronization">Trigger</string>
-    <string name="instructions">instructions</string>
+    <string name="instructions">指示</string>
     <string name="Please_re_adjust_the_gain">Please re-adjust the gain</string>
     <string name="gain">Gain</string>
     <!--新增翻译-->
@@ -66,7 +64,6 @@
     <string name="report_status">Upload</string>
     <string name="reply_status">Response</string>
     <string name="reply_content">Response information</string>
-    <string name="initiate_assistance">Initiate remote help</string>
     <string name="upload_data">Upload data</string>
     <string name="upload_success">Upload successful</string>
     <string name="search">Search</string>
@@ -84,7 +81,7 @@
     <string name="cancel">Cancel</string>
     <string name="company">Kehui International Ltd.</string>
     <string name="company_address">Address : Studio 206, Mill Studio Business Centre, Crane Mead, Ware, Hertfordshire SQ12 9PY, UK</string>
-    <string name="company_phone">Tel : 0533-3179631</string>
+    <string name="company_phone">Tel : 0533–3179631</string>
     <string name="zh">中文</string>
     <string name="en">English</string>
     <string name="de">Deutsch</string>
@@ -95,7 +92,7 @@
     <string name="test_name_is_empty">The tester name cannot be empty!</string>
     <string name="test_position_is_empty">The test location cannot be empty!</string>
     <string name="test_data_time_no_finish">Please wait 35 seconds for the data to be taken before you submit it.</string>
-    <string name="loading_more">Desperately loading...</string>
+    <string name="loading_more">Desperately loading…</string>
     <string name="no_load_more">Already in the end!</string>
     <string name="reported">Uploaded already</string>
     <string name="no_report">To be uploaded</string>
@@ -128,10 +125,9 @@
     <string name="latest_version">Your software is the latest version!</string>
     <string name="download_success">download successful!</string>
     <string name="download_failure">The download failed, please check if the permission is enabled!</string>
-    <string name="checking_update">Detecting updates...</string>
+    <string name="checking_update">Detecting updates…</string>
     <string name="this_update">This update</string>
-    <string name="wait_downloading">M\nPlease wait while downloading...</string>
-
+    <string name="wait_downloading">M\nPlease wait while downloading…</string>
     <string name="over_20_notice">Offline storage assistance data can not exceed 20, please upload un-uploaded assistance data when there is a network!</string>
     <string name="no_report_data">No unreported data！</string>
     <string name="uploading_waiting">Uploading, please wait</string>
@@ -140,32 +136,13 @@
     <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
     <string name="please_find_device">Please find a device!</string>
     <string name="min_delay">Minimum delay</string>
-
     <string name="pinpointer_position">Pinpointer Position</string>
-    <!--<string name="Yes">Fault detected</string>-->
-    <!--<string name="NO">Fault not detected</string>-->
-    <!--<string name="searching">Searching</string>-->
-    <!--&lt;!&ndash; 搜索故障放电声音词条 &ndash;&gt;-->
-    <!--&lt;!&ndash; 搜索故障放电声音，但之前曾经发现过故障放电声 &ndash;&gt;-->
-    <!--<string name="Search_for_fault_discharge_sound">Searching for acoustic signal</string>-->
-    <!--&lt;!&ndash; 第一次发现故障声音 &ndash;&gt;-->
-    <!--<string name="the_first_found_acoustic_signal">Acoustic signal found, move forward</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，前后两次声磁延时相同 &ndash;&gt;-->
-    <!--<string name="the_second_found_fault_distance_same">Distance from fault unchanged</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小且为历史最小值 &ndash;&gt;-->
-    <!--<string name="the_second_fault_smallest">Closest to fault so far. Move forward</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时小但大于历史最小值 &ndash;&gt;-->
-    <!--<string name="closest_fault_move">Closer to the fault, Move forward</string>-->
-    <!--&lt;!&ndash; 再次发现故障放电声，当前比上次声磁延时大 &ndash;&gt;-->
-    <!--<string name="away_from_fault">Away from the fault, turn back</string>-->
-    <string name="connecting_waite">Connecting, please wait...</string>
+    <string name="connecting_waite">Connecting, please wait…</string>
     <string name="please_choose">Please select</string>
-
     <string name="fault_type_1">Low impedance</string>
     <string name="fault_type_2">High impedance</string>
     <string name="fault_type_3">Flashing</string>
     <string name="fault_type_4">Open conductor</string>
-
     <string name="message_notice_1">Increase the sound gain</string>
     <string name="message_notice_2">Increase the magnetic field gain</string>
     <string name="message_notice_3">Reduce the sound gain</string>
@@ -184,5 +161,15 @@
     <string name="demo_notice">Eingegebenen Demo-Modus!</string>
     <string name="triggered">Triggered</string>
     <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrumnet!</string>
+    <string name="cichang_value_max">32</string>
+    <string name="cichang_value_min">0</string>
+    <string name="gpsNotifyMsg">当前应用需要打开定位功能。</string>
+    <string name="initiate_assistance">Begin to assist</string>
+    <string name="magnetic_field_gain_setting">Magnetic field gain setting</string>
+    <string name="voice_gain_setting">Sound gain settings</string>
+    <string name="shengyin_value_max">32</string>
+    <string name="shengyin_value_min">0</string>
+    <string name="notifyMsg">当前应用缺少必要权限。</string>
+    <string name="notifyTitle">Tips</string>
 
 </resources>

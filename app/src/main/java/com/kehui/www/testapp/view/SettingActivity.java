@@ -25,6 +25,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * @author Gong
+ * @date 2019/07/16
+ */
 public class SettingActivity extends BaseActivity {
 
     @BindView(R.id.ll_language)
@@ -90,18 +94,27 @@ public class SettingActivity extends BaseActivity {
 
     private void initView() {
         currentLanguage = PrefUtils.getString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE, "follow_sys");
-        if (currentLanguage.equals("follow_sys")) {
-            rbFollowSys.setChecked(true);
-        } else if (currentLanguage.equals("ch")) {
-            rbZh.setChecked(true);
-        } else if (currentLanguage.equals("en")) {
-            rbEn.setChecked(true);
-        } else if (currentLanguage.equals("de")) {
-            rbDe.setChecked(true);
-        } else if (currentLanguage.equals("fr")) {
-            rbFr.setChecked(true);
-        } else if (currentLanguage.equals("es")) {
-            rbSpain.setChecked(true);
+        switch (currentLanguage) {
+            case "follow_sys":
+                rbFollowSys.setChecked(true);
+                break;
+            case "ch":
+                rbZh.setChecked(true);
+                break;
+            case "en":
+                rbEn.setChecked(true);
+                break;
+            case "de":
+                rbDe.setChecked(true);
+                break;
+            case "fr":
+                rbFr.setChecked(true);
+                break;
+            case "es":
+                rbSpain.setChecked(true);
+                break;
+            default:
+                break;
         }
         tvVersionValue.setText(getVerCode(SettingActivity.this));
         rgLanguage.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -148,26 +161,34 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void setLanguage(String language) {
-        if (language.equals("follow_sys")) {
-            MultiLanguageUtil.getInstance().updateLanguage("follow_sys");
-        } else if (language.equals("ch")) {
-            MultiLanguageUtil.getInstance().updateLanguage("ch");
-
-        } else if (language.equals("en")) {
-            MultiLanguageUtil.getInstance().updateLanguage("en");
-
-        } else if (language.equals("de")) {
-            MultiLanguageUtil.getInstance().updateLanguage("de");
-        } else if (language.equals("fr")) {
-            MultiLanguageUtil.getInstance().updateLanguage("fr");
-        } else if (language.equals("es")) {
-            MultiLanguageUtil.getInstance().updateLanguage("es");
+        switch (language) {
+            case "follow_sys":
+                MultiLanguageUtil.getInstance().updateLanguage("follow_sys");
+                break;
+            case "ch":
+                MultiLanguageUtil.getInstance().updateLanguage("ch");
+                break;
+            case "en":
+                MultiLanguageUtil.getInstance().updateLanguage("en");
+                break;
+            case "de":
+                MultiLanguageUtil.getInstance().updateLanguage("de");
+                break;
+            case "fr":
+                MultiLanguageUtil.getInstance().updateLanguage("fr");
+                break;
+            case "es":
+                MultiLanguageUtil.getInstance().updateLanguage("es");
+                break;
+            default:
+                break;
         }
         Intent intent = new Intent();
         intent.setAction("restartapp");
         sendBroadcast(intent);
-        if (MainActivity.instance != null)
+        if (MainActivity.instance != null) {
             MainActivity.instance.finish();
+        }
         if (UserMainActivity.instance != null) {
             UserMainActivity.instance.finish();
         }
@@ -204,14 +225,14 @@ public class SettingActivity extends BaseActivity {
                 SplashActivity.instance.isToast = true;
                 SplashActivity.instance.initUpdateApk();
                 break;
+            default:
+                break;
         }
     }
 
     /**
-     * 获取软件版本号
-     *
-     * @param context
-     * @return
+     * @param context   //G?
+     * @return  获取软件版本号
      */
     public String getVerCode(Context context) {
         String verCode = "";

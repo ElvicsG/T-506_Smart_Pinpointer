@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -21,12 +20,11 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.kehui.www.testapp.R;
-import com.kehui.www.testapp.adpter.MyChartAdapter;
+import com.kehui.www.testapp.adpter.MyChartAdapterBase;
 import com.kehui.www.testapp.application.AppConfig;
 import com.kehui.www.testapp.application.Constant;
 import com.kehui.www.testapp.application.MyApplication;
 import com.kehui.www.testapp.bean.PackageBean;
-import com.kehui.www.testapp.event.AcousticMagneticDelayEvent;
 import com.kehui.www.testapp.event.AcousticMagneticDelay2;
 import com.kehui.www.testapp.event.HandleReceiveDataEvent;
 import com.kehui.www.testapp.event.OperationGuideEvent;
@@ -34,10 +32,8 @@ import com.kehui.www.testapp.event.SendDataFinishEvent;
 import com.kehui.www.testapp.event.StartReadThreadEvent;
 import com.kehui.www.testapp.event.UINoticeEvent;
 import com.kehui.www.testapp.ui.CustomDialog;
-import com.kehui.www.testapp.util.AplicationUtil;
 import com.kehui.www.testapp.util.PrefUtils;
 import com.kehui.www.testapp.util.Utils;
-import com.kehui.www.testapp.view.UserMainActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -133,8 +129,8 @@ public class BaseActivity extends AppCompatActivity {
     public int streamVolumenow;     //GN 当前音量值
     public boolean isClickRem;  //是否记忆波形的标志
     public boolean isCom;       //是否比较波形的标志
-    public MyChartAdapter myChartAdapterShengyin;
-    public MyChartAdapter myChartAdapterCichang;
+    public MyChartAdapterBase myChartAdapterShengyin;
+    public MyChartAdapterBase myChartAdapterCichang;
     private CustomDialog customDialog;      //GN 滤波方式选择对话框
     public int clickTongNum;    //GN 滤波方式选择， *低通1 *带通2 *高通3 *全通0
     public int currentFilter;   //GN 当前滤波方式  *低通1 *带通2 *高通3 *全通0
@@ -371,9 +367,12 @@ public class BaseActivity extends AppCompatActivity {
     //取蓝牙数据
     private void startThread() {
         try {
-            mSocket = MyApplication.getInstances().get_socket();    //GN 进入演示模式后打开仪器依旧可以正常连接
-            if (mSocket != null)
-                mInputStream = mSocket.getInputStream();    //GN 通过蓝牙socket获得输入流
+            //GN 进入演示模式后打开仪器依旧可以正常连接
+            mSocket = MyApplication.getInstances().get_socket();
+            if (mSocket != null) {
+                //GN 通过蓝牙socket获得输入流
+                mInputStream = mSocket.getInputStream();
+            }
 
         } catch (IOException e) {
             Toast.makeText(this, getResources().getString(R.string
@@ -389,12 +388,15 @@ public class BaseActivity extends AppCompatActivity {
         if (!getBDataThread) {
 
             //重连后下发参数
-            if(Constant.CurrentVoiceParam!=null)
+            if(Constant.CurrentVoiceParam!=null) {
                 sendString(Constant.CurrentVoiceParam);
-            if(Constant.CurrentFilterParam!=null)
+            }
+            if(Constant.CurrentFilterParam!=null) {
                 sendString(Constant.CurrentFilterParam);
-            if(Constant.CurrentMagParam!=null)
+            }
+            if(Constant.CurrentMagParam!=null) {
                 sendString(Constant.CurrentMagParam);
+            }
 
             //当前连接状态为连接
             Constant.BluetoothState = true;
@@ -422,12 +424,14 @@ public class BaseActivity extends AppCompatActivity {
                         //Log.e("stream", "len:" + len + "时间" + System.currentTimeMillis());     //GT20180321 每个输入流的的长度
                         byte[] tempbStream = new byte[len];    //jwj20180411
                         for (int i = 0, j = mTempLength; i < len; i++, j++) {
-                            if (Constant.isStartInterception)
+                            if (Constant.isStartInterception) {
                                 tempbStream[i] = bStream[i];
+                            }
                             mTemp[j] = bStream[i] & 0xff;   //将传过来的字节数组转变为int数组
                         }
-                        if (Constant.isStartInterception)
+                        if (Constant.isStartInterception) {
                             Constant.sbData.append(Utils.bytes2HexString(tempbStream));
+                        }
                         mTempLength += len;
                         mTempcount++;
                         //GC20171129 在没有处理蓝牙数据时缓存数个输入流用做后续蓝牙数据处理
@@ -998,8 +1002,9 @@ public class BaseActivity extends AppCompatActivity {
                         mSVMLocate[i] = mAIRecognitionArray[i];     //GC20181201
                     }
                     obtainFeaturex();
-                    if (svmTrainThread)
+                    if (svmTrainThread) {
                         voiceSvmPredict(featurex);
+                    }
                 }
                 Message message = new Message();
                 message.what = WHAT_REFRESH;
@@ -1044,23 +1049,36 @@ public class BaseActivity extends AppCompatActivity {
             int step = StepSizeTable[INDEX];
             int code = dateArray[i];
             int diffq = step / 8;
-            if ((code & 4) == 4) diffq = diffq + step;
-            if ((code & 2) == 2) diffq = diffq + step / 2;
-            if ((code & 1) == 1) diffq = diffq + step / 4;
-            if ((code & 8) == 8) PREDSAMPLE = PREDSAMPLE - diffq;
-            else PREDSAMPLE = PREDSAMPLE + diffq;
+            if ((code & 4) == 4) {
+                diffq = diffq + step;
+            }
+            if ((code & 2) == 2) {
+                diffq = diffq + step / 2;
+            }
+            if ((code & 1) == 1) {
+                diffq = diffq + step / 4;
+            }
+            if ((code & 8) == 8) {
+                PREDSAMPLE = PREDSAMPLE - diffq;
+            } else {
+                PREDSAMPLE = PREDSAMPLE + diffq;
+            }
 
-            if (PREDSAMPLE > 4095)
+            if (PREDSAMPLE > 4095) {
                 PREDSAMPLE = 4095;
-            if (PREDSAMPLE < 0)
+            }
+            if (PREDSAMPLE < 0) {
                 PREDSAMPLE = 0;
+            }
             //Log.e("FILE", code+"");
             INDEX = INDEX + IndexTable[code];
 
-            if (INDEX < 0)
+            if (INDEX < 0) {
                 INDEX = 0;
-            if (INDEX > 88)
+            }
+            if (INDEX > 88) {
                 INDEX = 88;
+            }
             prevsample = PREDSAMPLE;
             previndex = INDEX;
             result[i] = prevsample;
@@ -1094,7 +1112,9 @@ public class BaseActivity extends AppCompatActivity {
             bytes[i * 2] = bytes1[0];
             bytes[i * 2 + 1] = bytes1[1];
         }
-        if (!isExit) mAudioTrack.write(bytes, 0, bytes.length);
+        if (!isExit) {
+            mAudioTrack.write(bytes, 0, bytes.length);
+        }
 //        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss:SSS");
 //        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
 //        String str = formatter.format(curDate);
@@ -1646,12 +1666,15 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         try {
             isExit = true;
-            PrefUtils.setString(BaseActivity.this, AppConfig.CLICK_MODE, "notClicked");     //GC20181116
-            mAudioTrack.release();// 关闭并释放资源
+            //GC20181116
+            PrefUtils.setString(BaseActivity.this, AppConfig.CLICK_MODE, "notClicked");
+            // 关闭并释放资源
+            mAudioTrack.release();
             try {
                 mSocket.close();
-                if (mInputStream != null)
+                if (mInputStream != null) {
                     mInputStream.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

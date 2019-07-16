@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kehui.www.testapp.R;
-import com.kehui.www.testapp.adpter.MyChartAdapter;
+import com.kehui.www.testapp.adpter.MyChartAdapterBase;
 import com.kehui.www.testapp.application.AppConfig;
 import com.kehui.www.testapp.application.Constant;
 import com.kehui.www.testapp.application.MyApplication;
@@ -181,7 +180,8 @@ public class MainActivity extends BaseActivity {
     private ViewGroup.MarginLayoutParams layoutParams;  //GN 探头位置
     private ValueAnimator valueAnimator2;   //GN 动画绘制2
     //private double lastDelayValue = -1; //上次的声磁延时值
-    private double minDelayValue = 43.625;  //GC20181115 历史最小延时值（最大349*0.125=43.625ms）
+    //GC20181115 历史最小延时值（最大349*0.125=43.625ms）
+    private double minDelayValue = 43.625;
     //private Dialog dialog;
     public int currentPosition;     //GN 当前增益进度条的位置
     private boolean firstFind = true;   //GC20181119
@@ -526,7 +526,7 @@ public class MainActivity extends BaseActivity {
             for (int i = 0; i < split.length; i++) {
                 mTempCichangArray[i] = 0;
             }
-            myChartAdapterCichang = new MyChartAdapter(mTempCichangArray, null,
+            myChartAdapterCichang = new MyChartAdapterBase(mTempCichangArray, null,
                     false, 0, false);
 
             linechartCichang.setAdapter(myChartAdapterCichang);
@@ -580,7 +580,7 @@ public class MainActivity extends BaseActivity {
             //Log.e("HEJIA", "size:             " + mTempShengyinList.size());
 
             //refreshUi(false, 10);
-            myChartAdapterShengyin = new MyChartAdapter(mTempShengyinArray, null,
+            myChartAdapterShengyin = new MyChartAdapterBase(mTempShengyinArray, null,
                     false, 0, false);
 
             linechartShengyin.setAdapter(myChartAdapterShengyin);
@@ -682,7 +682,7 @@ public class MainActivity extends BaseActivity {
             toastDisconnected = true;
             if (!isExit) {
                 new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText(getResources().getString(R.string.tishi))
+                        .setTitleText(getResources().getString(R.string.note))
                         .setContentText(getResources().getString(R.string
                                 .Bluetooth_disconnected_please_reconnect))
                         /*.setCancelText("不，谢谢")*/
@@ -920,17 +920,8 @@ public class MainActivity extends BaseActivity {
             valueAnimator2.end();
         }
         if (event.isMalfunction) {
-            if (firstFind) {    //GN 第一次判断为故障声采取下列操作，后续不采取任何操作
-                /*//GN “已发现故障”中圈 状态2
-                tvNotice.setText(getString(R.string.message_notice_7));
-                //GN 去动画1
-                rlWaveU.removeView(v);               //GN 波纹
-                tvScanU.setVisibility(View.GONE);    //GN 正在测试中
-                ivScanU.setVisibility(View.GONE);    //GN ...
-                //GN 显示动画2
-                ccvSecondU.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
-                ccvFirstU.setVisibility(View.GONE);
-                ccvSecondU.setVisibility(View.VISIBLE);*/   //GC20190123 不作任何处理
+            //GN 第一次判断为故障声采取下列操作，后续不采取任何操作
+            if (firstFind) {
                 //延时值显示
                 if(lastDelayValue > 0){
                     tvLastDelayU.setText(lastDelayValue + "ms");    //GN 有过相关后的声磁延时值
@@ -944,8 +935,6 @@ public class MainActivity extends BaseActivity {
             }
 
         } else {
-           /* //GN “未发现故障”波纹 状态1
-            tvNotice.setText(getString(R.string.message_notice_6));*/
             //GC20190123 相关为否的状态 判断“磁场触发”，显示动画1
             tvNotice.setText(getString(R.string.triggered));
             tvNoticeU.setText(getString(R.string.triggered));   //GC201901232
@@ -977,48 +966,24 @@ public class MainActivity extends BaseActivity {
         if (event.isRelated) {
             //GC20190123 相关为是的状态，判断“已发现故障”，显示动画2
             tvNotice.setText(getString(R.string.message_notice_7));
-            tvNoticeU.setText(getString(R.string.message_notice_7));    //GC201901232
+            //GC201901232
+            tvNoticeU.setText(getString(R.string.message_notice_7));
 
             //GC20190422 播放提示音
             soundSystem.play(soundSystem.SONAR);
 
-
-
-            //GC20190625
+            //GC20190625 刻度圆圈动画2绘制
             currentDelayValue = event.delayValue;
             drawCircle();
 
-            /*//GN 去动画1
-            rlWaveU.removeView(v);               //GN 波纹
-            tvScanU.setVisibility(View.GONE);    //GN 正在测试中
-            ivScanU.setVisibility(View.GONE);    //GN ...
-            //GN 显示动画2
-            ccvFirstU.updateView("#555555", 20, 89);    //灰色 粗圈 中尺寸
-            ccvSecondU.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
-            if (valueAnimator2 == null) {
-                valueAnimator2 = ValueAnimator.ofInt(0, 2).setDuration(1000);
-                valueAnimator2.setRepeatCount(ValueAnimator.INFINITE);
-                valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        int i = (int) animation.getAnimatedValue();
-                        if (i == 0) {
-                            ccvSecondU.setVisibility(View.VISIBLE);
-                            ccvFirstU.setVisibility(View.GONE);
-                        } else if (i == 1) {
-                            ccvSecondU.setVisibility(View.GONE);
-                            ccvFirstU.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-            }
-            valueAnimator2.start();*/   //GC20190625
             //GC20190123 延时值显示
-            if (isRelatedCount == 0) {   //GN 第一次相关
+            if (isRelatedCount == 0) {
                 //GN 显示上次延时值
-                if(lastDelayValue < 0){     //GN 历史记录第一次相关
+                if(lastDelayValue < 0){
+                    //GN 历史记录第一次相关
                     tvLastDelayU.setText("");
-                }else if (lastDelayValue > 0) {  //GN 有过相关后的声磁延时值，
+                }else if (lastDelayValue > 0) {
+                    //GN 有过相关后的声磁延时值，
                     tvLastDelayU.setText(lastDelayValue + "ms");
                 }
                 //GN 显示当前延时值
@@ -1055,207 +1020,24 @@ public class MainActivity extends BaseActivity {
             //GC20190123 去动画2
             ccvFirstU.setVisibility(View.GONE);
             ccvSecondU.setVisibility(View.GONE);
-            //GC20190123 显示动画1
+            //GC20190123 显示动画1 非故障界面
             try {
-                rlWaveU.addView(v);                  //GN 波纹
-            }catch (Exception l_ex){}
-            tvScanU.setVisibility(View.VISIBLE); //GN 正在测试中
-            ivScanU.setVisibility(View.VISIBLE); //GN ...
+                rlWaveU.addView(v);
+            }catch (Exception l_ex) {
+
+            }
+            tvScanU.setVisibility(View.VISIBLE);
+            ivScanU.setVisibility(View.VISIBLE);
             //延时值显示
             if(lastDelayValue > 0){
-                tvLastDelayU.setText(lastDelayValue + "ms");    //GN 有过相关后的声磁延时值
+                //GN 有过相关后的声磁延时值
+                tvLastDelayU.setText(lastDelayValue + "ms");
             }else{
                 tvLastDelayU.setText("");
             }
             tvCurrentDelayU.setText("");
 
         }
-        //GC20190213 去掉接近远离逻辑判断，简化
-        /*if (event.isRelated) {
-            if (isRelatedCount == 0) {   //GN 第一次相关
-                if(lastDelayValue < 0){
-                    //GN 历史第一次发现故障 中圈闪烁 状态3
-                    tvNotice.setText(getString(R.string.message_notice_7));
-                    tvLastDelayU.setText("");
-                    tvCurrentDelayU.setText(event.delayValue + "ms");
-                    ccvFirstU.updateView("#555555", 20, 89);    //灰色 粗圈 中尺寸
-                    ccvSecondU.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
-                    if (valueAnimator2 == null) {
-                        valueAnimator2 = ValueAnimator.ofInt(0, 2).setDuration(1000);
-                        valueAnimator2.setRepeatCount(ValueAnimator.INFINITE);
-                        valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animation) {
-                                int i = (int) animation.getAnimatedValue();
-                                if (i == 0) {
-                                    ccvSecondU.setVisibility(View.VISIBLE);
-                                    ccvFirstU.setVisibility(View.GONE);
-                                } else if (i == 1) {
-                                    ccvSecondU.setVisibility(View.GONE);
-                                    ccvFirstU.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
-                    }
-                    valueAnimator2.start();
-
-                } else if (lastDelayValue > 0) {  //GN 有过相关后的声磁延时值，比较大小
-                    if (lastDelayValue < (event.delayValue - 0.375)) {  //GC20181204 3个点的波动范围
-                        //GN 远离故障点 大圈 状态4
-                        tvNotice.setText(getString(R.string.message_notice_9));
-                        tvLastDelayU.setText(lastDelayValue + "ms");
-                        tvCurrentDelayU.setText(event.delayValue + "ms");
-                        ccvFirstU.updateView("#555555", 5, 40);      //灰色 细圈 小尺寸
-                        ccvSecondU.updateView("#e1de04", 20, 138);   //黄色 粗圈 大尺寸
-                        ccvFirstU.setVisibility(View.VISIBLE);
-                        ccvSecondU.setVisibility(View.VISIBLE);
-                        positionState = 1;
-
-                    } else if (lastDelayValue > (event.delayValue + 0.375)) {   //GC20181204 3个点的波动范围
-                        //GN 接近故障点 小圈 状态6
-                        tvNotice.setText(getString(R.string.message_notice_8));
-                        tvLastDelayU.setText(lastDelayValue + "ms");
-                        tvCurrentDelayU.setText(event.delayValue + "ms");
-                        ccvFirstU.updateView("#555555", 5, 138);     //灰色 细圈 大尺寸
-                        ccvSecondU.updateView("#e1de04", 20, 40);    //黄色 粗圈 小尺寸
-                        ccvFirstU.setVisibility(View.VISIBLE);
-                        ccvSecondU.setVisibility(View.VISIBLE);
-                        positionState = 2;
-
-                    } else if ( (lastDelayValue <= (event.delayValue + 0.375)) && (lastDelayValue >= (event.delayValue - 0.375)) ) {    //GC20181204 3个点的波动范围
-                        tvNotice.setText(getString(R.string.message_notice_7));
-                        tvLastDelayU.setText(event.delayValue + "ms");   //GC20181122 经过相关为否或不是故障之后再次相关，且前后差值不大，更新为最新值
-                        tvCurrentDelayU.setText(event.delayValue + "ms");
-                        if(positionState == 1) {            //GN  后续发现故障 大圈闪烁 状态5
-                            ccvFirstU.updateView("#555555", 20, 138);    //灰色 粗圈 大尺寸
-                            ccvSecondU.updateView("#e1de04", 20, 138);   //黄色 粗圈 大尺寸
-                        }else if(positionState == 2) {      //GN  后续发现故障 小圈闪烁 状态7
-                            ccvFirstU.updateView("#555555", 20, 40);    //灰色 粗圈 小尺寸
-                            ccvSecondU.updateView("#e1de04", 20, 40);   //黄色 粗圈 小尺寸
-                        }else if(positionState == 3) {      //GN  后续发现故障 中圈闪烁 状态3
-                            ccvFirstU.updateView("#555555", 20, 89);    //灰色 粗圈 中尺寸
-                            ccvSecondU.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
-                        }
-                        if (valueAnimator2 == null) {
-                            valueAnimator2 = ValueAnimator.ofInt(0, 2).setDuration(1000);
-                            valueAnimator2.setRepeatCount(ValueAnimator.INFINITE);
-                            valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    int i = (int) animation.getAnimatedValue();
-                                    if (i == 0) {
-                                        ccvSecondU.setVisibility(View.VISIBLE);
-                                        ccvFirstU.setVisibility(View.GONE);
-                                    } else if (i == 1) {
-                                        ccvSecondU.setVisibility(View.GONE);
-                                        ccvFirstU.setVisibility(View.VISIBLE);
-                                    }
-                                }
-                            });
-                        }
-                        valueAnimator2.start();
-                    }
-                }
-                //GN 只有第一次相关才刷新声磁延时值
-                lastDelayValue = event.delayValue;      //GN 保存到上次的声磁延时值
-                if (event.delayValue < minDelayValue) {
-                    minDelayValue = event.delayValue;   //GN 保存历史最小声磁延时值
-                }
-                llMinDelayU.setVisibility(View.VISIBLE);
-                tvMinDelayValueU.setText(minDelayValue + "ms");  //GN 显示历史最小声磁延时值
-
-            } else if (isRelatedCount > 0) {    //从第二次相关开始后继续相关
-                tvNotice.setText(getString(R.string.message_notice_7));
-                tvLastDelayU.setText(lastDelayValue + "ms");
-                tvCurrentDelayU.setText(lastDelayValue + "ms");
-                if(positionState == 1) {                //GN  后续发现故障 大圈闪烁 状态5
-                    ccvFirstU.updateView("#555555", 20, 138);    //灰色 粗圈 大尺寸
-                    ccvSecondU.updateView("#e1de04", 20, 138);   //黄色 粗圈 大尺寸
-                }else if(positionState == 2) {          //GN  后续发现故障 小圈闪烁 状态7
-                    ccvFirstU.updateView("#555555", 20, 40);    //灰色 粗圈 小尺寸
-                    ccvSecondU.updateView("#e1de04", 20, 40);   //黄色 粗圈 小尺寸
-                }else if(positionState == 3) {          //GN  后续发现故障 中圈闪烁 状态3
-                    ccvFirstU.updateView("#555555", 20, 89);    //灰色 粗圈 中尺寸
-                    ccvSecondU.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
-                }
-                if (valueAnimator2 == null) {
-                    valueAnimator2 = ValueAnimator.ofInt(0, 2).setDuration(1000);
-                    valueAnimator2.setRepeatCount(ValueAnimator.INFINITE);
-                    valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            int i = (int) animation.getAnimatedValue();
-                            if (i == 0) {
-                                ccvSecondU.setVisibility(View.VISIBLE);
-                                ccvFirstU.setVisibility(View.GONE);
-                            } else if (i == 1) {
-                                ccvSecondU.setVisibility(View.GONE);
-                                ccvFirstU.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    });
-                }
-                valueAnimator2.start();
-
-            }
-            isRelatedCount++;
-
-        }else{  //相关结果为否
-            isRelatedCount = 0;
-            //GN “已发现故障”状态
-            tvNotice.setText(getString(R.string.message_notice_7));
-            if(lastDelayValue > 0){     //GN 有过相关后的声磁延时值
-                tvLastDelayU.setText(lastDelayValue + "ms");
-            }else{
-                tvLastDelayU.setText("");
-            }
-            tvCurrentDelayU.setText("");
-            if(positionState == 1) {                        //GN  相关为否 大圈 状态8
-                ccvSecondU.updateView("#e1de04", 20, 138);   //黄色 粗圈 大尺寸
-            }else if(positionState == 2) {                  //GN  相关为否 小圈 状态9
-                ccvSecondU.updateView("#e1de04", 20, 40);   //黄色 粗圈 小尺寸
-            }else if(positionState == 3) {                  //GN  相关为否 中圈 状态10
-                ccvSecondU.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
-            }
-            ccvFirstU.setVisibility(View.GONE);
-            ccvSecondU.setVisibility(View.VISIBLE);
-
-        }*/
-        //GC20181201 去掉波形界面自动定位提示
-        /*if (event.isRelated) {
-            if (isRelatedCount == 0) {   //GN 第一次相关
-                if(lastDelayValue < 0){ //历史第一次发现故障
-                    tvNotice.setText(getString(R.string.message_notice_7));
-                    //GN 只有第一次相关才刷新声磁延时值
-                    lastDelayValue = event.delayValue;      //GN 保存到上次的声磁延时值
-                } else if (lastDelayValue > 0) {  //GN 有过相关后的声磁延时值，比较大小
-                    if (lastDelayValue < (event.delayValue - 0.625)) {
-                        tvNotice.setText(getString(R.string.message_notice_9));
-                        positionState = 1;
-                        //GN 只有第一次相关才刷新声磁延时值
-                        lastDelayValue = event.delayValue;      //GN 保存到上次的声磁延时值
-                    } else if (lastDelayValue > (event.delayValue + 0.625)) {
-                        tvNotice.setText(getString(R.string.message_notice_8));
-                        positionState = 2;
-                        //GN 只有第一次相关才刷新声磁延时值
-                        lastDelayValue = event.delayValue;      //GN 保存到上次的声磁延时值
-                    } else if ( (lastDelayValue <= (event.delayValue + 0.625)) && (lastDelayValue >= (event.delayValue - 0.625)) ) {
-                        tvNotice.setText(getString(R.string.message_notice_7));
-
-                    }
-                }
-
-            } else if (isRelatedCount > 0) {    //从第二次相关开始后继续相关
-                tvNotice.setText(getString(R.string.message_notice_7));
-
-            }
-            isRelatedCount++;
-
-        }else{  //相关结果为否
-            isRelatedCount = 0;
-            tvNotice.setText(getString(R.string.message_notice_7));
-
-        }*/
 
     }
 
@@ -1329,7 +1111,8 @@ public class MainActivity extends BaseActivity {
         tvYanShi.setText((event.delayValue) + "ms");
     }
 
-    @OnClick({R.id.ll_silence, R.id.ll_pause, R.id.ll_memory, R.id.ll_compare, R.id.ll_filter, R.id.ll_assist, R.id.ll_settings, R.id.ll_mode, R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u})
+    @OnClick({R.id.ll_silence, R.id.ll_pause, R.id.ll_memory, R.id.ll_compare, R.id.ll_filter, R.id.ll_assist, R.id.ll_settings,
+            R.id.ll_mode, R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u})
     public void onViewClicked(View view) {
         Intent intent = new Intent();
         switch (view.getId()) {

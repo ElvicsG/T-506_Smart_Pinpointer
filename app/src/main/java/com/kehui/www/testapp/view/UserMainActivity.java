@@ -294,7 +294,7 @@ public class UserMainActivity extends BaseActivity {
             toastDisconnected = true;
             if (!isExit) {
                 new SweetAlertDialog(UserMainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText(getResources().getString(R.string.tishi))
+                        .setTitleText(getResources().getString(R.string.note))
                         .setContentText(getResources().getString(R.string
                                 .Bluetooth_disconnected_please_reconnect))
                         /*.setCancelText("不，谢谢")*/

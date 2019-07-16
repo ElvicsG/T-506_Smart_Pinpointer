@@ -12,17 +12,13 @@ import com.kehui.www.testapp.application.MyApplication;
 
 import java.util.Locale;
 
-
-
 /**
- * Created by jwj on 2018/7/11.
+ * @author jwj
+ * @date 2018/07/11
  */
-
 public class MultiLanguageUtil {
-    private static final String TAG = "MultiLanguageUtil";
     private static MultiLanguageUtil instance;
     private Context mContext;
-    public static final String SAVE_LANGUAGE = "save_language";
 
     public static void init(Context mContext) {
         if (instance == null) {
@@ -48,21 +44,8 @@ public class MultiLanguageUtil {
     /**
      * 设置语言
      */
-    public void setConfiguration() {
+    private void setConfiguration() {
         Locale targetLocale = getLanguageLocale();
-//        if (targetLocale==Locale.CHINESE){
-//            PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, "ch");
-//        }else if (targetLocale==Locale.ENGLISH){
-//            PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, "en");
-//        }else if (targetLocale==Locale.SIMPLIFIED_CHINESE) {
-//            PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, "ch");
-//        }else if (targetLocale==Locale.GERMANY){
-//            PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, "de");
-//        }else if (targetLocale==Locale.FRANCE){
-//            PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, "fr");
-//        }else if (targetLocale==Locale_Spanisch){
-//            PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, "es");
-//        }
         Configuration configuration = mContext.getResources().getConfiguration();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             configuration.setLocale(targetLocale);
@@ -71,34 +54,33 @@ public class MultiLanguageUtil {
         }
         Resources resources = mContext.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
-        resources.updateConfiguration(configuration, dm);//语言更换生效的代码!
+        //语言更换生效的代码!
+        resources.updateConfiguration(configuration, dm);
     }
 
-    public final Locale Locale_Spanisch = new Locale("Es", "es", "");
+    private final Locale Locale_Spanisch = new Locale("Es", "es", "");
 
     /**
-     * 如果不是英文、简体中文、繁体中文，默认返回简体中文
-     *
-     * @return
+     * @return  如果不是英文、简体中文、繁体中文，默认返回简体中文
      */
     private Locale getLanguageLocale() {
-//        PrefUtils.setString(App.getInstances(), AppConfig.CURRENT_LANGUAGE, language);
         String languageType = PrefUtils.getString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE, "follow_sys");
-        if (languageType.equals("follow_sys")) {
-            Locale sysLocale=getSysLocale();
-            return sysLocale;
-        } else if (languageType.equals("en")) {
-            return Locale.ENGLISH;
-        } else if (languageType.equals("ch")) {
-            return Locale.SIMPLIFIED_CHINESE;
-        } else if (languageType.equals("de")) {
-            return Locale.GERMANY;
-        } else if (languageType.equals("fr")) {
-            return Locale.FRANCE;
-        } else if (languageType.equals("es")) {
-            return Locale_Spanisch;
+        switch (languageType) {
+            case "follow_sys":
+                return getSysLocale();
+            case "en":
+                return Locale.ENGLISH;
+            case "ch":
+                return Locale.SIMPLIFIED_CHINESE;
+            case "de":
+                return Locale.GERMANY;
+            case "fr":
+                return Locale.FRANCE;
+            case "es":
+                return Locale_Spanisch;
+            default:
+                break;
         }
-//        Log.e(TAG, "getLanguageLocale" + languageType + languageType);
         getSystemLanguage(getSysLocale());
         return Locale.SIMPLIFIED_CHINESE;
     }
@@ -108,8 +90,10 @@ public class MultiLanguageUtil {
 
     }
 
-    //7.0以上获取方式需要特殊处理一下
-    public Locale getSysLocale() {
+    /**
+     * @return  7.0以上获取方式需要特殊处理一下
+     */
+    private Locale getSysLocale() {
         if (Build.VERSION.SDK_INT < 24) {
             return mContext.getResources().getConfiguration().locale;
         } else {
@@ -118,9 +102,7 @@ public class MultiLanguageUtil {
     }
 
     /**
-     * 更新语言
-     *
-     * @param languageType
+     * @param languageType  更新语言
      */
     public void updateLanguage(String languageType) {
         PrefUtils.setString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE,languageType);

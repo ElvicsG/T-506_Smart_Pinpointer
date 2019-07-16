@@ -1,12 +1,12 @@
 package com.kehui.www.testapp.adpter;
 
-import com.kehui.www.testapp.ui.SparkView.SparkAdapter;
+import com.kehui.www.testapp.ui.SparkView.BaseSparkAdapter;
 
 /*
  * Created by 29062 on 2017/2/17.
  */
 
-public class MyChartAdapter extends SparkAdapter {
+public class MyChartAdapterBase extends BaseSparkAdapter {
 
     private int[] mTempArray;
     private int[] mCompareArray;
@@ -29,7 +29,7 @@ public class MyChartAdapter extends SparkAdapter {
     private int splitNum;
     private boolean isShowSplitLine;
 
-    public MyChartAdapter(int[] mTempArray, int[] mCompareArray, boolean
+    public MyChartAdapterBase(int[] mTempArray, int[] mCompareArray, boolean
             isShowCompareLine, int splitNum, boolean isShowSplitLine) {
         this.mTempArray = mTempArray;
         this.mCompareArray = mCompareArray;
