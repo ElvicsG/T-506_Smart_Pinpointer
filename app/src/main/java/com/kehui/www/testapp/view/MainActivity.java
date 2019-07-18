@@ -31,7 +31,6 @@ import com.kehui.www.testapp.event.HandleReceiveDataEvent;
 import com.kehui.www.testapp.event.OperationGuideEvent;
 import com.kehui.www.testapp.event.SendDataFinishEvent;
 import com.kehui.www.testapp.event.UINoticeEvent;
-import com.kehui.www.testapp.ui.CustomDialog;
 import com.kehui.www.testapp.ui.PercentLinearLayout;
 import com.kehui.www.testapp.ui.SparkView.SparkView;
 import com.kehui.www.testapp.ui.TempControlView;
@@ -54,25 +53,23 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-
 /**
- * 界面无缝切换思路：
- * 将用户界面和专家界面用布局封装，放到一个activity中，
- * 点击模式切换时，控制布局的隐藏和显示。
- */
-/**
- * 专家模式页面
+ * @author Gong
+ * @date 2019/07/17
  */
 public class MainActivity extends BaseActivity {
 
-    private SoundUtils soundSystem; //GC20190422
-    //浮动层   //GC2.01.005 界面无缝切换
+    /**
+     * 浮动层   //GC2.01.005 界面无缝切换
+     */
     @BindView(R.id.mainUI)
     LinearLayout llMainUI;
     @BindView(R.id.userUI)
     LinearLayout llUserUI;
 
-    //用户界面所有控件
+    /**
+     * 用户界面控件
+     */
     @BindView(R.id.magnetic_field_gain_control_u)
     TempControlView magneticFieldGainControlU;
     @BindView(R.id.iv_magnetic_field_gain_u)
@@ -120,7 +117,9 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.ll_min_delay_u)
     LinearLayout llMinDelayU;
 
-    //专家界面控件
+    /**
+     * 专家界面控件
+     */
     @BindView(R.id.ll_silence)
     LinearLayout llSilence;
     @BindView(R.id.ll_pause)
@@ -172,33 +171,36 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.tv_position)
     TextView tvPosition;
 
-    //用户界面变量
-    //public static UserMainActivity instance;
-    private ValueAnimator valueAnimator;    //GN 动画绘制1
+    /**
+     * 用户界面变量部分
+     */
+    private ValueAnimator valueAnimator;
     private int[] scoreText = {R.drawable.ic_wait_empty, R.drawable.ic_wait_1, R.drawable.ic_wait_2, R.drawable.ic_wait_3};
-    private WaterWaveView v;    //水波纹动画
-    private ViewGroup.MarginLayoutParams layoutParams;  //GN 探头位置
-    private ValueAnimator valueAnimator2;   //GN 动画绘制2
-    //private double lastDelayValue = -1; //上次的声磁延时值
-    //GC20181115 历史最小延时值（最大349*0.125=43.625ms）
-    private double minDelayValue = 43.625;
-    //private Dialog dialog;
-    public int currentPosition;     //GN 当前增益进度条的位置
-    private boolean firstFind = true;   //GC20181119
-    //private int positionState = -1;  //GC20181119 故障圈的大小状态
-    //private int isRelatedCount = 0; //GC20181119 相关次数计数
+    private WaterWaveView v;
+    private ViewGroup.MarginLayoutParams layoutParams;
+    private ValueAnimator valueAnimator2;
+    public int currentPosition;
 
-    //专家界面变量
+    /**
+     * 延时值计算    //GC20181115 历史最小延时值（最大349*0.125=43.625ms）
+     */
+    private double lastDelayValue = -1;
+    private double minDelayValue = 43.625;
+    private double currentDelayValue = 0;
+
+    /**
+     * 相关功能 //GC20181119
+     */
+    private int isRelatedCount = 0;
+    private boolean firstFind = true;
+
+    /**
+     * 专家界面变量部分
+     */
     public static MainActivity instance;
-    private CustomDialog customDialog;
-    private Dialog dialog;
-    private double lastDelayValue = -1;         //上次的声磁延时值
-    private double currentDelayValue = 0;      //当前的声磁延时值   //GC20190625
     private int lastPosition = 50;  //GC20190218
-    private int positionState = -1;  //故障点状态远离还是接近
-    private int isRelatedCount = 0; //GC20181119 相关次数计数
-    private byte[] alarmByte;
-    private int alarmLen;
+    private Dialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,34 +213,17 @@ public class MainActivity extends BaseActivity {
         instance = this;
         initView();
         setSeekBar();
-        getShengyinData();  //初始化声音数据
-        getCichangData();   //初始化磁场数据
+        getShengyinData();
+        getCichangData();
         setChartListenner();
         //GC20190422 读取提示音
         soundSystem = new SoundUtils(this);
 //        showProgressDialog();
-
     }
 
-    //GN20190408 读取发现故障提示音
-    private void readAlarm() {
-
-        InputStream in = null;
-        try {
-            in = getResources().getAssets().open("8407.wav");
-            //获取文件的字节数
-            alarmLen = in.available();
-            //创建byte数组
-            alarmByte = new byte[alarmLen];
-            //将文件中的数据读到byte数组中
-            in.read(alarmByte);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    //初始化试图
+    /**
+     * 初始化试图
+     */
     private void initView() {
         seekbarCichang.setMax(100);
         seekbarShengyin.setMax(100);
@@ -247,10 +232,12 @@ public class MainActivity extends BaseActivity {
         tvCichangValue.setText(70 + "%");
         tvShengyinValue.setText(70 + "%");
         checkVoice();
-        //streamVolumenow = 0;
+        //streamVolumeNow = 0;
 
         //用户界面  //GC2.01.005 界面无缝切换
-        //GN 动画绘制1（正在测试中）
+        //去掉最小延时值显示    //GC20190717
+        llMinDelayU.setVisibility(View.GONE);
+        //动画绘制1（正在测试中）
         ccvFirstU.setVisibility(View.GONE);
         ccvSecondU.setVisibility(View.GONE);
         if (valueAnimator == null) {
@@ -268,6 +255,42 @@ public class MainActivity extends BaseActivity {
         v = new WaterWaveView(MainActivity.this);
         v.setFillWaveSourceShapeRadius(10);
         rlWaveU.addView(v);
+
+        /*//GTGC20190717
+        //去动画1——波纹  正在测试中   ...
+        rlWaveU.removeView(v);
+        tvScanU.setVisibility(View.GONE);
+        ivScanU.setVisibility(View.GONE);
+        //画动画2
+        //GC20190717 颜色改动之前——灰色"#555555"  "黄色#e1de04"
+        ccvFirstU.updateView("#00ffde", 8, 33);
+        ccvSecondU.updateView("#555555", 8, 33);
+        tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
+        tvCurrentDelayU.setText(getString(R.string.current) + currentDelayValue + "ms");
+        if (valueAnimator2 == null) {
+            valueAnimator2 = ValueAnimator.ofInt(0, 2).setDuration(1000);
+            valueAnimator2.setRepeatCount(ValueAnimator.INFINITE);
+            valueAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    int i = (int) animation.getAnimatedValue();
+                    if (i == 0) {
+                        ccvSecondU.setVisibility(View.VISIBLE);
+                        ccvFirstU.setVisibility(View.GONE);
+                        //GC20190717
+                        tvLastDelayU.setVisibility(View.INVISIBLE);
+                        tvCurrentDelayU.setVisibility(View.INVISIBLE);
+                    } else if (i == 1) {
+                        ccvSecondU.setVisibility(View.GONE);
+                        ccvFirstU.setVisibility(View.VISIBLE);
+                        tvLastDelayU.setVisibility(View.VISIBLE);
+                        tvCurrentDelayU.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+        }
+        valueAnimator2.start();*/
+
         //设置探头位置
         layoutParams = new ViewGroup.MarginLayoutParams(ivPositionU.getLayoutParams());
         //设置增益显示
@@ -292,7 +315,7 @@ public class MainActivity extends BaseActivity {
 
                 seekbarType = 1;
                 int[] ints = {96, 0, 128 + b2s(temp)};
-                long l = getRequestCrcByte(ints);
+                long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuffer ss = new StringBuffer();
                 if (s.length() <= 32) {
@@ -321,7 +344,7 @@ public class MainActivity extends BaseActivity {
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
                 Constant.CurrentMagParam = request; //GC2.01.006 蓝牙重连功能优化
-                sendString(request);
+                sendCommand(request);
 
             }
         });
@@ -346,7 +369,7 @@ public class MainActivity extends BaseActivity {
 
                 seekbarType = 2;
                 int[] ints = {96, 0, b2s(temp)};
-                long l = getRequestCrcByte(ints);
+                long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuffer ss = new StringBuffer();
                 if (s.length() <= 32) {
@@ -375,7 +398,7 @@ public class MainActivity extends BaseActivity {
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
                 Constant.CurrentVoiceParam = request;   //GC2.01.006 蓝牙重连功能优化
-                sendString(request);
+                sendCommand(request);
 
             }
         });
@@ -407,7 +430,7 @@ public class MainActivity extends BaseActivity {
 
                 seekbarType = 1;
                 int[] ints = {96, 0, 128 + b2s(seekBar.getProgress())};
-                long l = getRequestCrcByte(ints);
+                long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuffer ss = new StringBuffer();
                 if (s.length() <= 32) {
@@ -436,7 +459,7 @@ public class MainActivity extends BaseActivity {
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
                 Constant.CurrentMagParam = request; //GC2.01.006 蓝牙重连功能优化
-                sendString(request);
+                sendCommand(request);
             }
 
         });
@@ -461,7 +484,7 @@ public class MainActivity extends BaseActivity {
                 //Log.e("打印-设置shengyin", seekbarShengyin.getProgress() + "");
                 seekbarType = 2;
                 int[] ints = {96, 0, b2s(seekbarShengyin.getProgress())};
-                long l = getRequestCrcByte(ints);
+                long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuffer ss = new StringBuffer();
                 if (s.length() <= 32) {
@@ -490,7 +513,7 @@ public class MainActivity extends BaseActivity {
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
                 Constant.CurrentVoiceParam = request;   //GC2.01.006 蓝牙重连功能优化
-                sendString(request);
+                sendCommand(request);
 
             }
 
@@ -498,7 +521,9 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    //获得初始化磁场数据
+    /**
+     * 初始化磁场数据
+     */
     private void getCichangData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "cichang.txt");
         BufferedInputStream bis = new BufferedInputStream(mResourceAsStream);
@@ -542,7 +567,9 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    //获得初始化声音数据
+    /**
+     * 声音数据初始化
+     */
     private void getShengyinData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" +
                 "shengyin.txt");
@@ -612,7 +639,7 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    //GN 发送控制命令
+    //发送控制命令
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(SendDataFinishEvent event) {
         mHandle.postDelayed(new Runnable() {
@@ -634,12 +661,12 @@ public class MainActivity extends BaseActivity {
                 llFilterU.setClickable(true);   //GC2.01.005 界面无缝切换
                 voiceGainControlU.setEnabled(true);
                 magneticFieldGainControlU.setEnabled(true);
-                hasSendMessage = false;
+                hasSentCommand = false;
             }
         }, 500);
     }
 
-    //GN 接收控制命令
+    //接收控制命令
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(HandleReceiveDataEvent event) {
         if (seekbarType == 1) {
@@ -658,7 +685,8 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void run() {
                     llFilter.setClickable(true);
-                    llFilterU.setClickable(true);   //GC2.01.005 界面无缝切换
+                    //GC2.01.005 界面无缝切换
+                    llFilterU.setClickable(true);
                 }
             }, 500);
         }
@@ -669,7 +697,8 @@ public class MainActivity extends BaseActivity {
                     llFilter.setClickable(true);
                     seekbarCichang.setEnabled(true);
                     seekbarShengyin.setEnabled(true);
-                    llFilterU.setClickable(true);   //GC2.01.005 界面无缝切换
+                    //GC2.01.005 界面无缝切换
+                    llFilterU.setClickable(true);
                     voiceGainControlU.setEnabled(true);
                     magneticFieldGainControlU.setEnabled(true);
 
@@ -678,7 +707,7 @@ public class MainActivity extends BaseActivity {
             Toast.makeText(MainActivity.this, getResources().getString(R.string
                     .The_sending_data_failed_and_was_being_resent), Toast.LENGTH_SHORT).show();
         }
-        if (event.status == BLUETOOTH_DISCONNECTED) {
+        if (event.status == DISCONNECTED) {
             toastDisconnected = true;
             if (!isExit) {
                 new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
@@ -705,41 +734,46 @@ public class MainActivity extends BaseActivity {
                         .show();
             }
         }
-        if (event.status == WHAT_POSITION_Right) {
+        if (event.status == POSITION_RIGHT) {
             tvPosition.setText(getResources().getString(R.string.right));
             layoutParams.setMargins(Utils.dp2px(MainActivity.this, 100), Utils.dp2px(MainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
-            ivPositionU.setLayoutParams(params);    //GC2.01.005 界面无缝切换
+            //GC2.01.005 界面无缝切换
+            ivPositionU.setLayoutParams(params);
         }
-        if (event.status == WHAT_POSITION_LEFT) {
+        if (event.status == POSITION_LEFT) {
             tvPosition.setText(getResources().getString(R.string.left));
             layoutParams.setMargins(Utils.dp2px(MainActivity.this, 40), Utils.dp2px(MainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
             ivPositionU.setLayoutParams(params);
         }
 
-        if (event.status == WHAT_LIGHT) {
+        if (event.status == LIGHT_UP) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_red);
-            tvNotice.setText("");   //GC20190307 词条和延时跳动效果
+            //GC20190307 词条和延时跳动效果
+            tvNotice.setText("");
             tvNoticeU.setText("");
             tvPosition.setText("");
 
         }
-        if (event.status == CICHANG_CHANGE_OVER) {
+        if (event.status == TRIGGERED) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
         }
         if (event.status == WHAT_REFRESH) {
             if (isDraw) {
                 myChartAdapterShengyin.setmTempArray(mTempShengyinArray);
                 myChartAdapterShengyin.setShowCompareLine(isCom);
-                if (isCom) myChartAdapterShengyin.setmCompareArray(mCompareArray);
+                if (isCom) {
+                    myChartAdapterShengyin.setmCompareArray(mCompareArray);
+                }
                 myChartAdapterShengyin.notifyDataSetChanged();
                 myChartAdapterCichang.setmTempArray(mTempCichangArray);
                 myChartAdapterCichang.notifyDataSetChanged();
 
             }
-            handleGainView(maxShengYin, ivVoiceGainU, 1);    //GC20181113 上下语句顺序调整，否则影响进度条回落功能
-            handleGainView(maxCiChang, ivMagneticFieldGainU, 0);
+            //GC20181113 上下语句顺序调整，否则影响进度条回落功能
+            handleGainView(maxVoice, ivVoiceGainU, 1);
+            handleGainView(maxMagnetic, ivMagneticFieldGainU, 0);
         }
         //GN20190407
         if (event.status == LINK_LOST) {
@@ -788,7 +822,7 @@ public class MainActivity extends BaseActivity {
         //GC20181113 判断结构修改
         if (type == 0) {
             changeMagneticFieldGainView(imageView, currentPosition);
-            maxCiChang = 0;     //GC20181113 刷新之后归零
+            maxMagnetic = 0;     //GC20181113 刷新之后归零
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -803,7 +837,7 @@ public class MainActivity extends BaseActivity {
             }).start();
         } else if (type == 1) {
             changeVoiceGainView(ivVoiceGainU, currentPosition);
-            maxShengYin = 0;    //GC20181113 刷新之后归零
+            maxVoice = 0;    //GC20181113 刷新之后归零
             //GC20181121 添加声音回落
             new Thread(new Runnable() {
                 @Override
@@ -912,44 +946,47 @@ public class MainActivity extends BaseActivity {
         }
     });
 
-    //GC20190123 智能算法识别声音的结果
+    /**
+     * @param event 智能算法识别声音的结果 //GC20190123
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(OperationGuideEvent event) {
-        //GN 关闭闪烁动画 //GC20190123 每次智能识别都会先关闭一下
+        //关闭闪烁动画
         if (valueAnimator2 != null) {
             valueAnimator2.end();
         }
-        if (event.isMalfunction) {
-            //GN 第一次判断为故障声采取下列操作，后续不采取任何操作
+        if (event.isFault) {
+            //第一次判断为故障声采取下列操作，后续不采取任何操作
             if (firstFind) {
                 //延时值显示
                 if(lastDelayValue > 0){
-                    tvLastDelayU.setText(lastDelayValue + "ms");    //GN 有过相关后的声磁延时值
+                    //有过相关后的声磁延时值   //GC20190717
+                    tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
                 }else{
                     tvLastDelayU.setText("");
                 }
                 tvCurrentDelayU.setText("");
-
-                positionState = 3;
                 firstFind = false;
             }
 
         } else {
-            //GC20190123 相关为否的状态 判断“磁场触发”，显示动画1
+            //判断“磁场触发”，显示动画1
             tvNotice.setText(getString(R.string.triggered));
-            tvNoticeU.setText(getString(R.string.triggered));   //GC201901232
-            //GN 去动画2
+            tvNoticeU.setText(getString(R.string.triggered));
+            //去动画2
             ccvFirstU.setVisibility(View.GONE);
             ccvSecondU.setVisibility(View.GONE);
-            //GN 显示动画1
+            //画动画1——波纹  正在测试中   ...
             try {
-                rlWaveU.addView(v);                  //GN 波纹
-            }catch (Exception l_ex){}
-            tvScanU.setVisibility(View.VISIBLE); //GN 正在测试中
-            ivScanU.setVisibility(View.VISIBLE); //GN ...
+                rlWaveU.addView(v);
+            }catch (Exception ignored){
+            }
+            tvScanU.setVisibility(View.VISIBLE);
+            ivScanU.setVisibility(View.VISIBLE);
             //延时值显示
             if(lastDelayValue > 0){
-                tvLastDelayU.setText(lastDelayValue + "ms");    //GN 有过相关后的声磁延时值
+                //有过相关后的声磁延时值   //GC20190717
+                tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
             }else{
                 tvLastDelayU.setText("");
             }
@@ -966,7 +1003,6 @@ public class MainActivity extends BaseActivity {
         if (event.isRelated) {
             //GC20190123 相关为是的状态，判断“已发现故障”，显示动画2
             tvNotice.setText(getString(R.string.message_notice_7));
-            //GC201901232
             tvNoticeU.setText(getString(R.string.message_notice_7));
 
             //GC20190422 播放提示音
@@ -978,33 +1014,35 @@ public class MainActivity extends BaseActivity {
 
             //GC20190123 延时值显示
             if (isRelatedCount == 0) {
-                //GN 显示上次延时值
+                //显示上次延时值
                 if(lastDelayValue < 0){
-                    //GN 历史记录第一次相关
+                    //历史记录第一次相关
                     tvLastDelayU.setText("");
                 }else if (lastDelayValue > 0) {
-                    //GN 有过相关后的声磁延时值，
-                    tvLastDelayU.setText(lastDelayValue + "ms");
+                    //有过相关后的声磁延时值   //GC20190717
+                    tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
                 }
-                //GN 显示当前延时值
-                tvCurrentDelayU.setText(event.delayValue + "ms");
+                //GC20190717
+                tvCurrentDelayU.setText(getString(R.string.current) + event.delayValue + "ms");
                 //GC20190218 专家界面延时值显示
                 tvYanShi.setText(event.delayValue + "ms");
                 linechartShengyin.setScrubLine3(event.position);
-                //GN 保存到上次的声磁延时值
+                //保存到上次的声磁延时值
                 lastDelayValue = event.delayValue;
-                lastPosition = event.position;  //GC20190218
-                //GN 保存历史最小声磁延时值
+                //GC20190218
+                lastPosition = event.position;
+                //保存历史最小声磁延时值
                 if (event.delayValue < minDelayValue) {
                     minDelayValue = event.delayValue;
                 }
-                //GN 显示历史最小声磁延时值
-                llMinDelayU.setVisibility(View.VISIBLE);
-                tvMinDelayValueU.setText(minDelayValue + "ms");
+                //显示历史最小声磁延时值   //GC20190717
+                /*llMinDelayU.setVisibility(View.VISIBLE);
+                tvMinDelayValueU.setText(minDelayValue + "ms");*/
 
             } else if (isRelatedCount > 0) {    //从第二次相关开始后继续相关
-                tvLastDelayU.setText(lastDelayValue + "ms");
-                tvCurrentDelayU.setText(lastDelayValue + "ms");
+                //GC20190717
+                tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
+                tvCurrentDelayU.setText(getString(R.string.current) + event.delayValue + "ms");
                 //GC20190218 专家界面延时值显示
                 tvYanShi.setText(lastDelayValue + "ms");
                 linechartShengyin.setScrubLine3(lastPosition);
@@ -1014,24 +1052,23 @@ public class MainActivity extends BaseActivity {
 
         }else{
             isRelatedCount = 0;
-            //GC20190123 相关为否的状态 判断“磁场触发”，显示动画1
+            //相关为否的状态 判断“磁场触发”    //GC20190123
             tvNotice.setText(getString(R.string.triggered));
-            tvNoticeU.setText(getString(R.string.triggered));   //GC201901232
-            //GC20190123 去动画2
+            tvNoticeU.setText(getString(R.string.triggered));
+            //去动画2   //GC20190123
             ccvFirstU.setVisibility(View.GONE);
             ccvSecondU.setVisibility(View.GONE);
-            //GC20190123 显示动画1 非故障界面
+            //画动画1
             try {
                 rlWaveU.addView(v);
-            }catch (Exception l_ex) {
-
+            }catch (Exception ignored) {
             }
             tvScanU.setVisibility(View.VISIBLE);
             ivScanU.setVisibility(View.VISIBLE);
             //延时值显示
             if(lastDelayValue > 0){
-                //GN 有过相关后的声磁延时值
-                tvLastDelayU.setText(lastDelayValue + "ms");
+                //有过相关后的声磁延时值   //GC20190717
+                tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
             }else{
                 tvLastDelayU.setText("");
             }
@@ -1041,45 +1078,48 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    //GC20190625
+    /**
+     * 根据界面延时值大小画刻度圆圈   //GC20190625
+     */
     public void drawCircle() {
-        //GN 去动画1
-        rlWaveU.removeView(v);               //GN 波纹
-        tvScanU.setVisibility(View.GONE);    //GN 正在测试中
-        ivScanU.setVisibility(View.GONE);    //GN ...
-        //GN 显示动画2
+        //去动画1——波纹  正在测试中   ...
+        rlWaveU.removeView(v);
+        tvScanU.setVisibility(View.GONE);
+        ivScanU.setVisibility(View.GONE);
+        //画动画2
         if ( (currentDelayValue > 0) && (currentDelayValue <= 1) ){
-            ccvFirstU.updateView("#555555", 8, 5);
+            //GC20190717 颜色改动之前——"#555555"
+            ccvFirstU.updateView("#00ffde", 8, 5);
             ccvSecondU.updateView("#e1de04", 8, 5);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 2) ){
-            ccvFirstU.updateView("#555555", 8, 19);
+            ccvFirstU.updateView("#00ffde", 8, 19);
             ccvSecondU.updateView("#e1de04", 8, 19);
         }else if ( (currentDelayValue > 2) && (currentDelayValue <= 3) ){
-            ccvFirstU.updateView("#555555", 8, 33);
+            ccvFirstU.updateView("#00ffde", 8, 33);
             ccvSecondU.updateView("#e1de04", 8, 33);
         }else if ( (currentDelayValue > 3) && (currentDelayValue <= 4) ){
-            ccvFirstU.updateView("#555555", 8, 47);
+            ccvFirstU.updateView("#00ffde", 8, 47);
             ccvSecondU.updateView("#e1de04", 8, 47);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 5) ){
-            ccvFirstU.updateView("#555555", 8, 61);
+            ccvFirstU.updateView("#00ffde", 8, 61);
             ccvSecondU.updateView("#e1de04", 8, 61);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 6) ){
-            ccvFirstU.updateView("#555555", 8, 75);
+            ccvFirstU.updateView("#00ffde", 8, 75);
             ccvSecondU.updateView("#e1de04", 8, 75);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 7) ){
-            ccvFirstU.updateView("#555555", 8, 89);
+            ccvFirstU.updateView("#00ffde", 8, 89);
             ccvSecondU.updateView("#e1de04", 8, 89);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 8) ){
-            ccvFirstU.updateView("#555555", 8, 103);
+            ccvFirstU.updateView("#00ffde", 8, 103);
             ccvSecondU.updateView("#e1de04", 8, 103);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 9) ){
-            ccvFirstU.updateView("#555555", 8, 117);
+            ccvFirstU.updateView("#00ffde", 8, 117);
             ccvSecondU.updateView("#e1de04", 8, 117);
         }else if ( (currentDelayValue > 1) && (currentDelayValue <= 10) ){
-            ccvFirstU.updateView("#555555", 8, 131);
+            ccvFirstU.updateView("#00ffde", 8, 131);
             ccvSecondU.updateView("#e1de04", 8, 131);
         }else if (currentDelayValue > 10){
-            ccvFirstU.updateView("#555555", 8, 145);
+            ccvFirstU.updateView("#00ffde", 8, 145);
             ccvSecondU.updateView("#e1de04", 8, 145);
         }
 
@@ -1093,9 +1133,14 @@ public class MainActivity extends BaseActivity {
                     if (i == 0) {
                         ccvSecondU.setVisibility(View.VISIBLE);
                         ccvFirstU.setVisibility(View.GONE);
+                        //GC20190717
+                        tvLastDelayU.setVisibility(View.INVISIBLE);
+                        tvCurrentDelayU.setVisibility(View.INVISIBLE);
                     } else if (i == 1) {
                         ccvSecondU.setVisibility(View.GONE);
                         ccvFirstU.setVisibility(View.VISIBLE);
+                        tvLastDelayU.setVisibility(View.VISIBLE);
+                        tvCurrentDelayU.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -1193,17 +1238,17 @@ public class MainActivity extends BaseActivity {
         /*System.out.println("streamMaxVolume:" + streamMaxVolume);
         System.out.println("streamVolume:" + streamVolume);*/
         if (isSilence) {
-            if (streamVolumenow == 0) {
-                streamVolumenow = streamMaxVolume / 2;
+            if (streamVolumeNow == 0) {
+                streamVolumeNow = streamMaxVolume / 2;
             }
             //audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumenow,
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumeNow,
                     AudioManager
                             .FLAG_PLAY_SOUND);
             ivSilence.setImageResource(R.drawable.ic_open_voice);
             ivSilenceU.setImageResource(R.drawable.ic_open_voice);
         } else {
-            streamVolumenow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            streamVolumeNow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             //audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager
                     .FLAG_PLAY_SOUND);
@@ -1349,9 +1394,9 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         try {
             instance = null;
-//            if (mSocket != null) {
-//                mSocket.close();
-////                mInputStream.close();
+//            if (blueSocket != null) {
+//                blueSocket.close();
+////                inputStream.close();
 //            }
         } catch (Exception e) {
             e.printStackTrace();

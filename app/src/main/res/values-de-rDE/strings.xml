@@ -171,5 +171,7 @@
     <string name="gpsNotifyMsg">当前应用需要打开定位功能。</string>
     <string name="initiate_assistance">Begin to assist</string>
     <string name="notifyTitle">Tips</string>
+    <string name="current">Current:</string>
+    <string name="last">Last:</string>
 
 </resources>

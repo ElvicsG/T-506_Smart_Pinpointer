@@ -1,5 +1,6 @@
 package com.kehui.www.testapp.base;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -33,6 +34,7 @@ import com.kehui.www.testapp.event.StartReadThreadEvent;
 import com.kehui.www.testapp.event.UINoticeEvent;
 import com.kehui.www.testapp.ui.CustomDialog;
 import com.kehui.www.testapp.util.PrefUtils;
+import com.kehui.www.testapp.util.SoundUtils;
 import com.kehui.www.testapp.util.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -54,42 +56,50 @@ import libsvm.svm_parameter;
 import libsvm.svm_problem;
 
 /**
- * 是专家模式和用户模式基类
+ * @author Gong
+ * @date 2019/07/17
  */
 public class BaseActivity extends AppCompatActivity {
-    //蓝牙相关
-    BluetoothDevice _device = null; // 蓝牙设备
-    BluetoothSocket _socket = null; // 蓝牙通信socket
-    private BluetoothAdapter _bluetooth = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备
-    private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // SPP服务UUID号
-    //GN20190407 是否尝试连接
-    public boolean isFlag;
 
-    /*声音播放*/
+    /**
+     * 声音播放部分
+     */
     public AudioManager audioManager;
     public AudioTrack mAudioTrack;
-    /*声音特征训练*/
-    private double[] readFeature = new double[2000];
-    private boolean svmTrainThread; //GN 训练声音特征线程是否启动的标志
-    private svm_model model;
-    /*获取蓝牙数据*/
-    public long[] mCrcTable;
-    public BluetoothSocket mSocket;
-    public InputStream mInputStream;
-    public boolean getBDataThread;    //GN 获取蓝牙数据线程是否启动的标志
-    public int mTempLength = 0;         //GN 蓝牙数据的临时数组长度
-    public int[] mTemp = new int[1024000]; //GN 蓝牙数据的临时数组
-    public int mTempcount = 0;          //GN 蓝牙数据的临时数组内的输入流个数
-    public boolean handleBDataThread;   //GN 蓝牙数据是否正在处理的标志
-    public boolean sendCommand;         //GN 初始化控制命令是否已经发送的标志
-    public byte[] tempRequest = new byte[7];
-    public boolean hasSendMessage;      //GN 控制命令是否发送成功的标志
-    public int mTempLength2 = 0;            //GN 进行处理的蓝牙数据数组长度
-    public int[] mTemp2 = new int[1024000];   //GN 进行处理的蓝牙数据数组
-    /*处理蓝牙数据*/
-    public boolean hasLeft;     //GN 将蓝牙数据分包后，是否有剩余数据的标志
-    public int hasLeftLen = 0;  //GN 将蓝牙数据分包后(每包59个字节)，剩余数据的数组长度
-    public int[] mTempLeft = new int[59];    //GN 将蓝牙数据分包后有剩余数据时的临时数组
+
+    /**
+     * 蓝牙相关部分
+     */
+    BluetoothDevice device = null;
+    BluetoothSocket socket = null;
+    private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备
+    private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // SPP服务UUID号
+    public BluetoothSocket blueSocket;
+    public boolean needReconnect;
+
+    /**
+     * 发送蓝牙数据
+     */
+    public byte[] sendCommand;
+    public long[] crcTable;
+    public boolean hasSentInitCommand;
+    public boolean hasSentCommand;
+
+    /**
+     * 接收蓝牙数据
+     */
+    public InputStream inputStream;
+    public int[] stream;
+    public int streamLength;
+    public int streamCount;
+    public int[] blueStream;
+    public int blueStreamLen;
+    public boolean hasGotStream;
+    public boolean handleStream;
+    public int[] streamLeft;
+    public int leftLen;
+    public boolean hasLeft;
+
     public int seekbarType;     //GN 磁场（1）或声音（2）控制的选择
     public int[] shengyinSeekbarInts;
     public int[] cichangSeekbarInts;
@@ -106,61 +116,94 @@ public class BaseActivity extends AppCompatActivity {
     public int[] mCompareArray;
     public int[] mCichangArray;
     public int[] mTempCichangArray;
-    /*声音智能识别*/
-    private int[] mAIRecognitionArray = new int[900];   //GC20180412 需要预测的声音缓存数组
-    private int[] mSVM = new int[800];                   //GC20180412 获取声音特征值的缓存数组
-    private double[] featurex = new double[4];
-    private double[] mNormalization = new double[800];
-    //GC20181119 相关
-    private double[] mNormalization1 = new double[800];
-    public int svmPredictCount = 0; //预测结果为是的次数统计
-    private double p = 0;
-    private int[] mSVMLocate = new int[800];    //GC20181201 用于自动定位的缓存数组
-    private int[] mSVMLocate2 = new int[800];    //GC20181204 用于自动定位的缓存数组
-    private int position;       //光标位置
-    private double timeDelay;   //声磁延时值
-    private double userDelay;   //一组相关声音的声磁延时值
-    /*用户界面增益进度条显示*/
-    public int maxShengYin; //GN 声音信号幅值最大的点
-    public int maxCiChang;  //GN 磁场信号幅值最大的点
-    public int[] maxCichangArray;   //GC20181113
-    /*按钮控制*/
-    public boolean isSilence;  //是否是静音的标志
-    public int streamVolumenow;     //GN 当前音量值
-    public boolean isClickRem;  //是否记忆波形的标志
-    public boolean isCom;       //是否比较波形的标志
-    public MyChartAdapterBase myChartAdapterShengyin;
-    public MyChartAdapterBase myChartAdapterCichang;
-    private CustomDialog customDialog;      //GN 滤波方式选择对话框
-    public int clickTongNum;    //GN 滤波方式选择， *低通1 *带通2 *高通3 *全通0
-    public int currentFilter;   //GN 当前滤波方式  *低通1 *带通2 *高通3 *全通0
-    /*全局的handler对象用来执行UI更新*/
-    public int WHAT_LIGHT = 1;             //GN“同步指示” 灯变红
-    public int CICHANG_CHANGE_OVER = 2;    //GN“同步指示” 灯变灰
-    public int WHAT_REFRESH = 3;   //子线程通知主线程刷新UI的what
-    public int LINK_LOST = 11;      //GN20190407
-    public int LINK_RECONNECT = 22;     //GC20190613
-    public int SEND_SUCCESS = 100;     //GN平板命令下发成功
-    public int SEND_ERROR = 200;       //GN平板命令下发失败
-    public int BLUETOOTH_DISCONNECTED = 300;   //GN蓝牙设备未连接
-    public int WHAT_POSITION_Right = 400;  //GN通过磁场数据判断 仪器 在 电缆 的“右or左”
-    public int WHAT_POSITION_LEFT = 500;
-    //解密需要的解析常量数组
-    public int[] IndexTable = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
-    public int[] StepSizeTable = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31,
+
+    /**
+     * 解密需要的解析常量数组
+     */
+    public int[] indexTable = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
+    public int[] stepSizeTable = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31,
             34, 37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190,
             209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963,
             1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660,
             4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635,
             13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
 
+    /**
+     * View布局
+     */
+    public MyChartAdapterBase myChartAdapterShengyin;
+    public MyChartAdapterBase myChartAdapterCichang;
+    public int streamVolumeNow;
+    public boolean isSilence;
+    public boolean isClickMem;
+    public boolean isCom;
 
-    //GN全局handle更新UI
+    /**
+     * 自定义对话框   *低通1 *带通2 *高通3 *全通0
+     */
+    private CustomDialog customDialog;
+    public int clickTongNum;
+    public int currentFilter;
+
+    /**
+     * 声音特征训练
+     */
+    private double[] readFeature = new double[2000];
+    private boolean svmTrainThread;
+    private svm_model model;
+
+    /**
+     * 声音智能识别
+     */
+    private int[] tempVoice = new int[900];
+    private int[] svmData = new int[800];
+    private double[] featurex = new double[4];
+    private double[] mNormalization = new double[800];
+
+    /**
+     * 用户界面增益进度条显示  //GC20181113
+     */
+    public int maxVoice;
+    public int maxMagnetic;
+    public int[] maxMagneticArray;
+
+    /**
+     * 相关部分   //GC20181119
+     */
+    private double[] mNormalization1 = new double[800];
+    public int svmPredictCount = 0; //预测结果为是的次数统计
+    private double p = 0;
+    private int[] svmLocate = new int[800];    //GC20181201 用于自动定位的缓存数组
+    private int[] svmLocate2 = new int[800];    //GC20181204 用于自动定位的缓存数组
+    private int position;       //光标位置
+    private double timeDelay;   //声磁延时值
+    private double userDelay;   //一组相关声音的声磁延时值
+
+    /**
+     *  提示音功能添加 //GC20190422
+     */
+    public SoundUtils soundSystem;
+
+    /**
+     * 全局的handler对象用来执行UI更新
+     */
+    public static final int SEND_SUCCESS    = 1;
+    public static final int SEND_ERROR      = 2;
+    public static final int DISCONNECTED    = 3;
+    public static final int POSITION_RIGHT  = 4;
+    public static final int POSITION_LEFT   = 5;
+    public static final int LIGHT_UP        = 6;
+    public static final int TRIGGERED       = 7;
+    public static final int WHAT_REFRESH    = 8;
+    public static final int LINK_LOST       = 9;
+    public static final int LINK_RECONNECT  = 10;
+
+
+    @SuppressLint("HandlerLeak")
     public Handler mHandle = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             EventBus.getDefault().post(new UINoticeEvent(msg.what));
-
         }
     };
 
@@ -171,19 +214,36 @@ public class BaseActivity extends AppCompatActivity {
         initData();
         setAudioTrack();
         getFeaturexData();
-        svmTrain.start();      //GN 启动训练声音特征的线程
+        //启动训练声音特征的线程
+        svmTrain.start();
         getCrcTable();
-        startThread();          //GN 获取蓝牙数据
-        handleBData.start();   //GN 处理蓝牙数据的线程
+        //获取蓝牙数据
+        startThread();
+        handleBlueStream.start();   //GN 处理蓝牙数据的线程
         EventBus.getDefault().register(this);
 
     }
 
-    //初始化
+    /**
+     * 初始化
+     */
     private void initData() {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        mSocket = MyApplication.getInstances().get_socket();
-        hasSendMessage = false;
+        blueSocket = MyApplication.getInstances().get_socket();
+
+        sendCommand = new byte[7];
+        //缓存的蓝牙数据
+        stream = new int[1024000];
+        streamLength = 0;
+        //缓存数据包含的输入流个数
+        streamCount = 0;
+        //需要处理的蓝牙数据
+        blueStream = new int[1024000];
+        blueStreamLen = 0;
+        //将蓝牙数据分包后的剩余数据
+        streamLeft = new int[59];
+        leftLen = 0;
+
         seekbarType = 0;
         shengyinSeekbarInts = new int[]{22, 22};
         cichangSeekbarInts = new int[]{22, 22};
@@ -201,14 +261,18 @@ public class BaseActivity extends AppCompatActivity {
         mCompareArray = new int[500];
         mCichangArray = new int[400];
         mTempCichangArray = new int[400];
-        maxCichangArray = new int[400];     //GC20181113
-        isClickRem = false;
+        //GC20181113
+        maxMagneticArray = new int[400];
+        isClickMem = false;
         isCom = false;
-        clickTongNum = 0;   //初始化滤波方式为全通
+        //初始化滤波方式为全通
+        clickTongNum = 0;
 
     }
 
-    //设置音频播放工具
+    /**
+     * 设置音频播放工具
+     */
     public void setAudioTrack() {
         int minBufferSize = AudioTrack.getMinBufferSize(8000,
                 AudioFormat.CHANNEL_OUT_MONO,
@@ -237,35 +301,39 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //GC20180504 从assets文件夹中获取声音特征的数据
+    /**
+     * 从assets文件夹中获取声音特征的数据 //GC20180504 注意读取文本文件的编码格式为ANSI
+     */
     private void getFeaturexData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "feature.txt");
         BufferedInputStream bis = new BufferedInputStream(mResourceAsStream);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int c;//读取bis流中的下一个字节
+        int c;
         try {
+            //读取bis流中的下一个字节
             c = bis.read();
             while (c != -1) {
                 baos.write(c);
                 c = bis.read();
             }
             bis.close();
-            String s = baos.toString();         //Log.e("FILE", s);
-            String[] split = s.split("\\s+");   //Log.e("FILE","splitSize:"+split.length);
+            String s = baos.toString();
+            String[] split = s.split("\\s+");
             for (int i = 0; i < split.length; i++) {
                 try {
-                    readFeature[i] = Double.parseDouble(split[i]);    // Log.e("FILE","crcTable[i]:"+mCrcTable[i]);
-                } catch (Exception l_ex) {
+                    readFeature[i] = Double.parseDouble(split[i]);
+                } catch (Exception ignored) {
                 }
             }
-            //GC20180504 注意读取文本文件的编码格式为ANSI  Log.e("FILE",""+readFeature);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    //GC20180504 训练声音特征的线程
+    /**
+     * 训练声音特征的线程    //GC20180504
+     */
     Thread svmTrain = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -276,7 +344,10 @@ public class BaseActivity extends AppCompatActivity {
         }
     });
 
-    //GC20180504 训练声音特征生成model
+    /**
+     * 训练生成model
+     * @param readFeature   读取的声音特征
+     */
     private void voiceSvmTrain(double[] readFeature) {
         svm_problem sp = new svm_problem();
         svm_node[][] x = new svm_node[500][4];
@@ -321,13 +392,16 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //从assets文件夹中获取crctable的数据
+    /**
+     * 从assets文件夹中获取crctable的数据
+     */
     public void getCrcTable() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "crctable.txt");
         BufferedInputStream bis = new BufferedInputStream(mResourceAsStream);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        int c = 0;//读取bis流中的下一个字节
+        int c;
+        //读取bis流中的下一个字节
         try {
             c = bis.read();
             while (c != -1) {
@@ -335,22 +409,21 @@ public class BaseActivity extends AppCompatActivity {
                 c = bis.read();
             }
             bis.close();
-            String s = baos.toString();         //Log.e("FILE", s);
-            String[] split = s.split("\\s+");   //Log.e("FILE","splitSize:"+split.length);
-            mCrcTable = new long[256];
+            String s = baos.toString();
+            String[] split = s.split("\\s+");
+            crcTable = new long[256];
             for (int i = 0; i < split.length; i++) {
-                mCrcTable[i] = Long.parseLong(split[i], 16);    // Log.e("FILE","crcTable[i]:"+mCrcTable[i]);
+                crcTable[i] = Long.parseLong(split[i], 16);
             }
-            /* byte retArr[]=baos.toByteArray();
-            for (byte b : retArr) {
-                Log.e("FILE",""+b);
-            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
+    /**
+     * @param event 蓝牙重连事件
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StartReadThreadEvent event) {
         //GC20190613
@@ -359,21 +432,22 @@ public class BaseActivity extends AppCompatActivity {
         mHandle.sendMessage(message);
         Toast.makeText(this, getResources().getString(R.string.connect) + " " + event.device + " " + getResources().getString(R.string.success),
                 Toast.LENGTH_SHORT).show();
-        getBDataThread = false;
+        hasGotStream = false;
         startThread();
 
     }
 
-    //取蓝牙数据
+    /**
+     * 获取蓝牙数据
+     */
     private void startThread() {
         try {
-            //GN 进入演示模式后打开仪器依旧可以正常连接
-            mSocket = MyApplication.getInstances().get_socket();
-            if (mSocket != null) {
-                //GN 通过蓝牙socket获得输入流
-                mInputStream = mSocket.getInputStream();
+            //进入演示模式后打开仪器依旧可以正常连接
+            blueSocket = MyApplication.getInstances().get_socket();
+            if (blueSocket != null) {
+                //通过蓝牙socket获得输入流
+                inputStream = blueSocket.getInputStream();
             }
-
         } catch (IOException e) {
             Toast.makeText(this, getResources().getString(R.string
                     .Can_not_get_input_stream_via_Bluetooth_socket), Toast.LENGTH_SHORT).show();
@@ -385,123 +459,124 @@ public class BaseActivity extends AppCompatActivity {
             }, 3000);
             e.printStackTrace();
         }
-        if (!getBDataThread) {
-
-            //重连后下发参数
-            if(Constant.CurrentVoiceParam!=null) {
-                sendString(Constant.CurrentVoiceParam);
+        if (!hasGotStream) {
+            //重连时下发当前的参数命令  //GC2.01.006 蓝牙重连功能优化
+            if(Constant.CurrentVoiceParam != null) {
+                sendCommand(Constant.CurrentVoiceParam);
             }
-            if(Constant.CurrentFilterParam!=null) {
-                sendString(Constant.CurrentFilterParam);
+            if(Constant.CurrentFilterParam != null) {
+                sendCommand(Constant.CurrentFilterParam);
             }
-            if(Constant.CurrentMagParam!=null) {
-                sendString(Constant.CurrentMagParam);
+            if(Constant.CurrentMagParam != null) {
+                sendCommand(Constant.CurrentMagParam);
             }
-
             //当前连接状态为连接
             Constant.BluetoothState = true;
-            new Thread(getBluetoothData).start();  //GN 启动获取蓝牙数据的线程
-            getBDataThread = true;
-
+            //启动获取蓝牙数据的线程
+            new Thread(getStream).start();
+            hasGotStream = true;
         }
 
     }
 
-    //GN 获取蓝牙数据的线程
-    Runnable getBluetoothData = new Runnable() {
+    /**
+     * 获取蓝牙数据的线程
+     */
+    Runnable getStream = new Runnable() {
         @Override
         public void run() {
             int len;
-            byte[] bStream = new byte[1024000];    //GN 存放每个输入流的字节数组
+            //存放每个输入流的字节数组
+            byte[] buffer = new byte[1024000];
             while (true) {
                 try {
-                    while (true) {
-                        if (mInputStream == null) {
-                            Log.e("打印-mInputStream", "null");
+                    do {
+                        if (inputStream == null) {
+                            Log.e("打印-inputStream", "null");
                             return;
                         }
-                        len = mInputStream.read(bStream, 0, bStream.length);
+                        len = inputStream.read(buffer, 0, buffer.length);
                         //Log.e("stream", "len:" + len + "时间" + System.currentTimeMillis());     //GT20180321 每个输入流的的长度
-                        byte[] tempbStream = new byte[len];    //jwj20180411
-                        for (int i = 0, j = mTempLength; i < len; i++, j++) {
+                        byte[] tempBuffer = new byte[len];
+                        for (int i = 0, j = streamLength; i < len; i++, j++) {
                             if (Constant.isStartInterception) {
-                                tempbStream[i] = bStream[i];
+                                tempBuffer[i] = buffer[i];
                             }
-                            mTemp[j] = bStream[i] & 0xff;   //将传过来的字节数组转变为int数组
+                            //将传过来的字节数组转变为int数组
+                            stream[j] = buffer[i] & 0xff;
                         }
+                        //截取上传数据    //jwj20180411
                         if (Constant.isStartInterception) {
-                            Constant.sbData.append(Utils.bytes2HexString(tempbStream));
+                            Constant.sbData.append(Utils.bytes2HexString(tempBuffer));
                         }
-                        mTempLength += len;
-                        mTempcount++;
-                        //GC20171129 在没有处理蓝牙数据时缓存数个输入流用做后续蓝牙数据处理
-                        if (mTempcount >= 5 && !handleBDataThread) {
-                            if (sendCommand){
-                                /*//超过590滤除   //GC2.01.006 蓝牙重连功能优化
-                                if (mTempLength > 590) {
-                                    mTempLength = 590;
+                        streamLength += len;
+                        streamCount++;
+                        //在不处理数据时缓存数个输入流    //GC20171129
+                        if (streamCount >= 5 && !handleStream) {
+                            if (hasSentInitCommand) {
+                                /*//超过590滤除
+                                if (streamLength > 590) {
+                                    streamLength = 590;
                                 }*/     //GC20190627 触发灯闪烁bug原因
-                                for (int i = 0; i < mTempLength; i++) {
-                                    mTemp2[i] = mTemp[i];
+                                if (streamLength >= 0) {
+                                    System.arraycopy(stream, 0, blueStream, 0, streamLength);
                                 }
-                                mTempLength2 = mTempLength;
-                                //Log.e("stream", "lenSum:" + mTempLength2);  //GT20180321 要处理的蓝牙数据的长度
-                                handleBDataThread = true;
+                                blueStreamLen = streamLength;
+                                //Log.e("stream", "lenSum:" + blueStreamLen);  //GT20180321 要处理的蓝牙数据的长度
+                                handleStream = true;
 
                             } else {
-                                sendCichangInitData();
+                                //缓存数据之前先发送初始化控制命令
+                                sendMagneticInitCommand();
                                 mHandle.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        sendShengyinInitData();
+                                        sendVoiceInitCommand();
                                     }
-                                }, 1000);   //GN 缓存数据之前首先发送初始化控制命令
-                                sendCommand = true;
+                                }, 1000);
+                                hasSentInitCommand = true;
                             }
-                            mTempLength = 0;
-                            mTempcount = 0;
+                            //缓存的数据清零
+                            streamLength = 0;
+                            streamCount = 0;
                         }
                         //短时间没有数据才跳出进行显示
-                        if (mInputStream.available() == 0) {
-                            break;
-                        }
-                    }
+                    } while (inputStream.available() != 0);
+
                 } catch (IOException e) {
                     try {
-                        mInputStream.close();
+                        inputStream.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-                    mInputStream = null;
+                    inputStream = null;
 
                     //当前连接状态为断开 //GC2.01.006 蓝牙重连功能优化
                     Constant.BluetoothState = false;
                     //重置变量
-                    mTemp = null;
-                    mTemp = new int[1024000];
-                    mTemp2 = null;
-                    mTemp2 = new int[1024000];
-                    mTempLength2 = 0;
-                    mTempLength = 0;
-                    mTempcount = 0;
-                    hasLeftLen = 0;
-                    mTempLeft = null;
-                    mTempLeft = new int[59];
-                    handleBDataThread = false;
+                    stream = null;
+                    stream = new int[1024000];
+                    streamLength = 0;
+                    streamCount = 0;
+                    blueStream = null;
+                    blueStream = new int[1024000];
+                    blueStreamLen = 0;
+                    handleStream = false;
+                    streamLeft = null;
+                    streamLeft = new int[59];
+                    leftLen = 0;
                     hasLeft = false;
 
-
                     //GN20190407 启动重连
-                    isFlag = false;
+                    needReconnect = false;
                     Message message = new Message();
                     message.what = LINK_LOST;
                     mHandle.sendMessage(message);
-//                    mHandleReconnect.sendEmptyMessage(0);
                     //启动重连线程，是否需要单独线程控制，需要观察
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            while (!isFlag) {
+                            while (!needReconnect) {
                                 //Log.e("蓝牙测试", "connectThread线程，尝试连接");
                                 reconnect();
                             }
@@ -512,59 +587,44 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
     };
-    //蓝牙重连handler //GN去掉
-    public Handler mHandleReconnect = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0) {
-                while (!isFlag) {
-                    Log.e("蓝牙测试", "connectThread线程，尝试连接");
-                    reconnect();
-                }
-            }
-        }
-    };
-
 
     /**
      * 尝试连接蓝牙
      */
     public void reconnect() {
-        // 读取设置数据
+        //读取设置数据
         SharedPreferences sharedata1 = getSharedPreferences("Add", 0);
         String address = sharedata1.getString(String.valueOf(1), null);
-        // 得到蓝牙设备句柄
-        _device = _bluetooth.getRemoteDevice(address);
+        //得到蓝牙设备句柄
+        device = adapter.getRemoteDevice(address);
 
-        // 用服务号得到socket
+        //用服务号得到socket
         try {
-            _socket = _device.createRfcommSocketToServiceRecord(UUID
-                    .fromString(MY_UUID));
+            socket = device.createRfcommSocketToServiceRecord(UUID.fromString(MY_UUID));
+            MyApplication.getInstances().set_socket(socket);
+            MyApplication.getInstances().set_device(device);
+            MyApplication.getInstances().set_bluetooth(adapter);
 
-            MyApplication.getInstances().set_socket(_socket);
-            MyApplication.getInstances().set_device(_device);
-            MyApplication.getInstances().set_bluetooth(_bluetooth);
-
-        } catch (IOException e) {
+        } catch (IOException ignored) {
 
         }
         //连接socket
         try {
-            if (_socket != null) {  //GC2.01.007
-                _socket.connect();
-                isFlag = true;
-                EventBus.getDefault().post(new StartReadThreadEvent(_device.getName()));
+            //GC2.01.007
+            if (socket != null) {
+                socket.connect();
+                needReconnect = true;
+                EventBus.getDefault().post(new StartReadThreadEvent(device.getName()));
             }
 
         } catch (IOException e) {
             try {
-                _socket.close();
-                _socket = null;
+                socket.close();
+                socket = null;
                 //Log.e("蓝牙测试", "connectThread线程，走到异常");
                 Thread.sleep(10000);
-            } catch (Exception ee) {
+            } catch (Exception ignored) {
             }
-            return;
         }
     }
 
@@ -586,13 +646,17 @@ public class BaseActivity extends AppCompatActivity {
     第3个字节Respond：响应值，命令是否响应
         0：未响应
  	    1：已响应*/
-    //GN 发送声音初始化控制命令
-    public void sendShengyinInitData() {
-        int[] ints = {96, 0, 0 + 22};   //GN （控制命令前三个字节的十进制数值）  设备地址：96；增益调整功能：0；控制增益：声音0、阶数22
-        long l = getRequestCrcByte(ints);
+
+    /**
+     * 发送声音初始化控制命令
+     */
+    public void sendVoiceInitCommand() {
+        //设备地址：“96”= 0x60；声音/磁场增益调整：0；控制增益：声音0、阶数22
+        int[] ints = {96, 0, 22};
+        long l = getCommandCrcByte(ints);
 
         String s = Long.toBinaryString((int) l);
-        StringBuffer ss = new StringBuffer();
+        StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
             for (int i = 0; i < (32 - s.length()); i++) {
                 ss.append("0");
@@ -618,17 +682,19 @@ public class BaseActivity extends AppCompatActivity {
         request[4] = (byte) integer2.intValue();
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
-        sendString(request);
-
+        sendCommand(request);
     }
 
-    //GN 发送磁场初始化控制命令
-    public void sendCichangInitData() {
-        int[] ints = {96, 0, 128 + 22}; //GN （控制命令前三个字节的十进制数值）  设备地址：96；增益调整功能：0；控制增益：声音1、阶数22。
-        long l = getRequestCrcByte(ints);
+    /**
+     * 发送磁场初始化控制命令
+     */
+    public void sendMagneticInitCommand() {
+        //设备地址：96”= 0x60；声音/磁场增益调整：0；控制增益：声音“128”= 二进制1000 0000、阶数22。
+        int[] ints = {96, 0, 128 + 22};
+        long l = getCommandCrcByte(ints);
 
         String s = Long.toBinaryString((int) l);
-        StringBuffer ss = new StringBuffer();
+        StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
             for (int i = 0; i < (32 - s.length()); i++) {
                 ss.append("0");
@@ -654,96 +720,109 @@ public class BaseActivity extends AppCompatActivity {
         request[4] = (byte) integer2.intValue();
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
-        sendString(request);
-
+        sendCommand(request);
     }
 
     //对发送的控制命令进行CRC校验
-    public long getRequestCrcByte(int[] bytes) {
+    public long getCommandCrcByte(int[] bytes) {
         return testCrc(bytes);
-
     }
 
-    //GN 控制命令发送
-    public void sendString(byte[] request) {
-        if (!hasSendMessage) {
-            for (int i = 0; i < request.length; i++) {
-                tempRequest[i] = request[i];
+    /**
+     * @param command   设备控制命令
+     */
+    public void sendCommand(byte[] command) {
+        if (!hasSentCommand) {
+            for (int i = 0; i < command.length; i++) {
+                sendCommand[i] = command[i];
             }
-            if (mSocket == null) {
+            if (blueSocket == null) {
                 Toast.makeText(this, getResources().getString(R.string.Bluetooth_is_not_connected),
                         Toast.LENGTH_SHORT).show();
             }
             try {
-                OutputStream os = mSocket.getOutputStream(); // 蓝牙连接输出流
+                OutputStream os = blueSocket.getOutputStream(); // 蓝牙连接输出流
                 //byte[] bos = str.getBytes("GB2312");//native的Socket发送字节流默认是GB2312的，所以在Java方面需要指定GB2312
-                os.write(request);
+                os.write(command);
                 EventBus.getDefault().post(new SendDataFinishEvent());
-                hasSendMessage = true;
+                hasSentCommand = true;
             } catch (IOException e) {
                 //Toast.makeText(this, "发送失败" + e.toString(), Toast.LENGTH_SHORT).show();
             }
         } else {
             //Toast.makeText(MainActivity.this, "还没有收到来自设备端的回复", Toast.LENGTH_SHORT).show();
         }
-
     }
 
-    //GN 处理蓝牙数据的线程
-    Thread handleBData = new Thread(new Runnable() {
+    /**
+     * 处理蓝牙数据的线程
+     */
+    Thread handleBlueStream = new Thread(new Runnable() {
         @Override
         public void run() {
             while (true) {
-                if (handleBDataThread) {
-                    domTemp2(mTemp2, mTempLength2);
-                    handleBDataThread = false;
+                if (handleStream) {
+                    doBlueStream(blueStream, blueStreamLen);
+                    handleStream = false;
                 }
             }
         }
 
     });
 
-    //GN 处理蓝牙数据
-    private void domTemp2(int[] mTemp, int mTempLength) {
+    /**
+     * @param temp 需要处理的蓝牙数据    //G?
+     * @param tempLength   数据长度
+     */
+    private void doBlueStream(int[] temp, int tempLength) {
         int i = 0;
-        int dataNum = 0;    //GN 处理过的数据数组长度
-        int[] tempints = new int[59];   //GN 一个数据包的临时数组
-        int[] tempints2 = new int[7];   //GN 接收的控制命令临时数组
-        //GN 先判断截取数据包后是否有剩余数据
+        //处理过的数据长度
+        int dataNum = 0;
+        int[] receivedBean = new int[59];
+        int[] receivedCommand = new int[7];
+
+        //处理过后有剩余数据
         if (hasLeft) {
-            for (int j = hasLeftLen, k = 0; j < 59; j++, k++) {
-                mTempLeft[j] = mTemp[k];    //GN 将剩余数据与新数据合并
+            for (int j = leftLen, k = 0; j < 59; j++, k++) {
+                //合并剩余数据
+                streamLeft[j] = temp[k];
             }
             for (int i1 = 0; i1 < 59; i1++) {
-                if (mTempLeft[i1] == 83 || mTempLeft[i1] == 77 || mTempLeft[i1] == 96) {    //GN 找到数据开头（0x53：声音  0x4d：磁场  0x60：T-506）
+                //找数据头（0x53：声音  0x4d：磁场  0x60：T-506）
+                if (streamLeft[i1] == 83 || streamLeft[i1] == 77 || streamLeft[i1] == 96) {
                     for (int i2 = 0, j = i1; i2 < 59; i2++, j++) {
                         if (j >= 59) {
-                            tempints[i2] = mTemp[i + j - hasLeftLen];
+                            receivedBean[i2] = temp[i + j - leftLen];
                         } else {
-                            tempints[i2] = mTempLeft[j];    //GN 取数据包
+                            //截取数据包
+                            receivedBean[i2] = streamLeft[j];
                         }
-                        boolean isCrc = doTempCrc(tempints);
-                        if (isCrc) {    //GN CRC1校验成功，判断为数据包数据
-                            doTempBean(tempints);
+                        boolean isCrc = doTempCrc(receivedBean);
+                        if (isCrc) {
+                            //判断为数据包数据
+                            doTempBean(receivedBean);
                             i1 += 58;
-                        } else {        //GN CRC1校验失败，判断是否为控制命令
-                            if (mTempLeft[i1] == 96) {
+                        } else {
+                            if (streamLeft[i1] == 96) {
                                 for (int i3 = 0, k = i1; i3 < 7; i3++, k++) {
                                     if (k >= 59) {
-                                        tempints2[i3] = mTemp[i + k - hasLeftLen];
+                                        receivedCommand[i3] = temp[i + k - leftLen];
                                     } else {
-                                        tempints2[i3] = mTempLeft[k];
+                                        receivedCommand[i3] = streamLeft[k];
                                     }
                                 }
-                                boolean isCrc2 = doTempCrc2(tempints2);
-                                if (isCrc2) {   //GN接收到命令
-                                    hasSendMessage = false;
+                                boolean isCrc2 = doTempCrc2(receivedCommand);
+                                if (isCrc2) {
+                                    //判断为控制命令
+                                    hasSentCommand = false;
                                     i1 += 6;
-                                    if (tempints2[2] != 1) {    //GN Respond：响应值为0，命令未响应
+                                    if (receivedCommand[2] != 1) {
+                                        //Respond：响应值为0，命令未响应
                                         mHandle.sendEmptyMessage(SEND_ERROR);
                                         EventBus.getDefault().post(new HandleReceiveDataEvent());
                                         seekbarType = 0;
-                                    } else if (tempints2[1] == tempRequest[1]) {    //GN 接受命令内容与要发送命令一致
+                                    } else if (receivedCommand[1] == sendCommand[1]) {
+                                        //接収的命令内容与要发送的命令内容一致
                                         seekbarType = 0;
                                         mHandle.sendEmptyMessage(SEND_SUCCESS);
                                     }
@@ -756,28 +835,35 @@ public class BaseActivity extends AppCompatActivity {
             hasLeft = false;
         }
         //开始遍历
-        for (; i < mTempLength - 59; i++) {
-            if (mTemp[i] == 83 || mTemp[i] == 77 || mTemp[i] == 96) {
+        for (; i < tempLength - 59; i++) {
+            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96) {
                 for (int j = i, k = 0; j < (i + 59); j++, k++) {
-                    tempints[k] = mTemp[j];    //GN 取数据包
+                    //截取数据包
+                    receivedBean[k] = temp[j];
                 }
-                boolean isCrc = doTempCrc(tempints);
-                if (isCrc) {    //GN CRC1校验成功，判断为数据包数据
-                    doTempBean(tempints);
+                boolean isCrc = doTempCrc(receivedBean);
+                if (isCrc) {
+                    //判断为数据包数据
+                    doTempBean(receivedBean);
                     i += 58;
-                } else {        //GN CRC1校验失败，判断是否为控制命令
-                    if (mTemp[i] == 96) {
+                } else {
+                    if (temp[i] == 96) {
                         for (int j = i, k = 0; j < (i + 7); j++, k++) {
-                            tempints2[k] = mTemp[j];   //GN 取控制命令
+                            //截取控制命令
+                            receivedCommand[k] = temp[j];
                         }
-                        boolean isCrc2 = doTempCrc2(tempints2);
+                        boolean isCrc2 = doTempCrc2(receivedCommand);
                         if (isCrc2) {
-                            hasSendMessage = false;
-                            if (tempints2[2] != 1) {    //GN Respond：响应值，命令未响应
+                            //判断为控制命令
+                            hasSentCommand = false;
+                            if (receivedCommand[2] != 1) {
+                                //Respond：响应值，命令未响应
                                 mHandle.sendEmptyMessage(SEND_ERROR);
-                                EventBus.getDefault().post(new HandleReceiveDataEvent());   //GC20181118
+                                //GC20181118    //G?
+                                EventBus.getDefault().post(new HandleReceiveDataEvent());
                                 seekbarType = 0;
-                            } else if (tempints2[1] == tempRequest[1]) {
+                            } else if (receivedCommand[1] == sendCommand[1]) {
+                                //接収的命令内容与要发送的命令内容一致
                                 seekbarType = 0;
                                 mHandle.sendEmptyMessage(SEND_SUCCESS);
                             }
@@ -788,60 +874,85 @@ public class BaseActivity extends AppCompatActivity {
             }
             dataNum = i;
         }
-        if (dataNum == mTempLength) {
+
+        if (dataNum == tempLength) {
             hasLeft = false;
-        } else {    //如果剩余的数少于59个,退出循环 并且把剩下的数据存到临时数组中 同时设置有剩余的数组
-            for (int j = dataNum + 1, k = 0; j < mTempLength; j++, k++) {
-                mTempLeft[k] = mTemp[j];
+        } else {
+            //把剩下的数据存到临时数组中 同时设置有剩余的数组
+            for (int j = dataNum + 1, k = 0; j < tempLength; j++, k++) {
+                streamLeft[k] = temp[j];
             }
-            hasLeftLen = mTempLength - i;
+            leftLen = tempLength - i;
             hasLeft = true;
         }
 
     }
 
-    //GN 对数据包进行CRC校验
-    public boolean doTempCrc(int[] tempcrc) {
+    /**
+     * @param tempCrc   接収的数据包
+     * @return  CRC校验的结果
+     */
+    public boolean doTempCrc(int[] tempCrc) {
         int[] ints = new int[55];
-        int[] ints2 = new int[4];   //crc校验返回回来进行比对的4个字符
+        //crc校验返回回来进行比对的4个字符
+        int[] ints2 = new int[4];
         for (int i1 = 0, j = 0; i1 < 55; i1++, j++) {
-            ints[j] = tempcrc[i1];
+            ints[j] = tempCrc[i1];
         }
         for (int i1 = 55, j = 0; i1 < 59; i1++, j++) {
-            ints2[j] = tempcrc[i1];
+            ints2[j] = tempCrc[i1];
         }
         if (!isCrc(ints, ints2)) {
             crcNum++;
             //Log.d("CRC", crcNum + "");
         }
         return isCrc(ints, ints2);
-
     }
 
-    //GN 对接收的控制命令进行CRC校验
-    public boolean doTempCrc2(int[] tempcrc) {
+    /**
+     * @param tempCrc   接收的控制命令
+     * @return  CRC校验的结果
+     */
+    public boolean doTempCrc2(int[] tempCrc) {
         int[] ints = new int[3];
-        int[] ints2 = new int[4];   //crc校验返回回来进行比对的4个字符
+        //crc校验返回回来进行比对的4个字符
+        int[] ints2 = new int[4];
         for (int i1 = 0, j = 0; i1 < 3; i1++, j++) {
-            ints[j] = tempcrc[i1];
+            ints[j] = tempCrc[i1];
         }
         for (int i1 = 3, j = 0; i1 < 7; i1++, j++) {
-            ints2[j] = tempcrc[i1];
+            ints2[j] = tempCrc[i1];
         }
         return isCrc(ints, ints2);
+    }
+
+    /**
+     * @param ints  数据内容
+     * @param ints2 crc码
+     * @return  判断Crc校验的结果
+     */
+    public boolean isCrc(int[] ints, int[] ints2) {
+        long l = testCrc(ints);
+        long ll = (long) (ints2[0] * Math.pow(2, 24) + ints2[1] * Math.pow(2, 16) + ints2[2] *
+                Math.pow(2, 8) + ints2[3]);
+        return l == ll;
 
     }
 
-    //测试CRC
+    /**
+     * @param ints  数据内容
+     * @return  得到crc码
+     */
     public long testCrc(int[] ints) {
         crcNum++;
         final int qqq = crcNum;
-        if (crcNum >= 999999999)
+        if (crcNum >= 999999999) {
             crcNum = 0;
+        }
         mHandle.postDelayed(new Runnable() {
             @Override
             public void run() {
-//                if (qqq == crcNum) mHandle.sendEmptyMessage(BLUETOOTH_DISCONNECTED);
+//                if (qqq == crcNum) mHandle.sendEmptyMessage(DISCONNECTED);
             }
         }, 2000);
         long nReg = Long.valueOf("4294967295");
@@ -854,7 +965,7 @@ public class BaseActivity extends AppCompatActivity {
 //                Log.e("FILE", "a:" + a);
                 long b = a & 255;
 //                Log.e("FILE", "b:" + b);
-                long nTemp = mCrcTable[(int) b];
+                long nTemp = crcTable[(int) b];
 //                Log.e("FILE", "nTemp:" + nTemp);
                 //4294967295 -1
                 nReg = (nReg << 8) & integer;
@@ -862,15 +973,6 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
         return nReg;
-
-    }
-
-    //判断Crc校验的结果
-    public boolean isCrc(int[] ints, int[] ints2) {
-        long l = testCrc(ints);
-        long ll = (long) (ints2[0] * Math.pow(2, 24) + ints2[1] * Math.pow(2, 16) + ints2[2] *
-                Math.pow(2, 8) + ints2[3]);
-        return l == ll;
 
     }
 
@@ -897,50 +999,63 @@ public class BaseActivity extends AppCompatActivity {
     (4)	Predsample：解码数据（由两个字节组成，字节4为高8位，字节5为低8位）
     (5)	Date：声音编码数据
     (6)	Crc：循环冗余校验码*/
-    //对59个数据进行bean对象的处理
-    private void doTempBean(int[] tempints) {
+    /**
+     * @param tempBean  对59个数据进行bean对象的处理
+     */
+    private void doTempBean(int[] tempBean) {
         PackageBean packageBean = new PackageBean();
-        packageBean.setSM(tempints[0]);
-        packageBean.setMark(tempints[1]);
-        packageBean.setIndex(tempints[2]);
-        packageBean.setPredsample(new int[]{tempints[3], tempints[4]});
+        packageBean.setSM(tempBean[0]);
+        packageBean.setMark(tempBean[1]);
+        packageBean.setIndex(tempBean[2]);
+        packageBean.setPredsample(new int[]{tempBean[3], tempBean[4]});
         int[] date = new int[50];
         for (int i1 = 5, j = 0; i1 < 55; i1++, j++) {
-            date[j] = tempints[i1];
+            date[j] = tempBean[i1];
         }
         packageBean.setDate(date);
         doPackageBean(packageBean);
-
     }
 
-    //每当解析完生成一个packageBean,对其进行相应的操作
+    /**
+     * @param packageBean   解析packageBean并对其进行相应的操作
+     */
     public void doPackageBean(PackageBean packageBean) {
 //        Log.e("FILE", "packageBean:" + packageBean.toString());
         int[] results = decodeData(packageBean);
-        if (packageBean.getSM() == 83) {    //GN 0x53 声音
+        //SM: “83”=0x53 代表声音    “77”= 0x4d 代表磁场
+        if (packageBean.getSM() == 83) {
             int mark = packageBean.getMark();
-            if (binaryStartsWithOne(mark)) {    //GN Mark最高位1，仪器在这一包内触发，组成放电声音的第一个包的有效数据
+            //Mark最高位是1，代表仪器在这一包内触发，组成放电声音的第一个包的有效数据
+            if (binaryStartsWithOne(mark)) {
+                //触发灯变红
                 Message msg = new Message();
-                msg.what = WHAT_LIGHT;
-                mHandle.sendMessage(msg);   //GN“同步指示” 灯变红
-                mShengyinFlag = true;       //GN开始截取声音包
-                mShengyinMarkNum = getMarkLastSeven(mark);  //GN Mark后7位，触发时刻数据点所在的位置
+                msg.what = LIGHT_UP;
+                mHandle.sendMessage(msg);
+                //开始截取声音包
+                mShengyinFlag = true;
+                //Mark后7位，触发时刻数据点所在的位置
+                mShengyinMarkNum = getMarkLastSeven(mark);
                 for (int i = 0, j = mShengyinMarkNum; j < 100; i++, j++) {
                     mShengyinArray[i] = results[j];
-                    mAIRecognitionArray[i] = mAIRecognitionArray[j];    //GC20180412 凑足触发时刻之前100点的数据1
+                    //GC20180412 凑足触发时刻之前100点的数据1
+                    tempVoice[i] = tempVoice[j];
                 }
                 //GC20180412 凑足触发时刻之前100点的数据2
                 for (int i = 100 - mShengyinMarkNum, j = 0; j < 100; i++, j++) {
-                    mAIRecognitionArray[i] = results[j];
+                    tempVoice[i] = results[j];
                 }
-                mShengyinCount++;   //GN 获取声音包的个数
+                //获取声音包的个数
+                mShengyinCount++;
             } else {
-                if (mShengyinFlag) {    //GN 已经开始获取声音包
-                    if (mShengyinCount <= 7) {                  //GN 声音识别需要9个声音包 4
+                if (mShengyinFlag) {
+                    //已经开始获取声音包
+                    if (mShengyinCount <= 7) {
+                        //声音识别需要9个声音包 4
                         for (int i=100+mShengyinCount*100-mShengyinMarkNum , j = 0; j < 100; i++, j++) {
-                            mAIRecognitionArray[i] = results[j];
+                            tempVoice[i] = results[j];
                         }
-                        if (mShengyinCount <= 4) {              //GN 要画波形需要5个声音包
+                        if (mShengyinCount <= 4) {
+                            //画波形需要5个声音包
                             for (int i = mShengyinCount * 100 - mShengyinMarkNum, j = 0; j < 100; i++, j++) {
                                 mShengyinArray[i] = results[j];
                             }
@@ -950,56 +1065,58 @@ public class BaseActivity extends AppCompatActivity {
                         mShengyinFlag = false;
                         mShengyinCount = 0;
                     }
-                } else {      //不获取声音包
+                } else {
+                    //不获取声音包
                     for (int i = 0, j = 0; j < 100; i++, j++) {
-                        mAIRecognitionArray[i] = results[j];    //GC2018412 先缓存一包，用于找出声音识别的前100个点
+                        //GC2018412 先缓存一包，用于找出声音识别的前100个点
+                        tempVoice[i] = results[j];
                     }
                 }
             }
             playSound(results);
 
-        } else if (packageBean.getSM() == 77) {   //GN 0x4d 磁场
-            if (packageBean.getMark() >= 128) {     //GN  Mark "128" 二进制：10000000 代表位7是1
-                mHandle.sendEmptyMessage(WHAT_POSITION_Right);  //GC20171205 代表探头在电缆右侧
-                packageBean.setMark(packageBean.getMark() - 128); //令位7为0
+        } else if (packageBean.getSM() == 77) {
+            //探头相对电缆位置的判断   Mark "128"= 10000000 代表位7是1 //GC20171205
+            if (packageBean.getMark() >= 128) {
+                mHandle.sendEmptyMessage(POSITION_RIGHT);
+                //令位7为0
+                packageBean.setMark(packageBean.getMark() - 128);
             } else {
-                mHandle.sendEmptyMessage(WHAT_POSITION_LEFT);  //GC20171205  代表探头在电缆左侧
+                mHandle.sendEmptyMessage(POSITION_LEFT);
             }
-            //GN 按照顺序（00 01 10 11）将磁场数据拼接起来，1包含有100个数据点
+            //按照顺序（00 01 10 11）将磁场数据拼接起来，1包含有100个数据点
             for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
                 mCichangArray[j] = results[i];
             }
-            //GN 4个磁场包拼接完成，开始画主界面波形
+            //4个磁场包拼接完成，开始画主界面波形
             if (packageBean.getMark() == 3) {
+                //“同步指示” 灯变灰
                 Message msg = new Message();
-                msg.what = CICHANG_CHANGE_OVER;
+                msg.what = TRIGGERED;
                 mHandle.sendMessage(msg);
                 if (isDraw) {
                     for (int i = 0; i < 400; i++) {
                         mTempCichangArray[i] = mCichangArray[i];
                         //GC20181113 找寻磁场信号幅值最大点用于用户界面画进度条高度
-                        maxCichangArray[i] = mCichangArray[i] - 2048;
-                        if (maxCichangArray[i] > 2047) {
-                            maxCichangArray[i] = 2047;
-                        } else if (maxCichangArray[i] < -2048) {
-                            maxCichangArray[i] = -2048;
+                        maxMagneticArray[i] = mCichangArray[i] - 2048;
+                        if (maxMagneticArray[i] > 2047) {
+                            maxMagneticArray[i] = 2047;
+                        } else if (maxMagneticArray[i] < -2048) {
+                            maxMagneticArray[i] = -2048;
                         }
-                        maxCichangArray[i] = Math.abs(maxCichangArray[i]);    //取绝对值
-                        if (maxCichangArray[i] > maxCiChang) {
-                            maxCiChang = maxCichangArray[i];
+                        maxMagneticArray[i] = Math.abs(maxMagneticArray[i]);
+                        if (maxMagneticArray[i] > maxMagnetic) {
+                            maxMagnetic = maxMagneticArray[i];
                         }
                     }
-                    for (int i = 0; i < 400; i++) {
-                        //mTempShengyinArray[i] = mShengyinArray[i];
-                        mTempShengyinArray[i] = mAIRecognitionArray[i + 50];  //GC20180428 声音波形加上触发前50个点的数据
-                    }
-                    for (int i = 0; i < 400; i++) {
-                        mCompareShengyinArray[i] = mTempShengyinArray[i];
-                    }
+                    //GC20180428 声音波形加上触发前50个点的数据   //mTempShengyinArray[i] = mShengyinArray[i];
+                    System.arraycopy(tempVoice, 50, mTempShengyinArray, 0, 400);
+                    System.arraycopy(mTempShengyinArray, 0, mCompareShengyinArray, 0, 400);
                     //GC20180412 预测800个点的声音数据
                     for (int i = 0; i < 800; i++) {
-                        mSVM[i] = mAIRecognitionArray[i];
-                        mSVMLocate[i] = mAIRecognitionArray[i];     //GC20181201
+                        svmData[i] = tempVoice[i];
+                        //GC20181201
+                        svmLocate[i] = tempVoice[i];
                     }
                     obtainFeaturex();
                     if (svmTrainThread) {
@@ -1033,7 +1150,6 @@ public class BaseActivity extends AppCompatActivity {
             count += 2;
         }
         return decodeDataSecond(index, pred, dateArray);
-
     }
 
     //二次解密
@@ -1046,7 +1162,7 @@ public class BaseActivity extends AppCompatActivity {
         for (int i = 0; i < dateArray.length; i++) {
             PREDSAMPLE = prevsample;
             INDEX = previndex;
-            int step = StepSizeTable[INDEX];
+            int step = stepSizeTable[INDEX];
             int code = dateArray[i];
             int diffq = step / 8;
             if ((code & 4) == 4) {
@@ -1071,7 +1187,7 @@ public class BaseActivity extends AppCompatActivity {
                 PREDSAMPLE = 0;
             }
             //Log.e("FILE", code+"");
-            INDEX = INDEX + IndexTable[code];
+            INDEX = INDEX + indexTable[code];
 
             if (INDEX < 0) {
                 INDEX = 0;
@@ -1084,14 +1200,15 @@ public class BaseActivity extends AppCompatActivity {
             result[i] = prevsample;
         }
         return result;
-
     }
 
-    //判断二进制的最高位是否是1
+    /**
+     * @param tByte 需要判断的字节数组
+     * @return  判断二进制的最高位是否是1   //G?
+     */
     public boolean binaryStartsWithOne(int tByte) {
         String tString = Integer.toBinaryString((tByte & 0xFF) + 0x100).substring(1);
         return tString.startsWith("1");
-
     }
 
     //获取mark的后7位
@@ -1099,7 +1216,6 @@ public class BaseActivity extends AppCompatActivity {
         String tString = Integer.toBinaryString((mark & 0xFF) + 0x100).substring(1);
         String substring = tString.substring(1, tString.length());
         return Integer.valueOf(substring, 2);
-
     }
 
     //播放声音
@@ -1138,20 +1254,20 @@ public class BaseActivity extends AppCompatActivity {
         //GN数据归一化
         int max = 0;
         for (int i = 0; i < 800; i++) {
-            mSVM[i] = mSVM[i] - 2048;
-            if (mSVM[i] > 2047) {
-                mSVM[i] = 2047;
-            } else if (mSVM[i] < -2048) {
-                mSVM[i] = -2048;
+            svmData[i] = svmData[i] - 2048;
+            if (svmData[i] > 2047) {
+                svmData[i] = 2047;
+            } else if (svmData[i] < -2048) {
+                svmData[i] = -2048;
             }
-            mSVM[i] = Math.abs(mSVM[i]);    //取绝对值
-            if (mSVM[i] > max) {
-                max = mSVM[i];
-                maxShengYin = max;  //GC20181113 找寻声音信号幅值最大点用于用户界面画进度条高度
+            svmData[i] = Math.abs(svmData[i]);    //取绝对值
+            if (svmData[i] > max) {
+                max = svmData[i];
+                maxVoice = max;  //GC20181113 找寻声音信号幅值最大点用于用户界面画进度条高度
             }
         }
         for (int i = 0; i < 800; i++) {
-            mNormalization[i] = mSVM[i] / (max * 1.0);  //强制转换类型，int运算得double
+            mNormalization[i] = svmData[i] / (max * 1.0);  //强制转换类型，int运算得double
         }
         //短时步长为50
         //GN短时能量分布处理
@@ -1227,7 +1343,10 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //GC20180412 使用模型去预测获得的声音
+    /**
+     * 使用生成的model去预测
+     * @param featurex  获得的声音特征
+     */
     private void voiceSvmPredict(double[] featurex) {
         svm_node[] test = new svm_node[]{new svm_node(), new svm_node(), new svm_node(), new svm_node()};
         test[0].index = 1;
@@ -1257,7 +1376,7 @@ public class BaseActivity extends AppCompatActivity {
             EventBus.getDefault().post(new OperationGuideEvent(true));
             //GC20181204 autoLocate();
             for (int i = 0; i < 800; i++) {
-                mSVMLocate2[i] = mSVMLocate[i];     //GC20181204
+                svmLocate2[i] = svmLocate[i];     //GC20181204
             }
             /*String p1 = String.valueOf(position);
             String t = String.valueOf(timeDelay);
@@ -1290,18 +1409,18 @@ public class BaseActivity extends AppCompatActivity {
     private void autoLocate() {
         //GC20181204
         for (int i = 0; i < 800; i++) {
-            mSVMLocate[i] = ( mSVMLocate[i] + mSVMLocate2[i] ) / 2;
+            svmLocate[i] = ( svmLocate[i] + svmLocate2[i] ) / 2;
         }
         //求均值
         double ave = 0;
         for (int i = 0; i < 100; i++) {
-            ave += mSVMLocate[i];
+            ave += svmLocate[i];
         }
         ave = ave / 100;
         //求方差
         double var = 0;
         for (int i = 0; i < 100; i++) {
-            var += (mSVMLocate[i] - ave) * (mSVMLocate[i] - ave);
+            var += (svmLocate[i] - ave) * (svmLocate[i] - ave);
         }
         var = var / 100;
         //求标准差
@@ -1310,12 +1429,12 @@ public class BaseActivity extends AppCompatActivity {
         int m = 0;
         int n = 0;
         for (int i = 101; i < 449; i++) {   //GN 去头去尾
-            //if ((mSVM[i] > (ave + sta * 5)) || (mSVM[i] < (ave - sta * 5))) {       //置信边界
-            if ( mSVMLocate[i] < (ave - sta * 5) ){   //GC20181201 只求极小值
-                /*if ((mSVM[i] > mSVM[i - 1]) && (mSVM[i] >= mSVM[i + 1])) {
+            //if ((svmData[i] > (ave + sta * 5)) || (svmData[i] < (ave - sta * 5))) {       //置信边界
+            if ( svmLocate[i] < (ave - sta * 5) ){   //GC20181201 只求极小值
+                /*if ((svmData[i] > svmData[i - 1]) && (svmData[i] >= svmData[i + 1])) {
                     m = i;  //极大值点
                 } else*/    //GC20181201 只求极小值
-                if ((mSVMLocate[i] < mSVMLocate[i - 1]) && (mSVMLocate[i] <= mSVMLocate[i + 1])) {
+                if ((svmLocate[i] < svmLocate[i - 1]) && (svmLocate[i] <= svmLocate[i + 1])) {
                     n = i;  //极小值点
                     /*String n1 = String.valueOf(n);
                     Log.e("n", n1);*/
@@ -1377,7 +1496,7 @@ public class BaseActivity extends AppCompatActivity {
 
     //点击记忆按钮执行的方法
     public void clickMemory() {
-        isClickRem = true;
+        isClickMem = true;
         for (int i = 0; i < 400; i++) {
             mCompareArray[i] = mCompareShengyinArray[i];
         }
@@ -1386,7 +1505,7 @@ public class BaseActivity extends AppCompatActivity {
 
     //点击比较按钮执行的方法
     public void clickCompare() {
-        if (isClickRem) {
+        if (isClickMem) {
             isCom = !isCom;
         } else {
             Toast.makeText(this, getResources().getString(R.string
@@ -1420,6 +1539,8 @@ public class BaseActivity extends AppCompatActivity {
             case 3:
                 customDialog.clearFilter1();
                 customDialog.rgFilter2.check(customDialog.rbGaoTong.getId());
+                break;
+            default:
                 break;
         }
         customDialog.setFilterVisible();
@@ -1497,7 +1618,7 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 1;
         int[] ints = {96, 1, 0};    //GN （控制命令前三个字节的十进制数值）  设备地址：96；低通滤波功能：1；控制增益：无
 
-        long l = getRequestCrcByte(ints);
+        long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
         StringBuffer ss = new StringBuffer();
         if (s.length() <= 32) {
@@ -1526,7 +1647,7 @@ public class BaseActivity extends AppCompatActivity {
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
         Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendString(request);
+        sendCommand(request);
 
     }
 
@@ -1535,7 +1656,7 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 2;
         int[] ints = {96, 2, 0};
 
-        long l = getRequestCrcByte(ints);
+        long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
         StringBuffer ss = new StringBuffer();
         if (s.length() <= 32) {
@@ -1564,7 +1685,7 @@ public class BaseActivity extends AppCompatActivity {
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
         Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendString(request);
+        sendCommand(request);
 
     }
 
@@ -1573,7 +1694,7 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 3;
         int[] ints = {96, 3, 0};
 
-        long l = getRequestCrcByte(ints);
+        long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
         StringBuffer ss = new StringBuffer();
         if (s.length() <= 32) {
@@ -1602,7 +1723,7 @@ public class BaseActivity extends AppCompatActivity {
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
         Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendString(request);
+        sendCommand(request);
 
     }
 
@@ -1611,7 +1732,7 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 0;
         int[] ints = {96, 4, 0};
 
-        long l = getRequestCrcByte(ints);
+        long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
         StringBuffer ss = new StringBuffer();
         if (s.length() <= 32) {
@@ -1640,7 +1761,7 @@ public class BaseActivity extends AppCompatActivity {
         request[5] = (byte) integer3.intValue();
         request[6] = (byte) integer4.intValue();
         Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendString(request);
+        sendCommand(request);
 
     }
 
@@ -1671,9 +1792,9 @@ public class BaseActivity extends AppCompatActivity {
             // 关闭并释放资源
             mAudioTrack.release();
             try {
-                mSocket.close();
-                if (mInputStream != null) {
-                    mInputStream.close();
+                blueSocket.close();
+                if (inputStream != null) {
+                    inputStream.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1693,11 +1814,11 @@ public class BaseActivity extends AppCompatActivity {
 //GT20180321 蓝牙输入流解读
 
 /*更改记录*/
-//GC20171129  修改蓝牙输入流的处理，缩短声音播放的延时问题
-//GC20171205  添加磁场左右判断的功能
+//GC20171129  修改蓝牙输入流的处理，缩短声音播放的延时问题    //G?
+//GC20171205  添加探头相对电缆位置的左右判断的功能
 
 //GC20180412  获取声音特征并预测
-//GC20180504  训练声音特征生成model
+//GC20180504  训练声音特征生成model //G?是否不用线程
 //GC20180417  是否是故障点声音
 
 //GC20180428  画声音波形的位置改变，提前50个点
@@ -1713,7 +1834,6 @@ public class BaseActivity extends AppCompatActivity {
 
 //GC20190123 智能识别提示优化
 //GC201901231 去掉启动APP读取内存记录的模式操作
-//GC201901232 用户模式提示框文字添加
 //GC20190216 红色虚光标绘制情况修改
 //GC20190218 专家界面延时值显示和相关结果一致起来（通过相关后计时自动定位数值不一致也不刷新延时值）
 //GC20190307 词条和延时跳动效果
@@ -1722,8 +1842,11 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190613 重连主提示框提示
 //GC20190625 用户界面发现故障UI提示更改 （去掉上次延时值，显示刻度圆圈大小）
 //GC20190627 触发灯闪烁bug原因
+//GC20190717 用户界面布局修改
 
-//GN去掉
+//版本变动
 //GC2.01.005 界面无缝切换
 //GC2.01.006 蓝牙重连功能优化
 //GC2.01.007 提示音改进和蓝牙重连提示优化
+//GC2.01.008 稳定无bug版本
+//GC2.01.009 用户界面布局修改

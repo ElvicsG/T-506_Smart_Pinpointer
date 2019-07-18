@@ -94,11 +94,11 @@ public class UserMainActivity extends BaseActivity {
     LinearLayout llMinDelay;
 
     public static UserMainActivity instance;
-    private ValueAnimator valueAnimator;    //GN 动画绘制1
+    private ValueAnimator valueAnimator;    //动画绘制1
     private int[] scoreText = {R.drawable.ic_wait_empty, R.drawable.ic_wait_1, R.drawable.ic_wait_2, R.drawable.ic_wait_3};
     private WaterWaveView v;    //水波纹动画
     private ViewGroup.MarginLayoutParams layoutParams;  //GN 探头位置
-    private ValueAnimator valueAnimator2;   //GN 动画绘制1
+    private ValueAnimator valueAnimator2;   //动画绘制1
     private double lastDelayValue = -1; //上次的声磁延时值
     private double minDelayValue = 43.625;  //GC20181115 历史最小延时值（最大349*0.125=43.625ms）
     private Dialog dialog;
@@ -160,7 +160,7 @@ public class UserMainActivity extends BaseActivity {
                 cichangSeekbarInts[1] = temp;
                 seekbarType = 1;
                 int[] ints = {96, 0, 128 + b2s(temp)};
-                long l = getRequestCrcByte(ints);
+                long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuffer ss = new StringBuffer();
                 if (s.length() <= 32) {
@@ -188,7 +188,7 @@ public class UserMainActivity extends BaseActivity {
                 request[4] = (byte) integer2.intValue();
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
-                sendString(request);
+                sendCommand(request);
             }
         });
 //        voiceGainControl.setAngleRate(1);
@@ -208,7 +208,7 @@ public class UserMainActivity extends BaseActivity {
                 shengyinSeekbarInts[1] = temp;
                 seekbarType = 2;
                 int[] ints = {96, 0, b2s(temp)};
-                long l = getRequestCrcByte(ints);
+                long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuffer ss = new StringBuffer();
                 if (s.length() <= 32) {
@@ -236,7 +236,7 @@ public class UserMainActivity extends BaseActivity {
                 request[4] = (byte) integer2.intValue();
                 request[5] = (byte) integer3.intValue();
                 request[6] = (byte) integer4.intValue();
-                sendString(request);
+                sendCommand(request);
             }
         });
 
@@ -257,7 +257,7 @@ public class UserMainActivity extends BaseActivity {
                 llFilter.setClickable(true);
                 voiceGainControl.setEnabled(true);
                 magneticFieldGainControl.setEnabled(true);
-                hasSendMessage = false;
+                hasSentCommand = false;
             }
         }, 500);
     }
@@ -290,7 +290,7 @@ public class UserMainActivity extends BaseActivity {
             Toast.makeText(UserMainActivity.this, getResources().getString(R.string
                     .The_sending_data_failed_and_was_being_resent), Toast.LENGTH_SHORT).show();
         }
-        if (event.status == BLUETOOTH_DISCONNECTED) {
+        if (event.status == DISCONNECTED) {
             toastDisconnected = true;
             if (!isExit) {
                 new SweetAlertDialog(UserMainActivity.this, SweetAlertDialog.WARNING_TYPE)
@@ -317,19 +317,19 @@ public class UserMainActivity extends BaseActivity {
                         .show();
             }
         }
-        if (event.status == WHAT_POSITION_Right) {
+        if (event.status == POSITION_RIGHT) {
             layoutParams.setMargins(Utils.dp2px(UserMainActivity.this, 100), Utils.dp2px(UserMainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
             ivPosition.setLayoutParams(params);
         }
-        if (event.status == WHAT_POSITION_LEFT) {
+        if (event.status == POSITION_LEFT) {
             layoutParams.setMargins(Utils.dp2px(UserMainActivity.this, 40), Utils.dp2px(UserMainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
             ivPosition.setLayoutParams(params);
         }
         if (event.status == WHAT_REFRESH) {
-            handleGainView(maxShengYin, ivVoiceGain, 1);    //GC20181113 上下语句顺序调整，否则影响进度条回落功能
-            handleGainView(maxCiChang, ivMagneticFieldGain, 0);
+            handleGainView(maxVoice, ivVoiceGain, 1);    //GC20181113 上下语句顺序调整，否则影响进度条回落功能
+            handleGainView(maxMagnetic, ivMagneticFieldGain, 0);
         }
 
     }
@@ -363,7 +363,7 @@ public class UserMainActivity extends BaseActivity {
         //GC20181113 判断结构修改
         if (type == 0) {
             changeMagneticFieldGainView(imageView, currentPosition);
-            maxCiChang = 0;     //GC20181113 刷新之后归零
+            maxMagnetic = 0;     //GC20181113 刷新之后归零
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -378,7 +378,7 @@ public class UserMainActivity extends BaseActivity {
             }).start();
         } else if (type == 1) {
             changeVoiceGainView(ivVoiceGain, currentPosition);
-            maxShengYin = 0;    //GC20181113 刷新之后归零
+            maxVoice = 0;    //GC20181113 刷新之后归零
             //GC20181121 添加声音回落
             new Thread(new Runnable() {
                 @Override
@@ -490,7 +490,7 @@ public class UserMainActivity extends BaseActivity {
         if (valueAnimator2 != null) {
             valueAnimator2.end();
         }
-        if (event.isMalfunction) {
+        if (event.isFault) {
             if (firstFind) {
                 //GN 去动画1
                 rlWave.removeView(v);               //GN 波纹
@@ -517,7 +517,8 @@ public class UserMainActivity extends BaseActivity {
             ccvSecond.setVisibility(View.GONE);
             //GN “未发现故障”波纹 状态1
             tvNotice.setText(getString(R.string.message_notice_6));
-            if(lastDelayValue > 0){     //GN 有过相关后的声磁延时值
+            if(lastDelayValue > 0){
+                //有过相关后的声磁延时值
                 tvLastDelay.setText(lastDelayValue + "ms");
             }else{
                 tvLastDelay.setText("");
@@ -722,15 +723,15 @@ public class UserMainActivity extends BaseActivity {
      /*   System.out.println("streamMaxVolume:" + streamMaxVolume);
         System.out.println("streamVolume:" + streamVolume);*/
         if (isSilence) {
-            if (streamVolumenow == 0) {
-                streamVolumenow = streamMaxVolume / 2;
+            if (streamVolumeNow == 0) {
+                streamVolumeNow = streamMaxVolume / 2;
             }
             //audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumenow, AudioManager
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumeNow, AudioManager
                     .FLAG_PLAY_SOUND);
             ivSilence.setImageResource(R.drawable.ic_open_voice);
         } else {
-            streamVolumenow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            streamVolumeNow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             //audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager
                     .FLAG_PLAY_SOUND);

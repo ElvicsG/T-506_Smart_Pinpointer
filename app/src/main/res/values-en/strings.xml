@@ -171,5 +171,7 @@
     <string name="shengyin_value_min">0</string>
     <string name="notifyMsg">当前应用缺少必要权限。</string>
     <string name="notifyTitle">Tips</string>
+    <string name="current">Current:</string>
+    <string name="last">Last:</string>
 
 </resources>

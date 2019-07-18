@@ -174,5 +174,7 @@
     <string name="voice_gain_setting">声音增益设置</string>
     <string name="shengyin_value_max">32</string>
     <string name="shengyin_value_min">0</string>
+    <string name="current">当前：</string>
+    <string name="last">上次：</string>
 
 </resources>

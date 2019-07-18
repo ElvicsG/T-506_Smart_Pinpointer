@@ -1,9 +1,5 @@
 package com.kehui.www.testapp.ui;
 
-/**
- * Created by jwj on 2018/4/16.
- */
-
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -18,10 +14,9 @@ import android.widget.TextView;
 
 import com.kehui.www.testapp.R;
 
-
 /**
- * 自定义Dialog弹窗
- * Created by zhuwentao on 2016-08-19.
+ * @author jwj  /   zhuwentao
+ * @date 2018/04/16     /   2016-08-19.
  */
 public class CustomDialog extends Dialog {
 

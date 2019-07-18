@@ -171,5 +171,7 @@
     <string name="triggered">Activado</string>
     <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrumnet!</string>
     <string name="Please_re_adjust_the_gain">Please re-adjust the gain</string>
+    <string name="current">Current:</string>
+    <string name="last">Last:</string>
 
 </resources>

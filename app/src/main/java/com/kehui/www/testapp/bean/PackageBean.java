@@ -2,10 +2,10 @@ package com.kehui.www.testapp.bean;
 
 import java.util.Arrays;
 
-/*
- * Created by 29062 on 2016/11/22.
+/**
+ * @author 29062
+ * @date 2016/11/22
  */
-
 public class PackageBean {
 
     private int SM;

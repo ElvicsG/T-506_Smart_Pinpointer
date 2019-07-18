@@ -1,13 +1,16 @@
 package com.kehui.www.testapp.event;
 
 /**
- * Created by jwj on 2018/6/9.
+ * @author jwj
+ * @date 2018/06/09
  */
-
 public class OperationGuideEvent {
-    public boolean isMalfunction;//是故障点
-    public OperationGuideEvent(boolean isMalfunction) {
-        this.isMalfunction = isMalfunction;
+    /**
+     * 判断是故障点
+     */
+    public boolean isFault;
+    public OperationGuideEvent(boolean isFault) {
+        this.isFault = isFault;
     }
 
 }

@@ -291,21 +291,21 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.2"
-        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-24.2.1_78539e0c171186e9f7ab34e2e5aebad5e1ef6469.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\sun.misc.BASE64Decoder.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.2"
         sha1="acd93e3727886196f9b8434279ff445ba8611186">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\sun.misc.BASE64Decoder_de673d07bc4921cab896ff795d0a31987d86900f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-24.2.1_78539e0c171186e9f7ab34e2e5aebad5e1ef6469.jar" />
     </item>
     <item
         is-multidex="false"
