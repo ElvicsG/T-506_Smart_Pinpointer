@@ -1,5 +1,6 @@
 package com.kehui.www.testapp.view;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -69,13 +70,6 @@ public class SplashActivity extends BaseActivity {
         tvAppName.setTypeface(type);
         Constant.DeviceId = Utils.getAndroidId(SplashActivity.this);
         Log.e("设备序列号", Constant.DeviceId);//8ffd20e5d086759d  // cf390c486799c36e
-        //GC20181116 模式切换时无需点击操作
-        if (PrefUtils.getString(SplashActivity.this, AppConfig.CLICK_MODE, "click_mode").equals("clicked")) {
-            Utils.showToast(SplashActivity.this, getString(R.string.connecting_waite));
-            Intent intent = new Intent(this, SeekDeviceActivity.class);
-            startActivity(intent);
-            finish();
-        }
 
     }
 
@@ -268,20 +262,20 @@ public class SplashActivity extends BaseActivity {
     protected static final int URL_ERROR = 102;
     protected static final int IO_ERROR = 103;
     protected static final int JSON_ERROR = 104;
+    @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
+        @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case UPDATE_VERSION:
                     // 弹出对话框，提示用户更新
-
                     if (SettingActivity.instance != null) {
                         SettingActivity.instance.showUpdateDialog();
                     } else {
-
-                        if (!isFinishing())
+                        if (!isFinishing()) {
                             showUpdateDialog();
+                        }
                     }
-
                     isCheckOver = true;
                     break;
                 case ENTER_HOME:
@@ -308,8 +302,8 @@ public class SplashActivity extends BaseActivity {
         }
     };
 
-    public static boolean isCancel = true; // 用来判断是否点击了取消
-
+    // 用来判断是否点击了取消
+    public static boolean isCancel = true;
 
     /**
      * 弹出对话框，提示用户更新

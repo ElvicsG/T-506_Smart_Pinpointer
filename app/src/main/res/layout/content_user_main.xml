@@ -226,10 +226,10 @@
                                 android:layout_marginStart="5dp"
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
-                                android:padding="8dp"
+                                android:padding="6dp"
                                 android:text=""
                                 android:textColor="@color/yellow3"
-                                android:textSize="9dp"
+                                android:textSize="13dp"
                                 android:textStyle="bold"
                                 tools:visibility="invisible"/>
                         </LinearLayout>

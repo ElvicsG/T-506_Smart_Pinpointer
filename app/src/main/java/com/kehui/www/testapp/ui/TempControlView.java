@@ -17,8 +17,8 @@ import android.view.View;
 import com.kehui.www.testapp.R;
 
 /**
- * 增益控制
- * Created by yangle on 2016/11/29.
+ * @author yangle
+ * @date 2016/11/29
  */
 public class TempControlView extends View {
 
@@ -127,6 +127,7 @@ public class TempControlView extends View {
 
     private String arcColor = "#000000";
 
+    //弧度颜色
     public void setArcColor(String color) {
         this.arcColor = color;
         arcPaint.reset();
@@ -210,14 +211,17 @@ public class TempControlView extends View {
     private String dialColor2 = "#000000";
     private String valueColor = "#000000";
 
+    //未选中刻度颜色
     public void setDialColor1(String color) {
         this.dialColor1 = color;
     }
 
+    //选中刻度颜色
     public void setDialColor2(String color) {
         this.dialColor2 = color;
     }
 
+    //最大最小值颜色
     public void setValueColor(String color) {
         this.valueColor = color;
         tempFlagPaint.reset();
@@ -290,6 +294,7 @@ public class TempControlView extends View {
 
     public String currentValueColor = "#000000";
 
+    //当前设置值颜色
     public void setCurrentValueColor(String color) {
         this.currentValueColor = color;
         tempPaint.reset();

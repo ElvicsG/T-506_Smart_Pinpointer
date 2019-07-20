@@ -41,7 +41,7 @@
     <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
     <string name="Exit_application">Ausgang</string>
     <string name="The_sending_data_failed_and_was_being_resent">The sending data failed and was being resent</string>
-    <string name="Sound_field_delay">Schallverzögerung : </string>
+    <string name="Sound_field_delay">"Schallverzögerung: "</string>
     <string name="Sound_field_delay2">Schallverzögerung</string>
     <string name="Can_not_get_input_stream_via_Bluetooth_socket">Can not get input stream via</string>
     <string name="You_have_no_memory_data_can_not_compare">You have no memory data, can not compare</string>
@@ -171,7 +171,7 @@
     <string name="gpsNotifyMsg">当前应用需要打开定位功能。</string>
     <string name="initiate_assistance">Begin to assist</string>
     <string name="notifyTitle">Tips</string>
-    <string name="current">Current:</string>
-    <string name="last">Last:</string>
+    <string name="current">"Current: "</string>
+    <string name="last">"Last: "</string>
 
 </resources>

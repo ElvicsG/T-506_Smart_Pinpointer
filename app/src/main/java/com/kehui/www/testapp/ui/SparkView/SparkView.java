@@ -383,7 +383,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         canvas.drawPath(scrubLinePath, scrubLinePaint);
         canvas.drawPath(scrubLinePath2, scrubLinePaint2);
 
-        //GC20190216 判断紫光标的绘制情况
+        //GC20190216
         if(scrubEnabled) {
             setScrubLine2(50);
         }

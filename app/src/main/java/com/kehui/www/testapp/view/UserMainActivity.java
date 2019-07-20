@@ -23,9 +23,9 @@ import com.kehui.www.testapp.application.Constant;
 import com.kehui.www.testapp.application.MyApplication;
 import com.kehui.www.testapp.base.BaseActivity;
 import com.kehui.www.testapp.event.AcousticMagneticDelay2;
-import com.kehui.www.testapp.event.HandleReceiveDataEvent;
+import com.kehui.www.testapp.event.HandleReceiveNotRespondEvent;
 import com.kehui.www.testapp.event.OperationGuideEvent;
-import com.kehui.www.testapp.event.SendDataFinishEvent;
+import com.kehui.www.testapp.event.SendCommandFinishEvent;
 import com.kehui.www.testapp.event.UINoticeEvent;
 import com.kehui.www.testapp.ui.PercentLinearLayout;
 import com.kehui.www.testapp.ui.TempControlView;
@@ -40,7 +40,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * 用户模式页面
@@ -156,9 +155,9 @@ public class UserMainActivity extends BaseActivity {
             public void change(int temp) {
                 Constant.magneticFieldGain = temp;
                 magneticFieldGainControl.setEnabled(false);
-                cichangSeekbarInts[0] = cichangSeekbarInts[1];
-                cichangSeekbarInts[1] = temp;
-                seekbarType = 1;
+                seekBarMagneticInt[0] = seekBarMagneticInt[1];
+                seekBarMagneticInt[1] = temp;
+                seekBarType = 1;
                 int[] ints = {96, 0, 128 + b2s(temp)};
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
@@ -204,9 +203,9 @@ public class UserMainActivity extends BaseActivity {
             public void change(int temp) {
                 Constant.voiceGain = temp;
                 voiceGainControl.setEnabled(false);
-                shengyinSeekbarInts[0] = shengyinSeekbarInts[1];
-                shengyinSeekbarInts[1] = temp;
-                seekbarType = 2;
+                seekBarVoiceInt[0] = seekBarVoiceInt[1];
+                seekBarVoiceInt[1] = temp;
+                seekBarType = 2;
                 int[] ints = {96, 0, b2s(temp)};
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
@@ -244,16 +243,16 @@ public class UserMainActivity extends BaseActivity {
 
     //GN 发送控制命令
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(SendDataFinishEvent event) {
+    public void onEventMainThread(SendCommandFinishEvent event) {
         mHandle.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (seekbarType == 1) {
-                    cichangSeekbarInts[1] = cichangSeekbarInts[0];
-                } else if (seekbarType == 2) {
-                    shengyinSeekbarInts[1] = shengyinSeekbarInts[0];
+                if (seekBarType == 1) {
+                    seekBarMagneticInt[1] = seekBarMagneticInt[0];
+                } else if (seekBarType == 2) {
+                    seekBarVoiceInt[1] = seekBarVoiceInt[0];
                 }
-                seekbarType = 0;
+                seekBarType = 0;
                 llFilter.setClickable(true);
                 voiceGainControl.setEnabled(true);
                 magneticFieldGainControl.setEnabled(true);
@@ -261,15 +260,19 @@ public class UserMainActivity extends BaseActivity {
             }
         }, 500);
     }
-    //GC20181118 接收控制命令
+
+    /**
+     * @param event 接收控制命令未响应   //GC20181118
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(HandleReceiveDataEvent event) {
-        if (seekbarType == 1) {
-            cichangSeekbarInts[1] = cichangSeekbarInts[0];;
-        } else if (seekbarType == 2) {
-            shengyinSeekbarInts[1] = shengyinSeekbarInts[0];
+    public void onEventMainThread(HandleReceiveNotRespondEvent event) {
+        if (seekBarType == 1) {
+            seekBarMagneticInt[1] = seekBarMagneticInt[0];;
+        } else if (seekBarType == 2) {
+            seekBarVoiceInt[1] = seekBarVoiceInt[0];
         }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(UINoticeEvent event) {
         if (event.status == SEND_SUCCESS) {
@@ -290,33 +293,6 @@ public class UserMainActivity extends BaseActivity {
             Toast.makeText(UserMainActivity.this, getResources().getString(R.string
                     .The_sending_data_failed_and_was_being_resent), Toast.LENGTH_SHORT).show();
         }
-        if (event.status == DISCONNECTED) {
-            toastDisconnected = true;
-            if (!isExit) {
-                new SweetAlertDialog(UserMainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText(getResources().getString(R.string.note))
-                        .setContentText(getResources().getString(R.string
-                                .Bluetooth_disconnected_please_reconnect))
-                        /*.setCancelText("不，谢谢")*/
-                        .setConfirmText(getResources().getString(R.string.Exit_application))
-                        .showCancelButton(true)
-                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-                                sDialog.dismiss();
-                            }
-                        })
-                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-                                finish();
-                                MyApplication.getInstances().get_bluetooth().disable();
-                                sDialog.dismiss();
-                            }
-                        })
-                        .show();
-            }
-        }
         if (event.status == POSITION_RIGHT) {
             layoutParams.setMargins(Utils.dp2px(UserMainActivity.this, 100), Utils.dp2px(UserMainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
@@ -328,7 +304,8 @@ public class UserMainActivity extends BaseActivity {
             ivPosition.setLayoutParams(params);
         }
         if (event.status == WHAT_REFRESH) {
-            handleGainView(maxVoice, ivVoiceGain, 1);    //GC20181113 上下语句顺序调整，否则影响进度条回落功能
+            //GC20181113 上下语句顺序调整，否则影响进度条回落功能
+            handleGainView(maxVoice, ivVoiceGain, 1);
             handleGainView(maxMagnetic, ivMagneticFieldGain, 0);
         }
 
@@ -478,11 +455,13 @@ public class UserMainActivity extends BaseActivity {
             if (msg.what == 4) {
                 changeMagneticFieldGainView(ivMagneticFieldGain, position);
             } else if (msg.what == 5) {
-                changeVoiceGainView(ivVoiceGain, position);     //GC20181121 添加声音回落
+                //GC20181121 添加声音回落
+                changeVoiceGainView(ivVoiceGain, position);
             }
             return false;
         }
     });
+
     //信息提示框内容
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(OperationGuideEvent event) {
@@ -492,10 +471,10 @@ public class UserMainActivity extends BaseActivity {
         }
         if (event.isFault) {
             if (firstFind) {
-                //GN 去动画1
-                rlWave.removeView(v);               //GN 波纹
-                tvScan.setVisibility(View.GONE);    //GN 正在测试中
-                ivScan.setVisibility(View.GONE);    //GN ...
+                //去动画1——波纹  正在测试中   ...
+                rlWave.removeView(v);
+                tvScan.setVisibility(View.GONE);
+                ivScan.setVisibility(View.GONE);
                 //GN “已发现故障”中圈 状态2
                 tvNotice.setText(getString(R.string.message_notice_7));
                 if(lastDelayValue > 0){     //GN 有过相关后的声磁延时值
@@ -512,7 +491,7 @@ public class UserMainActivity extends BaseActivity {
             }
 
         } else {
-            //GN 去动画2
+            //去动画2
             ccvFirst.setVisibility(View.GONE);
             ccvSecond.setVisibility(View.GONE);
             //GN “未发现故障”波纹 状态1
@@ -709,7 +688,6 @@ public class UserMainActivity extends BaseActivity {
                 break;
             case R.id.ll_mode_u:
                 PrefUtils.setString(UserMainActivity.this, AppConfig.CURRENT_MODE, "expert");
-                PrefUtils.setString(UserMainActivity.this, AppConfig.CLICK_MODE, "clicked");   //GC20181116
                 intent.setAction("restartapp");
                 sendBroadcast(intent);
 //                finish();
@@ -719,26 +697,20 @@ public class UserMainActivity extends BaseActivity {
     //点击静音按钮执行的方法
     public void clickSilence() {
         int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-     /*   System.out.println("streamMaxVolume:" + streamMaxVolume);
-        System.out.println("streamVolume:" + streamVolume);*/
         if (isSilence) {
             if (streamVolumeNow == 0) {
                 streamVolumeNow = streamMaxVolume / 2;
             }
-            //audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumeNow, AudioManager
                     .FLAG_PLAY_SOUND);
             ivSilence.setImageResource(R.drawable.ic_open_voice);
         } else {
             streamVolumeNow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            //audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager
                     .FLAG_PLAY_SOUND);
             ivSilence.setImageResource(R.drawable.ic_close_voice);
         }
         isSilence = !isSilence;
-        //AplicationUtil.makeToast(this, "clickSilence");
     }
     //点击滤波
     private void clickFilter() {
@@ -784,11 +756,6 @@ public class UserMainActivity extends BaseActivity {
             }, 500);
             super.onKeyDown(keyCode, event);
 
-        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
-            super.onKeyDown(keyCode, event);
-            checkVoice();
-            super.onKeyDown(keyCode, event);
-            checkVoice();
         }
         return false;
 
@@ -825,7 +792,6 @@ public class UserMainActivity extends BaseActivity {
 //GC20181102 增益初始值修改
 //GC20181113 增益进度条显示bug修改
 //GC20181115 改进发现过声音故障时，再次未发现故障时的声磁延时动画效果
-//GC20181116 模式切换时无需点击操作
 //GC20181117 系统音量监听
 //GC20181119 增加相关后提示效果逻辑判断重写
 //GC20181121 添加声音回落

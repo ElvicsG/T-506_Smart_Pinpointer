@@ -235,6 +235,7 @@ public class DeviceListActivity extends BaseActivity {
 
     // 选择设备响应函数
     private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
+        @Override
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
             // 准备连接设备，关闭服务查找
             mBtAdapter.cancelDiscovery();
@@ -267,7 +268,6 @@ public class DeviceListActivity extends BaseActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // 得到蓝牙设备
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // 如果是已配对的则略过，已得到显示，其余的在添加到列表中进行显示
                 // 如果是已配对的则略过，已得到显示，其余的在添加到列表中进行显示
                 if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
                     String str = device.getName() + "\n" + device.getAddress();

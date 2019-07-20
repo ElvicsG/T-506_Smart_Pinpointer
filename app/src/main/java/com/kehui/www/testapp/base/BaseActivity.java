@@ -22,18 +22,16 @@ import android.widget.Toast;
 
 import com.kehui.www.testapp.R;
 import com.kehui.www.testapp.adpter.MyChartAdapterBase;
-import com.kehui.www.testapp.application.AppConfig;
 import com.kehui.www.testapp.application.Constant;
 import com.kehui.www.testapp.application.MyApplication;
 import com.kehui.www.testapp.bean.PackageBean;
 import com.kehui.www.testapp.event.AcousticMagneticDelay2;
-import com.kehui.www.testapp.event.HandleReceiveDataEvent;
+import com.kehui.www.testapp.event.HandleReceiveNotRespondEvent;
 import com.kehui.www.testapp.event.OperationGuideEvent;
-import com.kehui.www.testapp.event.SendDataFinishEvent;
+import com.kehui.www.testapp.event.SendCommandFinishEvent;
 import com.kehui.www.testapp.event.StartReadThreadEvent;
 import com.kehui.www.testapp.event.UINoticeEvent;
 import com.kehui.www.testapp.ui.CustomDialog;
-import com.kehui.www.testapp.util.PrefUtils;
 import com.kehui.www.testapp.util.SoundUtils;
 import com.kehui.www.testapp.util.Utils;
 
@@ -100,22 +98,19 @@ public class BaseActivity extends AppCompatActivity {
     public int leftLen;
     public boolean hasLeft;
 
-    public int seekbarType;     //GN 磁场（1）或声音（2）控制的选择
-    public int[] shengyinSeekbarInts;
-    public int[] cichangSeekbarInts;
-    public int crcNum;
-    public boolean toastDisconnected;  //蓝牙设备是否连接失败的标志
+    public int seekBarType;
+    public int[] seekBarVoiceInt;
+    public int[] seekBarMagneticInt;
     public boolean isExit;     //是否退出软件的标志
     public boolean mShengyinFlag;   //是否开始获取声音包的标志
     public int mShengyinMarkNum;    //GN 触发时刻数据点所在的位置
     public int mShengyinCount;      //GN 触发后获取声音包的个数
     public int[] mShengyinArray;
-    public boolean isDraw;     //是否可以画波形的标志
-    public int[] mTempShengyinArray;
-    public int[] mCompareShengyinArray;
-    public int[] mCompareArray;
-    public int[] mCichangArray;
-    public int[] mTempCichangArray;
+    public int[] voiceDraw;
+    public int[] compareDraw;
+    public int[] magneticArray;
+    public int[] magneticDraw;
+    public boolean isDraw;
 
     /**
      * 解密需要的解析常量数组
@@ -146,6 +141,12 @@ public class BaseActivity extends AppCompatActivity {
     public int currentFilter;
 
     /**
+     * 用户界面增益进度条显示  //GC20181113
+     */
+    public int maxVoice;
+    public int maxMagnetic;
+
+    /**
      * 声音特征训练
      */
     private double[] readFeature = new double[2000];
@@ -155,29 +156,22 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * 声音智能识别
      */
-    private int[] tempVoice = new int[900];
-    private int[] svmData = new int[800];
-    private double[] featurex = new double[4];
-    private double[] mNormalization = new double[800];
-
-    /**
-     * 用户界面增益进度条显示  //GC20181113
-     */
-    public int maxVoice;
-    public int maxMagnetic;
-    public int[] maxMagneticArray;
+    private int[] tempVoice;
+    private int[] svmData;
+    private int[] autoLocate;
+    private double[] feature;
+    private double[] normalization;
+    private double[] normalization2;
 
     /**
      * 相关部分   //GC20181119
      */
-    private double[] mNormalization1 = new double[800];
-    public int svmPredictCount = 0; //预测结果为是的次数统计
+    public int svmPredictCount;
+    public int isRelatedCount;
+    public boolean firstFind;
     private double p = 0;
-    private int[] svmLocate = new int[800];    //GC20181201 用于自动定位的缓存数组
-    private int[] svmLocate2 = new int[800];    //GC20181204 用于自动定位的缓存数组
-    private int position;       //光标位置
-    private double timeDelay;   //声磁延时值
-    private double userDelay;   //一组相关声音的声磁延时值
+    private int cursorPosition;
+    private double timeDelay;
 
     /**
      *  提示音功能添加 //GC20190422
@@ -189,7 +183,6 @@ public class BaseActivity extends AppCompatActivity {
      */
     public static final int SEND_SUCCESS    = 1;
     public static final int SEND_ERROR      = 2;
-    public static final int DISCONNECTED    = 3;
     public static final int POSITION_RIGHT  = 4;
     public static final int POSITION_LEFT   = 5;
     public static final int LIGHT_UP        = 6;
@@ -244,11 +237,10 @@ public class BaseActivity extends AppCompatActivity {
         streamLeft = new int[59];
         leftLen = 0;
 
-        seekbarType = 0;
-        shengyinSeekbarInts = new int[]{22, 22};
-        cichangSeekbarInts = new int[]{22, 22};
-        crcNum = 0;
-        toastDisconnected = false;
+        //seekBar控制情况 磁场（1）声音（2）
+        seekBarType = 0;
+        seekBarVoiceInt = new int[]{22, 22};
+        seekBarMagneticInt = new int[]{22, 22};
         isExit = false;
         mShengyinFlag = false;
         mShengyinMarkNum = 0;
@@ -256,17 +248,28 @@ public class BaseActivity extends AppCompatActivity {
         mShengyinArray = new int[500];
         new Random();
         isDraw = true;
-        mTempShengyinArray = new int[500];
-        mCompareShengyinArray = new int[500];
-        mCompareArray = new int[500];
-        mCichangArray = new int[400];
-        mTempCichangArray = new int[400];
-        //GC20181113
-        maxMagneticArray = new int[400];
+        voiceDraw = new int[400];
+        magneticArray = new int[400];
+        magneticDraw = new int[400];
+        compareDraw = new int[400];
         isClickMem = false;
         isCom = false;
         //初始化滤波方式为全通
         clickTongNum = 0;
+
+        tempVoice = new int[900];
+        svmData = new int[800];
+        autoLocate = new int[800];
+        feature = new double[4];
+        //归一化的声音数据
+        normalization = new double[800];
+        normalization2 = new double[800];
+
+        //连续预测为故障声的次数
+        svmPredictCount = 0;
+        //连续相关的次数
+        isRelatedCount = 0;
+        firstFind = true;
 
     }
 
@@ -725,7 +728,32 @@ public class BaseActivity extends AppCompatActivity {
 
     //对发送的控制命令进行CRC校验
     public long getCommandCrcByte(int[] bytes) {
-        return testCrc(bytes);
+        return getCrc(bytes);
+    }
+
+    /**
+     * @param ints  数据内容
+     * @return  得到crc码
+     */
+    public long getCrc(int[] ints) {
+        mHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 2000);
+        long nReg = Long.valueOf("4294967295");
+        long integer = Long.valueOf("4294967295");
+        for (int i = 0; i < ints.length; i++) {
+            nReg = nReg ^ ints[i];
+            for (int j = 0; j < 4; j++) {
+                long a = nReg >> 24;
+                long b = a & 255;
+                long nTemp = crcTable[(int) b];
+                nReg = (nReg << 8) & integer;
+                nReg = nReg ^ nTemp;
+            }
+        }
+        return nReg;
     }
 
     /**
@@ -733,18 +761,16 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void sendCommand(byte[] command) {
         if (!hasSentCommand) {
-            for (int i = 0; i < command.length; i++) {
-                sendCommand[i] = command[i];
-            }
+            System.arraycopy(command, 0, sendCommand, 0, command.length);
             if (blueSocket == null) {
                 Toast.makeText(this, getResources().getString(R.string.Bluetooth_is_not_connected),
                         Toast.LENGTH_SHORT).show();
             }
             try {
-                OutputStream os = blueSocket.getOutputStream(); // 蓝牙连接输出流
-                //byte[] bos = str.getBytes("GB2312");//native的Socket发送字节流默认是GB2312的，所以在Java方面需要指定GB2312
+                //蓝牙输出流
+                OutputStream os = blueSocket.getOutputStream();
                 os.write(command);
-                EventBus.getDefault().post(new SendDataFinishEvent());
+                EventBus.getDefault().post(new SendCommandFinishEvent());
                 hasSentCommand = true;
             } catch (IOException e) {
                 //Toast.makeText(this, "发送失败" + e.toString(), Toast.LENGTH_SHORT).show();
@@ -819,11 +845,11 @@ public class BaseActivity extends AppCompatActivity {
                                     if (receivedCommand[2] != 1) {
                                         //Respond：响应值为0，命令未响应
                                         mHandle.sendEmptyMessage(SEND_ERROR);
-                                        EventBus.getDefault().post(new HandleReceiveDataEvent());
-                                        seekbarType = 0;
+                                        EventBus.getDefault().post(new HandleReceiveNotRespondEvent());
+                                        seekBarType = 0;
                                     } else if (receivedCommand[1] == sendCommand[1]) {
                                         //接収的命令内容与要发送的命令内容一致
-                                        seekbarType = 0;
+                                        seekBarType = 0;
                                         mHandle.sendEmptyMessage(SEND_SUCCESS);
                                     }
                                 }
@@ -859,12 +885,11 @@ public class BaseActivity extends AppCompatActivity {
                             if (receivedCommand[2] != 1) {
                                 //Respond：响应值，命令未响应
                                 mHandle.sendEmptyMessage(SEND_ERROR);
-                                //GC20181118    //G?
-                                EventBus.getDefault().post(new HandleReceiveDataEvent());
-                                seekbarType = 0;
+                                EventBus.getDefault().post(new HandleReceiveNotRespondEvent());
+                                seekBarType = 0;
                             } else if (receivedCommand[1] == sendCommand[1]) {
                                 //接収的命令内容与要发送的命令内容一致
-                                seekbarType = 0;
+                                seekBarType = 0;
                                 mHandle.sendEmptyMessage(SEND_SUCCESS);
                             }
                             i += 6;
@@ -902,10 +927,6 @@ public class BaseActivity extends AppCompatActivity {
         for (int i1 = 55, j = 0; i1 < 59; i1++, j++) {
             ints2[j] = tempCrc[i1];
         }
-        if (!isCrc(ints, ints2)) {
-            crcNum++;
-            //Log.d("CRC", crcNum + "");
-        }
         return isCrc(ints, ints2);
     }
 
@@ -932,47 +953,10 @@ public class BaseActivity extends AppCompatActivity {
      * @return  判断Crc校验的结果
      */
     public boolean isCrc(int[] ints, int[] ints2) {
-        long l = testCrc(ints);
+        long l = getCrc(ints);
         long ll = (long) (ints2[0] * Math.pow(2, 24) + ints2[1] * Math.pow(2, 16) + ints2[2] *
                 Math.pow(2, 8) + ints2[3]);
         return l == ll;
-
-    }
-
-    /**
-     * @param ints  数据内容
-     * @return  得到crc码
-     */
-    public long testCrc(int[] ints) {
-        crcNum++;
-        final int qqq = crcNum;
-        if (crcNum >= 999999999) {
-            crcNum = 0;
-        }
-        mHandle.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-//                if (qqq == crcNum) mHandle.sendEmptyMessage(DISCONNECTED);
-            }
-        }, 2000);
-        long nReg = Long.valueOf("4294967295");
-        long integer = Long.valueOf("4294967295");
-        for (int i = 0; i < ints.length; i++) {
-            nReg = nReg ^ ints[i];
-//            Log.e("FILE","nReg=nReg^bytes[i];");
-            for (int j = 0; j < 4; j++) {
-                long a = nReg >> 24;
-//                Log.e("FILE", "a:" + a);
-                long b = a & 255;
-//                Log.e("FILE", "b:" + b);
-                long nTemp = crcTable[(int) b];
-//                Log.e("FILE", "nTemp:" + nTemp);
-                //4294967295 -1
-                nReg = (nReg << 8) & integer;
-                nReg = nReg ^ nTemp;
-            }
-        }
-        return nReg;
 
     }
 
@@ -1051,7 +1035,7 @@ public class BaseActivity extends AppCompatActivity {
                     //已经开始获取声音包
                     if (mShengyinCount <= 7) {
                         //声音识别需要9个声音包 4
-                        for (int i=100+mShengyinCount*100-mShengyinMarkNum , j = 0; j < 100; i++, j++) {
+                        for (int i = 100 + mShengyinCount * 100 - mShengyinMarkNum , j = 0; j < 100; i++, j++) {
                             tempVoice[i] = results[j];
                         }
                         if (mShengyinCount <= 4) {
@@ -1086,7 +1070,7 @@ public class BaseActivity extends AppCompatActivity {
             }
             //按照顺序（00 01 10 11）将磁场数据拼接起来，1包含有100个数据点
             for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
-                mCichangArray[j] = results[i];
+                magneticArray[j] = results[i];
             }
             //4个磁场包拼接完成，开始画主界面波形
             if (packageBean.getMark() == 3) {
@@ -1096,31 +1080,32 @@ public class BaseActivity extends AppCompatActivity {
                 mHandle.sendMessage(msg);
                 if (isDraw) {
                     for (int i = 0; i < 400; i++) {
-                        mTempCichangArray[i] = mCichangArray[i];
-                        //GC20181113 找寻磁场信号幅值最大点用于用户界面画进度条高度
-                        maxMagneticArray[i] = mCichangArray[i] - 2048;
-                        if (maxMagneticArray[i] > 2047) {
-                            maxMagneticArray[i] = 2047;
-                        } else if (maxMagneticArray[i] < -2048) {
-                            maxMagneticArray[i] = -2048;
+                        magneticDraw[i] = magneticArray[i];
+                        //找寻磁场信号幅值最大点用于用户界面画进度条高度   //GC20181113
+                        magneticArray[i] = magneticArray[i] - 2048;
+                        if (magneticArray[i] > 2047) {
+                            magneticArray[i] = 2047;
+                        } else if (magneticArray[i] < -2048) {
+                            magneticArray[i] = -2048;
                         }
-                        maxMagneticArray[i] = Math.abs(maxMagneticArray[i]);
-                        if (maxMagneticArray[i] > maxMagnetic) {
-                            maxMagnetic = maxMagneticArray[i];
+                        magneticArray[i] = Math.abs(magneticArray[i]);
+                        if (magneticArray[i] > maxMagnetic) {
+                            maxMagnetic = magneticArray[i];
                         }
                     }
-                    //GC20180428 声音波形加上触发前50个点的数据   //mTempShengyinArray[i] = mShengyinArray[i];
-                    System.arraycopy(tempVoice, 50, mTempShengyinArray, 0, 400);
-                    System.arraycopy(mTempShengyinArray, 0, mCompareShengyinArray, 0, 400);
-                    //GC20180412 预测800个点的声音数据
+                    //GC20180428 声音波形加上触发前50个点的数据   //voiceDraw[i] = mShengyinArray[i];
+                    System.arraycopy(tempVoice, 50, voiceDraw, 0, 400);
                     for (int i = 0; i < 800; i++) {
+                        //用于计算特征值的声音数据  //GC20180412
                         svmData[i] = tempVoice[i];
-                        //GC20181201
-                        svmLocate[i] = tempVoice[i];
+                        //用于自动定位的声音数据   //GC20181201
+                        autoLocate[i] = tempVoice[i];
                     }
+                    //获取声音特征
                     obtainFeaturex();
+                    //根据声音特征预测
                     if (svmTrainThread) {
-                        voiceSvmPredict(featurex);
+                        voiceSvmPredict(feature);
                     }
                 }
                 Message message = new Message();
@@ -1218,7 +1203,9 @@ public class BaseActivity extends AppCompatActivity {
         return Integer.valueOf(substring, 2);
     }
 
-    //播放声音
+    /**
+     * @param results   声音数据
+     */
     public void playSound(int[] results) {
         byte[] bytes = new byte[results.length * 2];
         for (int i = 0; i < results.length; i++) {
@@ -1249,9 +1236,11 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //GC20180412 获取当前的声音特征
+    /**
+     * 获取当前声音数据的特征值    //GC20180412
+     */
     private void obtainFeaturex() {
-        //GN数据归一化
+        //声音数据归一化
         int max = 0;
         for (int i = 0; i < 800; i++) {
             svmData[i] = svmData[i] - 2048;
@@ -1260,39 +1249,42 @@ public class BaseActivity extends AppCompatActivity {
             } else if (svmData[i] < -2048) {
                 svmData[i] = -2048;
             }
-            svmData[i] = Math.abs(svmData[i]);    //取绝对值
+            svmData[i] = Math.abs(svmData[i]);
             if (svmData[i] > max) {
                 max = svmData[i];
-                maxVoice = max;  //GC20181113 找寻声音信号幅值最大点用于用户界面画进度条高度
+                //找寻声音信号幅值最大点用于用户界面画进度条高度 //GC20181113
+                maxVoice = max;
             }
         }
         for (int i = 0; i < 800; i++) {
-            mNormalization[i] = svmData[i] / (max * 1.0);  //强制转换类型，int运算得double
+            //强制转换类型，int运算得double
+            normalization[i] = svmData[i] / (max * 1.0);
         }
-        //短时步长为50
-        //GN短时能量分布处理
+        //短时能量分布处理  （短时步长为50）
         double[] mED = new double[751];
         for (int i = 0; i < 751; i++) {
             double mtemp = 0.0;
             for (int j = 0; j < 50; j++) {
-                mtemp = mtemp + mNormalization[i + j] * mNormalization[i + j];
+                mtemp = mtemp + normalization[i + j] * normalization[i + j];
             }
             mED[i] = mtemp / 50;
         }
-        //GN短时过零率
-        double th = 0.5;     //阈值 threshold
+        //短时过零率 //阈值
+        double threshold = 0.5;
         double[] mZCR = new double[750];
         for (int i = 0; i < 750; i++) {
             double mtemp = 0.0;
             for (int j = 0; j < 50; j++) {
-                mtemp = mtemp + Math.abs(Math.signum(mNormalization[i + j + 1] - th) - Math.signum(mNormalization[i + j] - th))
-                        + Math.abs(Math.signum(mNormalization[i + j + 1] + th) - Math.signum(mNormalization[i + j] + th));
+                mtemp = mtemp + Math.abs(Math.signum(normalization[i + j + 1] - threshold) - Math.signum(normalization[i + j] - threshold))
+                        + Math.abs(Math.signum(normalization[i + j + 1] + threshold) - Math.signum(normalization[i + j] + threshold));
             }
             mZCR[i] = mtemp / 2;
         }
         //短时能量分布脉冲的宽度、高宽比、位置特征值
-        int isStart = 0;    //是否是脉冲宽度的起始
-        int Nu = 1;         //数据序数
+        //是否是脉冲宽度的起始
+        int isStart = 0;
+        //数据序数
+        int Nu = 1;
         int widthFirst = 0;
         int widthLast = 0;
         double max2 = 0.0;
@@ -1317,9 +1309,12 @@ public class BaseActivity extends AppCompatActivity {
                 max2 = mED[i];
             }
         }
-        featurex[0] = widthLast - widthFirst;   //脉冲宽度（大于均值的元素中，最小序数元素与最大序数元素序数的差值）
-        featurex[1] = max2 / (widthLast - widthFirst);  //脉冲高宽比观测值
-        featurex[2] = Math.round((widthLast + widthFirst) / 2); //脉冲位置取整观测值
+        //脉冲宽度（大于均值的元素中，最小序数元素与最大序数元素序数的差值）
+        feature[0] = widthLast - widthFirst;
+        //脉冲高宽比观测值
+        feature[1] = max2 / (widthLast - widthFirst);
+        //脉冲位置取整观测值
+        feature[2] = Math.round((widthLast + widthFirst) / 2);
         //短时过零率特征值
         //求均值
         double sum2 = 0.0;
@@ -1334,12 +1329,13 @@ public class BaseActivity extends AppCompatActivity {
                 temp = temp + mZCR[i];
             }
         }
-        featurex[3] = temp; //数组中大于均值的元素和为过零率特征值
-        //GC20180707 特征值归一化（参考已采数据特征的最大最小值进行归一化）
-        featurex[0] = Math.abs(featurex[0] - 39) / (750 - 39);
-        featurex[1] = Math.abs(featurex[1] - 7.6523e-5) / (0.0047 - 7.6523e-5);
-        featurex[2] = Math.abs(featurex[2] - 105) / (732 - 105);
-        featurex[3] = Math.abs(featurex[3] - 7) / (4871 - 7);
+        //数组中大于均值的元素和为过零率特征值
+        feature[3] = temp;
+        //特征值归一化（参考已采数据特征的最大最小值进行归一化）   //GC20180707
+        feature[0] = Math.abs(feature[0] - 39) / (750 - 39);
+        feature[1] = Math.abs(feature[1] - 7.6523e-5) / (0.0047 - 7.6523e-5);
+        feature[2] = Math.abs(feature[2] - 105) / (732 - 105);
+        feature[3] = Math.abs(feature[3] - 7) / (4871 - 7);
 
     }
 
@@ -1357,150 +1353,124 @@ public class BaseActivity extends AppCompatActivity {
         test[1].value = featurex[1];
         test[2].value = featurex[2];
         test[3].value = featurex[3];
-        /*未训练过未归一化的故障点声音特征
-        test[0].value = 173;
-        test[1].value = 0.0021;
-        test[2].value = 174;
-        test[3].value = 1191;*/
-        /*未训练过归一化的故障点声音特征
-        test[0].value = (200 - 39) / (750 - 39);
-        test[1].value = (0.0021 - 7.6523e-5) / (0.0047 - 7.6523e-5);
-        test[2].value = (188 - 105) / (732 - 105);
-        test[3].value = (1393 - 7) / (4871 - 7);*/
-        //test[2].value = (Double.valueOf(featurex[2])).intValue();
-        //double[] l = new double[2];
-        //double result_prob = svm.svm_predict_probability(model, test,l);		//测试1，带预测概率的分类测试
-        double result_normal = svm.svm_predict(model, test);    //测试2 不带概率的分类测试
-        //GC20180417 是否是故障点声音
-        if (result_normal == 1.0) {
+
+        //不带概率的分类测试
+        double result = svm.svm_predict(model, test);
+        if (result == 1.0) {
+            //是故障点
             EventBus.getDefault().post(new OperationGuideEvent(true));
-            //GC20181204 autoLocate();
-            for (int i = 0; i < 800; i++) {
-                svmLocate2[i] = svmLocate[i];     //GC20181204
-            }
-            /*String p1 = String.valueOf(position);
-            String t = String.valueOf(timeDelay);
-            Log.e("position", p1);
-            Log.e("timeDelay", t);*/
-            //GC20181119 添加相关判断
-            if(svmPredictCount > 0){    //GN 从连续判断为是的第二组开始做相关
+            //连续两次判断为故障声开始进行相关
+            if(svmPredictCount > 0){
+                //相关判断
                 related();
-                if(p > 0.9){        //GC20181201
+                if(p > 0.9){
+                    //相关之后再光标定位、计算延时值
                     autoLocate();
-                    userDelay = timeDelay;  //GN 只传递相关通过后的声磁延时值
-                    EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,true,position));    //GC20190218 虚光标位置传递
+                    //相关——判断是故障,虚光标位置和声磁延时值传递   //GC20190218
+                    EventBus.getDefault().post(new AcousticMagneticDelay2(timeDelay,true, cursorPosition));
                 }else{
-                    EventBus.getDefault().post(new AcousticMagneticDelay2(userDelay,false,position));
+                    //不相关——判断不是故障
+                    EventBus.getDefault().post(new AcousticMagneticDelay2(timeDelay,false, cursorPosition));
                 }
             }
-            for (int i = 0; i < 800; i++) {
-                mNormalization1[i] = mNormalization[i]; //GC20181119 保留上次预测结果为是的声音数据用做相关计算
-            }
+            //保留上次预测结果为是的声音数据用做相关计算 //GC20181119
+            System.arraycopy(normalization, 0, normalization2, 0, 800);
             svmPredictCount++;
 
         } else {
-            svmPredictCount = 0;
+            //判断不是故障
             EventBus.getDefault().post(new OperationGuideEvent(false));
+            svmPredictCount = 0;
+            //延时值显示逻辑bug修改  //GC20190720
+            isRelatedCount = 0;
         }
 
     }
 
-    //GC20180613 计算出光标的位置和相应的声磁延时值
-    private void autoLocate() {
-        //GC20181204
-        for (int i = 0; i < 800; i++) {
-            svmLocate[i] = ( svmLocate[i] + svmLocate2[i] ) / 2;
-        }
-        //求均值
-        double ave = 0;
-        for (int i = 0; i < 100; i++) {
-            ave += svmLocate[i];
-        }
-        ave = ave / 100;
-        //求方差
-        double var = 0;
-        for (int i = 0; i < 100; i++) {
-            var += (svmLocate[i] - ave) * (svmLocate[i] - ave);
-        }
-        var = var / 100;
-        //求标准差
-        double sta = Math.sqrt(var);
-        //GN 从触发时刻（第101个点i=100）之后，找出越出置信边界的第一个极值点（屏幕波形显示触发时刻前50个点和后349个点）
-        int m = 0;
-        int n = 0;
-        for (int i = 101; i < 449; i++) {   //GN 去头去尾
-            //if ((svmData[i] > (ave + sta * 5)) || (svmData[i] < (ave - sta * 5))) {       //置信边界
-            if ( svmLocate[i] < (ave - sta * 5) ){   //GC20181201 只求极小值
-                /*if ((svmData[i] > svmData[i - 1]) && (svmData[i] >= svmData[i + 1])) {
-                    m = i;  //极大值点
-                } else*/    //GC20181201 只求极小值
-                if ((svmLocate[i] < svmLocate[i - 1]) && (svmLocate[i] <= svmLocate[i + 1])) {
-                    n = i;  //极小值点
-                    /*String n1 = String.valueOf(n);
-                    Log.e("n", n1);*/
-                }
-            }
-            //if (m > 0 || n > 0) {
-            if ( n > 0 ) {
-                break;
-            }
-        }
-        /*if (m > 0) {
-            position = m - 50;
-            timeDelay = (position - 50) * 0.125;
-            EventBus.getDefault().post(new AcousticMagneticDelayEvent(position, timeDelay));    //GC20181106
-        } else */
-        if (n > 0) {
-            position = n - 50;
-            timeDelay = (position - 50) * 0.125;
-            //GC20190218 EventBus.getDefault().post(new AcousticMagneticDelayEvent(position, timeDelay));    //GC20181106
-        }
-
-    }
-
-    //GC20181119 计算相关系数
+    /**
+     * 计算相关系数       //GC20181119
+     */
     private void related() {
         //分母1
         double sum1 = 0;
         for (int i = 0; i < 800; i++) {
-            sum1 += mNormalization1[i];
+            sum1 += normalization2[i];
         }
         double ave1 = sum1 / 800;
         double var1 = 0;
         for (int i = 0; i < 800; i++) {
-            var1 += (mNormalization1[i] - ave1) * (mNormalization1[i] - ave1);
+            var1 += (normalization2[i] - ave1) * (normalization2[i] - ave1);
         }
         double sta1 = Math.sqrt(var1);
         //分母2
         double sum2 = 0;
         for (int i = 0; i < 800; i++) {
-            sum2 += mNormalization[i];
+            sum2 += normalization[i];
         }
         double ave2 = sum2 / 800;
         double var2 = 0;
         for (int i = 0; i < 800; i++) {
-            var2 += (mNormalization[i] - ave2) * (mNormalization[i] - ave2);
+            var2 += (normalization[i] - ave2) * (normalization[i] - ave2);
         }
         double sta2 = Math.sqrt(var2);
         //分子
         double sum = 0;
         for (int i = 0; i < 800; i++) {
-            sum += (mNormalization1[i] - ave1) * (mNormalization[i] - ave2);
+            sum += (normalization2[i] - ave1) * (normalization[i] - ave2);
         }
         //相关系数
         p = sum / (sta1 * sta2);
         /*String related = String.valueOf(p);
         Log.e("related", related);*/
+    }
+
+    /**
+     * 得到自动定位的光标位置和相应的声磁延时值
+     */
+    private void autoLocate() {
+        //求触发时刻前50个点的均值    //20190720
+        double ave = 0;
+        for (int i = 50; i < 100; i++) {
+            ave += autoLocate[i];
+        }
+        ave = ave / 50;
+        //方差
+        double var = 0;
+        for (int i = 50; i < 100; i++) {
+            var += (autoLocate[i] - ave) * (autoLocate[i] - ave);
+        }
+        var = var / 50;
+        //标准差
+        double sta = Math.sqrt(var);
+
+        //从触发时刻（第101个点i=100）之后，找出越出置信边界的第一个极值点（屏幕波形显示触发时刻前50个点和后349个点）
+        int n = 0;
+        //去头去尾
+        for (int i = 101; i < 449; i++) {
+            //置信边界  //GC20181201 只求极小值
+            if ( autoLocate[i] < (ave - sta * 5) ){
+                if ((autoLocate[i] < autoLocate[i - 1]) && (autoLocate[i] <= autoLocate[i + 1])) {
+                    //极小值点
+                    n = i;
+                }
+            }
+            if ( n > 0 ) {
+                break;
+            }
+        }
+        if (n > 0) {
+            cursorPosition = n - 50;
+            timeDelay = (cursorPosition - 50) * 0.125;
+            Log.e("test",cursorPosition + "点数");
+            Log.e("test",timeDelay + "ms");
+        }
 
     }
 
     //点击记忆按钮执行的方法
     public void clickMemory() {
         isClickMem = true;
-        for (int i = 0; i < 400; i++) {
-            mCompareArray[i] = mCompareShengyinArray[i];
-        }
-
+        System.arraycopy(voiceDraw, 0, compareDraw, 0, 400);
     }
 
     //点击比较按钮执行的方法
@@ -1511,12 +1481,10 @@ public class BaseActivity extends AppCompatActivity {
             Toast.makeText(this, getResources().getString(R.string
                     .You_have_no_memory_data_can_not_compare), Toast.LENGTH_SHORT).show();
         }
-        myChartAdapterShengyin.setmTempArray(mTempShengyinArray);
+        myChartAdapterShengyin.setmTempArray(voiceDraw);
         myChartAdapterShengyin.setShowCompareLine(isCom);
-        myChartAdapterShengyin.setmCompareArray(mCompareArray);
+        myChartAdapterShengyin.setmCompareArray(compareDraw);
         myChartAdapterShengyin.notifyDataSetChanged();
-        //refreshUi(false, 10);
-
     }
 
     //弹出滤波对话框   //GN 滤波方式选择， *低通1 *带通2 *高通3 *全通0
@@ -1787,8 +1755,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         try {
             isExit = true;
-            //GC20181116
-            PrefUtils.setString(BaseActivity.this, AppConfig.CLICK_MODE, "notClicked");
             // 关闭并释放资源
             mAudioTrack.release();
             try {
@@ -1814,26 +1780,18 @@ public class BaseActivity extends AppCompatActivity {
 //GT20180321 蓝牙输入流解读
 
 /*更改记录*/
-//GC20171129  修改蓝牙输入流的处理，缩短声音播放的延时问题    //G?
-//GC20171205  添加探头相对电缆位置的左右判断的功能
-
-//GC20180412  获取声音特征并预测
-//GC20180504  训练声音特征生成model //G?是否不用线程
-//GC20180417  是否是故障点声音
-
-//GC20180428  画声音波形的位置改变，提前50个点
-//GC20180707 声音特征值归一化计算修改
-
-//GC20181106 声磁延时显示优化（光标定位、延时值计算）
-//GC20181113 增益进度条显示bug修改
-//GC20181116 模式切换时无需点击操作
-//GC20181118 接收控制命令修改
+//GC20171129    修改蓝牙输入流的处理，缩短声音播放的延时问题    //G?
+//GC20171205    添加探头相对电缆位置的左右判断的功能
+//GC20180412    获取需要处理的声音数据并计算其特征值
+//GC20180428    画声音波形的位置改变，提前50个点
+//GC20180504    训练声音特征生成model //G?是否不用线程
+//GC20180707    声音特征值归一化计算修改
+//GC20181113    增益进度条高度显示优化
+//GC20181118    接收控制命令未响应处理
 //GC20181119 添加相关判断
 //GC20181201 自动定位算法优化
-//GC20181204 信号迭加平均处理
 
 //GC20190123 智能识别提示优化
-//GC201901231 去掉启动APP读取内存记录的模式操作
 //GC20190216 红色虚光标绘制情况修改
 //GC20190218 专家界面延时值显示和相关结果一致起来（通过相关后计时自动定位数值不一致也不刷新延时值）
 //GC20190307 词条和延时跳动效果
@@ -1843,6 +1801,7 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190625 用户界面发现故障UI提示更改 （去掉上次延时值，显示刻度圆圈大小）
 //GC20190627 触发灯闪烁bug原因
 //GC20190717 用户界面布局修改
+//GC20190720    延时值显示逻辑bug修改
 
 //版本变动
 //GC2.01.005 界面无缝切换

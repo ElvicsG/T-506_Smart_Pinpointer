@@ -36,7 +36,7 @@
     <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
     <string name="Exit_application">exit</string>
     <string name="The_sending_data_failed_and_was_being_resent">The sending data failed and was being resent</string>
-    <string name="Sound_field_delay">Time Delay :</string>
+    <string name="Sound_field_delay">"Time Delay: "</string>
     <string name="Sound_field_delay2">Time Delay</string>
     <string name="Can_not_get_input_stream_via_Bluetooth_socket">Can not get input stream via
         Bluetooth socket, please reopen the application to connect</string>
@@ -171,7 +171,7 @@
     <string name="shengyin_value_min">0</string>
     <string name="notifyMsg">当前应用缺少必要权限。</string>
     <string name="notifyTitle">Tips</string>
-    <string name="current">Current:</string>
-    <string name="last">Last:</string>
+    <string name="current">"Current: "</string>
+    <string name="last">"Last: "</string>
 
 </resources>

@@ -37,7 +37,7 @@
     <string name="Bluetooth_disconnected_please_reconnect">蓝牙断开,请重新连接</string>
     <string name="Exit_application">退出应用</string>
     <string name="The_sending_data_failed_and_was_being_resent">发送数据失败，正在重新发送</string>
-    <string name="Sound_field_delay">声磁延时 : </string>
+    <string name="Sound_field_delay">声磁延时：</string>
     <string name="Sound_field_delay2">声磁延时</string>
     <string name="Can_not_get_input_stream_via_Bluetooth_socket">不能通过蓝牙socket获得输入流,请重新打开应用进行连接
     </string>
