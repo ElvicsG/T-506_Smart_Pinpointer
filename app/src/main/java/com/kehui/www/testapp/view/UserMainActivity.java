@@ -22,16 +22,17 @@ import com.kehui.www.testapp.application.AppConfig;
 import com.kehui.www.testapp.application.Constant;
 import com.kehui.www.testapp.application.MyApplication;
 import com.kehui.www.testapp.base.BaseActivity;
-import com.kehui.www.testapp.event.AcousticMagneticDelay2;
-import com.kehui.www.testapp.event.HandleReceiveNotRespondEvent;
-import com.kehui.www.testapp.event.OperationGuideEvent;
+import com.kehui.www.testapp.event.ResultOfRelevantEvent;
+import com.kehui.www.testapp.event.SendCommandNotRespondEvent;
+import com.kehui.www.testapp.event.ResultOfSvmEvent;
 import com.kehui.www.testapp.event.SendCommandFinishEvent;
-import com.kehui.www.testapp.event.UINoticeEvent;
+import com.kehui.www.testapp.event.UiHandleEvent;
+import com.kehui.www.testapp.ui.CustomCircleView;
 import com.kehui.www.testapp.ui.PercentLinearLayout;
 import com.kehui.www.testapp.ui.TempControlView;
 import com.kehui.www.testapp.ui.WaterWaveView;
 import com.kehui.www.testapp.util.PrefUtils;
-import com.kehui.www.testapp.util.ShowProgressDialog;
+import com.kehui.www.testapp.ui.ShowProgressDialog;
 import com.kehui.www.testapp.util.Utils;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -45,6 +46,7 @@ import butterknife.OnClick;
  * 用户模式页面
  */
 public class UserMainActivity extends BaseActivity {
+
     @BindView(R.id.magnetic_field_gain_control_u)
     TempControlView magneticFieldGainControl;
     @BindView(R.id.iv_magnetic_field_gain_u)
@@ -244,7 +246,7 @@ public class UserMainActivity extends BaseActivity {
     //GN 发送控制命令
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(SendCommandFinishEvent event) {
-        mHandle.postDelayed(new Runnable() {
+        handle.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (seekBarType == 1) {
@@ -265,7 +267,7 @@ public class UserMainActivity extends BaseActivity {
      * @param event 接收控制命令未响应   //GC20181118
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(HandleReceiveNotRespondEvent event) {
+    public void onEventMainThread(SendCommandNotRespondEvent event) {
         if (seekBarType == 1) {
             seekBarMagneticInt[1] = seekBarMagneticInt[0];;
         } else if (seekBarType == 2) {
@@ -274,9 +276,9 @@ public class UserMainActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(UINoticeEvent event) {
+    public void onEventMainThread(UiHandleEvent event) {
         if (event.status == SEND_SUCCESS) {
-            mHandle.postDelayed(new Runnable() {
+            handle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     llFilter.setClickable(true);
@@ -284,7 +286,7 @@ public class UserMainActivity extends BaseActivity {
             }, 500);
         }
         if (event.status == SEND_ERROR) {
-            mHandle.postDelayed(new Runnable() {
+            handle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     llFilter.setClickable(true);
@@ -464,7 +466,7 @@ public class UserMainActivity extends BaseActivity {
 
     //信息提示框内容
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(OperationGuideEvent event) {
+    public void onEventMainThread(ResultOfSvmEvent event) {
         //GN 闪烁动画关闭
         if (valueAnimator2 != null) {
             valueAnimator2.end();
@@ -514,14 +516,14 @@ public class UserMainActivity extends BaseActivity {
     }
     //GC20181119 相关后进行效果显示，至少第二次连续判断为是故障点
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(AcousticMagneticDelay2 event) {
+    public void onEventMainThread(ResultOfRelevantEvent event) {
         if (event.isRelated) {
             if (isRelatedCount == 0) {   //GN 第一次相关
                 if(lastDelayValue < 0){
                     //GN 历史第一次发现故障 中圈闪烁 状态3
                     tvNotice.setText(getString(R.string.message_notice_7));
                     tvLastDelay.setText("");
-                    tvCurrentDelay.setText(event.delayValue + "ms");
+                    tvCurrentDelay.setText(event.timeDelay + "ms");
                     ccvFirst.updateView("#555555", 20, 89);    //灰色 粗圈 中尺寸
                     ccvSecond.updateView("#e1de04", 20, 89);   //黄色 粗圈 中尺寸
                     if (valueAnimator2 == null) {
@@ -544,32 +546,32 @@ public class UserMainActivity extends BaseActivity {
                     valueAnimator2.start();
 
                 } else if (lastDelayValue > 0) {  //GN 有过相关后的声磁延时值，比较大小
-                    if (lastDelayValue < (event.delayValue - 0.375)) {  //GC20181204 3个点的波动范围
+                    if (lastDelayValue < (event.timeDelay - 0.375)) {  //GC20181204 3个点的波动范围
                         //GN 远离故障点 大圈 状态4
                         tvNotice.setText(getString(R.string.message_notice_9));
                         tvLastDelay.setText(lastDelayValue + "ms");
-                        tvCurrentDelay.setText(event.delayValue + "ms");
+                        tvCurrentDelay.setText(event.timeDelay + "ms");
                         ccvFirst.updateView("#555555", 5, 40);      //灰色 细圈 小尺寸
                         ccvSecond.updateView("#e1de04", 20, 138);   //黄色 粗圈 大尺寸
                         ccvFirst.setVisibility(View.VISIBLE);
                         ccvSecond.setVisibility(View.VISIBLE);
                         positionState = 1;
 
-                    } else if (lastDelayValue > (event.delayValue + 0.375)) {   //GC20181204 3个点的波动范围
+                    } else if (lastDelayValue > (event.timeDelay + 0.375)) {   //GC20181204 3个点的波动范围
                         //GN 接近故障点 小圈 状态6
                         tvNotice.setText(getString(R.string.message_notice_8));
                         tvLastDelay.setText(lastDelayValue + "ms");
-                        tvCurrentDelay.setText(event.delayValue + "ms");
+                        tvCurrentDelay.setText(event.timeDelay + "ms");
                         ccvFirst.updateView("#555555", 5, 138);     //灰色 细圈 大尺寸
                         ccvSecond.updateView("#e1de04", 20, 40);    //黄色 粗圈 小尺寸
                         ccvFirst.setVisibility(View.VISIBLE);
                         ccvSecond.setVisibility(View.VISIBLE);
                         positionState = 2;
 
-                    } else if ( (lastDelayValue <= (event.delayValue + 0.375)) && (lastDelayValue >= (event.delayValue - 0.375)) ) {    //GC20181204 3个点的波动范围
+                    } else if ( (lastDelayValue <= (event.timeDelay + 0.375)) && (lastDelayValue >= (event.timeDelay - 0.375)) ) {    //GC20181204 3个点的波动范围
                         tvNotice.setText(getString(R.string.message_notice_7));
-                        tvLastDelay.setText(event.delayValue + "ms");   //GC20181122 经过相关为否或不是故障之后再次相关，且前后差值不大，更新为最新值
-                        tvCurrentDelay.setText(event.delayValue + "ms");
+                        tvLastDelay.setText(event.timeDelay + "ms");   //GC20181122 经过相关为否或不是故障之后再次相关，且前后差值不大，更新为最新值
+                        tvCurrentDelay.setText(event.timeDelay + "ms");
                         if(positionState == 1) {            //GN  后续发现故障 大圈闪烁 状态5
                             ccvFirst.updateView("#555555", 20, 138);    //灰色 粗圈 大尺寸
                             ccvSecond.updateView("#e1de04", 20, 138);   //黄色 粗圈 大尺寸
@@ -601,9 +603,9 @@ public class UserMainActivity extends BaseActivity {
                     }
                 }
                 //GN 只有第一次相关才刷新声磁延时值
-                lastDelayValue = event.delayValue;      //GN 保存到上次的声磁延时值
-                if (event.delayValue < minDelayValue) {
-                    minDelayValue = event.delayValue;   //GN 保存历史最小声磁延时值
+                lastDelayValue = event.timeDelay;      //GN 保存到上次的声磁延时值
+                if (event.timeDelay < minDelayValue) {
+                    minDelayValue = event.timeDelay;   //GN 保存历史最小声磁延时值
                 }
                 llMinDelay.setVisibility(View.VISIBLE);
                 tvMinDelayValue.setText(minDelayValue + "ms");  //GN 显示历史最小声磁延时值
@@ -729,7 +731,7 @@ public class UserMainActivity extends BaseActivity {
             MyApplication.getInstances().get_bluetooth().disable();
 
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            mHandle.postDelayed(new Runnable() {
+            handle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     runOnUiThread(new Runnable() {
@@ -743,7 +745,7 @@ public class UserMainActivity extends BaseActivity {
             super.onKeyDown(keyCode, event);
 
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            mHandle.postDelayed(new Runnable() {
+            handle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     runOnUiThread(new Runnable() {

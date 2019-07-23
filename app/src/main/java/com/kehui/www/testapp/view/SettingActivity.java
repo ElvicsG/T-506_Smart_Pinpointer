@@ -27,7 +27,7 @@ import butterknife.OnClick;
 
 /**
  * @author Gong
- * @date 2019/07/16
+ * @date 2019/07/22
  */
 public class SettingActivity extends BaseActivity {
 
@@ -79,9 +79,11 @@ public class SettingActivity extends BaseActivity {
     RadioButton rbFollowSys;
     @BindView(R.id.ll_container)
     LinearLayout llContainer;
+
+    public static SettingActivity instance;
     private String currentLanguage;
     private CustomDialog customDialog;
-    public static SettingActivity instance;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +95,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void initView() {
+        //获取当前语言
         currentLanguage = PrefUtils.getString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE, "follow_sys");
         switch (currentLanguage) {
             case "follow_sys":
@@ -116,7 +119,9 @@ public class SettingActivity extends BaseActivity {
             default:
                 break;
         }
-        tvVersionValue.setText(getVerCode(SettingActivity.this));
+        //获取版本名称
+        tvVersionValue.setText(getVersionName(SettingActivity.this));
+        //语言更改监听
         rgLanguage.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -137,8 +142,43 @@ public class SettingActivity extends BaseActivity {
         });
     }
 
+    @OnClick({R.id.btn_language, R.id.btn_software_upgrade, R.id.btn_about_us, R.id.btn_back, R.id.btn_switch, R.id.tv_update_version})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_language:
+                llLanguage.setVisibility(View.VISIBLE);
+                rlSoftUpgrade.setVisibility(View.GONE);
+                llAboutUs.setVisibility(View.GONE);
+                break;
+            case R.id.btn_software_upgrade:
+                llLanguage.setVisibility(View.GONE);
+                rlSoftUpgrade.setVisibility(View.VISIBLE);
+                llAboutUs.setVisibility(View.GONE);
+                break;
+            case R.id.btn_about_us:
+                llLanguage.setVisibility(View.GONE);
+                rlSoftUpgrade.setVisibility(View.GONE);
+                llAboutUs.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btn_back:
+                finish();
+                break;
+            case R.id.btn_switch:
+                if (!currentLanguage.equals(PrefUtils.getString(SettingActivity.this, AppConfig.CURRENT_LANGUAGE, "follow_sys"))) {
+                    showLanguageDialog();
+                }
+                break;
+            case R.id.tv_update_version:
+                SplashActivity.instance.isToast = true;
+                SplashActivity.instance.initUpdateApk();
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
-     * 弹出对话框，提示用户更新
+     * 弹出对话框，提示用户更换语言
      */
     protected void showLanguageDialog() {
         customDialog = new CustomDialog(SettingActivity.this);
@@ -183,9 +223,11 @@ public class SettingActivity extends BaseActivity {
             default:
                 break;
         }
+
         Intent intent = new Intent();
         intent.setAction("restartapp");
         sendBroadcast(intent);
+
         if (MainActivity.instance != null) {
             MainActivity.instance.finish();
         }
@@ -195,55 +237,19 @@ public class SettingActivity extends BaseActivity {
 //        finish();
     }
 
-    @OnClick({R.id.btn_language, R.id.btn_software_upgrade, R.id.btn_about_us, R.id.btn_back, R.id.btn_switch, R.id.tv_update_version})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btn_language:
-                llLanguage.setVisibility(View.VISIBLE);
-                rlSoftUpgrade.setVisibility(View.GONE);
-                llAboutUs.setVisibility(View.GONE);
-                break;
-            case R.id.btn_software_upgrade:
-                llLanguage.setVisibility(View.GONE);
-                rlSoftUpgrade.setVisibility(View.VISIBLE);
-                llAboutUs.setVisibility(View.GONE);
-                break;
-            case R.id.btn_about_us:
-                llLanguage.setVisibility(View.GONE);
-                rlSoftUpgrade.setVisibility(View.GONE);
-                llAboutUs.setVisibility(View.VISIBLE);
-                break;
-            case R.id.btn_back:
-                finish();
-                break;
-            case R.id.btn_switch:
-                if (!currentLanguage.equals(PrefUtils.getString(SettingActivity.this, AppConfig.CURRENT_LANGUAGE, "follow_sys"))) {
-                    showLanguageDialog();
-                }
-                break;
-            case R.id.tv_update_version:
-                SplashActivity.instance.isToast = true;
-                SplashActivity.instance.initUpdateApk();
-                break;
-            default:
-                break;
-        }
-    }
-
     /**
-     * @param context   //G?
-     * @return  获取软件版本号
+     * @param context   运行环境、场景
+     * @return  软件版本名称
      */
-    public String getVerCode(Context context) {
-        String verCode = "";
+    public String getVersionName(Context context) {
+        String versionName = "";
         try {
             //注意："com.example.try_downloadfile_progress"对应AndroidManifest.xml里的package="……"部分
-            verCode = context.getPackageManager().getPackageInfo(
-                    "com.kehui.www.testapp", 0).versionName;
+            versionName = context.getPackageManager().getPackageInfo("com.kehui.www.testapp", 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("msg", e.getMessage());
         }
-        return verCode;
+        return versionName;
     }
 
     /**
@@ -259,8 +265,8 @@ public class SettingActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     SplashActivity.isCancel = true;
-                    // 下载apk，，apk链接地址，downloadUrl
-                    SplashActivity.DownloadApk(SettingActivity.this);
+                    // 下载apk，apk链接地址，downloadUrl
+                    SplashActivity.downloadApk(SettingActivity.this);
                     customDialog.dismiss();
                 }
             });

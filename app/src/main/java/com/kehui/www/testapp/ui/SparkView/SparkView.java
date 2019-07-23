@@ -868,7 +868,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         if(x >= 211.86 & x <= 1460) {
             setScrubLine(x);
         }
-        Log.i("position", String.valueOf(x));
+        Log.i("cursorPosition", String.valueOf(x));
 
     }
 

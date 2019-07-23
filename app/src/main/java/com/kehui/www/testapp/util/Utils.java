@@ -19,38 +19,42 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by jwj on 2018/4/10.
+ * @author jwj
+ * @date 2018/04/10
  */
-
 public class Utils {
+
     /**
      * @param b 字节数组
-     * @return 16进制字符串
-     * @throws
-     * @Title:bytes2HexString
-     * @Description:字节数组转16进制字符串
+     * @return  字节数组转16进制字符串
      */
     public static String bytes2HexString(byte[] b) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String hex;
         for (int i = 0; i < b.length; i++) {
             hex = Integer.toHexString(b[i] & 0xff);
             if (hex.length() == 1) {
                 hex = '0' + hex;
             }
-            result.append(hex.toUpperCase() + " ");
+            result.append(hex.toUpperCase()).append(" ");
         }
         return result.toString();
-
     }
 
+    /**
+     * //G?
+     * @param str   需要保存的字符串
+     */
     public static void saveFile(String str) {
         String filePath = null;
-        boolean hasSDCard = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-        if (hasSDCard) { // SD卡根目录的hello.text
+        boolean hasSdCard = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+        if (hasSdCard) {
+            // SD卡根目录的hello.text
             filePath = Environment.getExternalStorageDirectory().toString() + File.separator + "hello.txt";
-        } else  // 系统下载缓存根目录的hello.text
+        } else {
+            // 系统下载缓存根目录的hello.text
             filePath = Environment.getDownloadCacheDirectory().toString() + File.separator + "hello.txt";
+        }
 
         try {
             File file = new File(filePath);
@@ -71,10 +75,8 @@ public class Utils {
     }
 
     public static void showToast(final Context activity, final String word) {
-
         final Toast toast = Toast.makeText(activity, word, Toast.LENGTH_SHORT);
         toast.show();
-//
     }
 
     public static boolean isNetVisible(Context context) {
@@ -83,10 +85,8 @@ public class Utils {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             if (info != null && info.isConnected()) {
                 // 当前网络是连接的
-                if (info.getState() == NetworkInfo.State.CONNECTED) {
-                    // 当前所连接的网络可用
-                    return true;
-                }
+                // 当前所连接的网络可用
+                return info.getState() == NetworkInfo.State.CONNECTED;
             }
         }
         return false;
@@ -128,7 +128,6 @@ public class Utils {
                 bos.write(buffer, 0, temp);
             }
             // 返回读取的数据
-
             return bos.toString();
         } catch (IOException e) {
             e.printStackTrace();
@@ -156,16 +155,17 @@ public class Utils {
     }
 
     /**
-     * 获取当前时间
-     *
-     * @return
+     * @return  当前时间
      */
     public static String formatTimeStamp(long time) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(time);
     }
 
-    //字符串转时间戳
+    /**
+     * @param timeString    字符串
+     * @return  转时间戳
+     */
     public static long getTime(String timeString) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date d;
@@ -179,10 +179,12 @@ public class Utils {
         return l;
     }
 
+    /**
+     * @param context   运行环境、场景
+     * @return  获取设备序列号
+     */
     public static String getAndroidId(Context context) {
-        String androidId = Settings.Secure.getString(
-                context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        return androidId;
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     /**

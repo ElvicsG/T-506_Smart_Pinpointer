@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.kehui.www.testapp.R;
 
 /**
+ * 自定义对话框
  * @author jwj  /   zhuwentao
  * @date 2018/04/16     /   2016-08-19.
  */
@@ -23,20 +24,16 @@ public class CustomDialog extends Dialog {
     /**
      * 提示
      */
-    protected TextView hintTv;
+    private TextView hintTv;
 
     /**
-     * 左边按钮
+     * 左边和右边的按钮
      */
-    protected Button doubleLeftBtn;
-
-    /**
-     * 右边按钮
-     */
-    protected Button doubleRightBtn;
+    private Button doubleLeftBtn;
+    private Button doubleRightBtn;
     private final WindowManager wm;
 
-    public LinearLayout llFilter;
+    private LinearLayout llFilter;
     public RadioGroup rgFilter1;
     public RadioGroup rgFilter2;
     public RadioButton rbDiTong;
@@ -65,6 +62,7 @@ public class CustomDialog extends Dialog {
         rbQuanTong = (RadioButton) findViewById(R.id.rb_quan);
 
         Window win = getWindow();
+        assert win != null;
         WindowManager.LayoutParams lp = win.getAttributes();
         lp.width = (int) (wm.getDefaultDisplay().getWidth() * 0.6);
         lp.height = (int) (wm.getDefaultDisplay().getHeight() * 0.6);
@@ -94,10 +92,6 @@ public class CustomDialog extends Dialog {
     public void setTextGone() {
         hintTv.setVisibility(View.GONE);
     }
-
-//    public void setRadioGroup1(RadioGroup.OnCheckedChangeListener checkedChangeListener) {
-//        rgFilter1.setOnCheckedChangeListener(checkedChangeListener);
-//    }
 
     public void setRadioGroup(RadioGroup.OnCheckedChangeListener checkedChangeListener) {
         rgFilter2.setOnCheckedChangeListener(checkedChangeListener);
@@ -141,4 +135,5 @@ public class CustomDialog extends Dialog {
         doubleLeftBtn.setText(leftStr);
         doubleRightBtn.setText(rightStr);
     }
+
 }

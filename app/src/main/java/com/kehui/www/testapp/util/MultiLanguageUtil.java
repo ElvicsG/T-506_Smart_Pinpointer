@@ -17,6 +17,7 @@ import java.util.Locale;
  * @date 2018/07/11
  */
 public class MultiLanguageUtil {
+
     private static MultiLanguageUtil instance;
     private Context mContext;
 
@@ -87,7 +88,6 @@ public class MultiLanguageUtil {
 
     private String getSystemLanguage(Locale locale) {
         return locale.getLanguage() + "_" + locale.getCountry();
-
     }
 
     /**
@@ -107,7 +107,6 @@ public class MultiLanguageUtil {
     public void updateLanguage(String languageType) {
         PrefUtils.setString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE,languageType);
         MultiLanguageUtil.getInstance().setConfiguration();
-
     }
 
     public static Context attachBaseContext(Context context) {

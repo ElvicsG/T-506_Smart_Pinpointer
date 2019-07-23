@@ -1,6 +1,5 @@
 package com.kehui.www.testapp.view;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -38,7 +37,7 @@ import com.kehui.www.testapp.bean.RequestBean;
 import com.kehui.www.testapp.database.AssistanceDataInfo;
 import com.kehui.www.testapp.retrofit.APIService;
 import com.kehui.www.testapp.ui.CustomDialog;
-import com.kehui.www.testapp.util.DES3Utils;
+import com.kehui.www.testapp.util.TripleDesUtils;
 import com.kehui.www.testapp.util.PrefUtils;
 import com.kehui.www.testapp.util.Utils;
 
@@ -56,7 +55,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
- * 发起协助页面
+ * @author Gong
+ * @date 2019/07/22
  */
 public class InitiateAssistanceActivity extends BaseActivity {
 
@@ -88,12 +88,6 @@ public class InitiateAssistanceActivity extends BaseActivity {
     private AssistanceDataInfoDao dao;
     private LocationManager lm;
     private static final String TAG = "打印-位置";
-    protected String[] needPermissions = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-    };
-    private static final int PERMISSON_REQUESTCODE = 0;
-    private static final int SETTING_REQUESTCODE = 1;
     private static boolean isFinish;
 
 
@@ -338,20 +332,20 @@ public class InitiateAssistanceActivity extends BaseActivity {
 //            return;
 //        }
         RequestBean requestBean = new RequestBean();
-        requestBean.InfoDevID = Constant.DeviceId;
+        requestBean.infoDevId = Constant.DeviceId;
         requestBean.InfoID = infoId;
-        requestBean.InfoTime = Utils.formatTimeStamp(currentTimeStamp);
-        requestBean.InfoUName = testName;
-        requestBean.InfoAddress = testPosition;
-        requestBean.InfoLength = cableLength;
-        requestBean.InfoLineType = cableType;
-        requestBean.InfoFaultType = faultType;
-        requestBean.InfoFaultLength = faultLength;
-        requestBean.InfoCiChang = Constant.sbData.toString();
-        requestBean.InfoCiCangVol = Constant.magneticFieldGain + "";//磁场增益
-        requestBean.InfoShengYinVol = Constant.voiceGain + "";//声音增益
-        requestBean.InfoLvBo = Constant.filterType + "";//滤波模式
-        requestBean.InfoYuYan = language;//语言类型
+        requestBean.infoTime = Utils.formatTimeStamp(currentTimeStamp);
+        requestBean.infoName = testName;
+        requestBean.infoAddress = testPosition;
+        requestBean.infoLength = cableLength;
+        requestBean.infoVoltageLevel = cableType;
+        requestBean.infoFaultType = faultType;
+        requestBean.infoFaultLength = faultLength;
+        requestBean.infoMagnetic = Constant.sbData.toString();
+        requestBean.infoMagneticGain = Constant.magneticFieldGain + "";//磁场增益
+        requestBean.infoVoiceGain = Constant.voiceGain + "";//声音增益
+        requestBean.infoFilter = Constant.filterType + "";//滤波模式
+        requestBean.infoLanguage = language;//语言类型
         requestBean.InfoMemo = shortNote;
         //0是未回复
 
@@ -384,7 +378,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
     private void uploadInfo(RequestBean requestBean) {
         final Gson gson = new Gson();
         String json = gson.toJson(requestBean);
-        json = DES3Utils.encryptMode(MyApplication.keyBytes, json.getBytes());
+        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -400,7 +394,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 try {
-                    byte[] srcBytes = DES3Utils.decryptMode(MyApplication.keyBytes, response.body());
+                    byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                     String result = new String(srcBytes);
                     AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
                     if (responseBean.Code.equals("1")) {

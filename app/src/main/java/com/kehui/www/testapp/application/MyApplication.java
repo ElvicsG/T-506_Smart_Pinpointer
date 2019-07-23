@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.XXXX.dao.db.DaoMaster;
 import com.XXXX.dao.db.DaoSession;
-import com.kehui.www.testapp.util.DES3Utils;
+import com.kehui.www.testapp.util.TripleDesUtils;
 import com.kehui.www.testapp.util.MultiLanguageUtil;
 import com.kehui.www.testapp.util.PrefUtils;
 
@@ -20,8 +20,8 @@ import java.util.Locale;
  */
 
 public class MyApplication extends Application {
-    public static final String key = DES3Utils.MD5Encode("KH_Key_*", "").substring(3, 27).toUpperCase();//秘钥
-    public static final byte[] keyBytes = DES3Utils.hexToBytes(DES3Utils.byte2hex(key.getBytes()));//24位密钥
+    public static final String key = TripleDesUtils.MD5Encode("KH_Key_*", "").substring(3, 27).toUpperCase();//秘钥
+    public static final byte[] keyBytes = TripleDesUtils.hexToBytes(TripleDesUtils.byte2hex(key.getBytes()));//24位密钥
     private DaoMaster.DevOpenHelper mHelper;
     private SQLiteDatabase db;
     private DaoMaster mDaoMaster;

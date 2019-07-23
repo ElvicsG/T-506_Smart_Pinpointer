@@ -40,7 +40,7 @@ import com.kehui.www.testapp.database.AssistanceDataInfo;
 import com.kehui.www.testapp.retrofit.APIService;
 import com.kehui.www.testapp.ui.CLinearLayoutManager;
 import com.kehui.www.testapp.ui.CustomDialog;
-import com.kehui.www.testapp.util.DES3Utils;
+import com.kehui.www.testapp.util.TripleDesUtils;
 import com.kehui.www.testapp.util.Utils;
 
 import java.util.ArrayList;
@@ -173,10 +173,10 @@ public class AssistListActivity extends BaseActivity {
     //同步协助列表数据的方法
     private void requestAssist() {
         final RequestBean requestBean = new RequestBean();
-        requestBean.InfoDevID = Constant.DeviceId;
+        requestBean.infoDevId = Constant.DeviceId;
         final Gson gson = new Gson();
         String json = gson.toJson(requestBean);
-        json = DES3Utils.encryptMode(MyApplication.keyBytes, json.getBytes());
+        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -195,7 +195,7 @@ public class AssistListActivity extends BaseActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            byte[] srcBytes = DES3Utils.decryptMode(MyApplication.keyBytes, response.body());
+                            byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                             String result = new String(srcBytes);
                             AssistListBean assistListBean = gson.fromJson(result, AssistListBean.class);
                             List<AssistanceDataInfo> tempList = new ArrayList<AssistanceDataInfo>();
@@ -353,20 +353,20 @@ public class AssistListActivity extends BaseActivity {
                 //有未上报数据
                 for (int i = 0; i < tempList.size(); i++) {
                     RequestBean requestBean = new RequestBean();
-                    requestBean.InfoDevID = Constant.DeviceId;
+                    requestBean.infoDevId = Constant.DeviceId;
                     requestBean.InfoID = tempList.get(i).getInfoId();
-                    requestBean.InfoTime = Utils.formatTimeStamp(tempList.get(i).getTestTime());
-                    requestBean.InfoUName = tempList.get(i).getTestName();
-                    requestBean.InfoAddress = tempList.get(i).getTestPosition();
-                    requestBean.InfoLength = tempList.get(i).getCableLength();
-                    requestBean.InfoLineType = tempList.get(i).getCableType();
-                    requestBean.InfoFaultType = tempList.get(i).getFaultType();
-                    requestBean.InfoFaultLength = tempList.get(i).getFaultLength();
-                    requestBean.InfoCiChang = tempList.get(i).getDataCollection();
-                    requestBean.InfoCiCangVol = tempList.get(i).getMagneticFieldGain() + "";//磁场增益
-                    requestBean.InfoShengYinVol = tempList.get(i).getVoiceGain() + "";//声音增益
-                    requestBean.InfoLvBo = tempList.get(i).getFilterMode() + "";//滤波模式
-                    requestBean.InfoYuYan = tempList.get(i).getLanguage();//语言类型
+                    requestBean.infoTime = Utils.formatTimeStamp(tempList.get(i).getTestTime());
+                    requestBean.infoName = tempList.get(i).getTestName();
+                    requestBean.infoAddress = tempList.get(i).getTestPosition();
+                    requestBean.infoLength = tempList.get(i).getCableLength();
+                    requestBean.infoVoltageLevel = tempList.get(i).getCableType();
+                    requestBean.infoFaultType = tempList.get(i).getFaultType();
+                    requestBean.infoFaultLength = tempList.get(i).getFaultLength();
+                    requestBean.infoMagnetic = tempList.get(i).getDataCollection();
+                    requestBean.infoMagneticGain = tempList.get(i).getMagneticFieldGain() + "";//磁场增益
+                    requestBean.infoVoiceGain = tempList.get(i).getVoiceGain() + "";//声音增益
+                    requestBean.infoFilter = tempList.get(i).getFilterMode() + "";//滤波模式
+                    requestBean.infoLanguage = tempList.get(i).getLanguage();//语言类型
                     requestBean.InfoMemo = tempList.get(i).getShortNote();
                     uploadInfo(requestBean);
                 }
@@ -378,7 +378,7 @@ public class AssistListActivity extends BaseActivity {
     private void uploadInfo(final RequestBean requestBean) {
         final Gson gson = new Gson();
         String json = gson.toJson(requestBean);
-        json = DES3Utils.encryptMode(MyApplication.keyBytes, json.getBytes());
+        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -394,7 +394,7 @@ public class AssistListActivity extends BaseActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 try {
-                    byte[] srcBytes = DES3Utils.decryptMode(MyApplication.keyBytes, response.body());
+                    byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                     String result = new String(srcBytes);
                     AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
                     if (responseBean.Code.equals("1")) {
@@ -729,7 +729,7 @@ public class AssistListActivity extends BaseActivity {
                 requestBean.InfoIDS = requestInfoIds;
                 final Gson gson = new Gson();
                 String json = gson.toJson(requestBean);
-                json = DES3Utils.encryptMode(MyApplication.keyBytes, json.getBytes());
+                json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                         .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -745,7 +745,7 @@ public class AssistListActivity extends BaseActivity {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
                         try {
-                            byte[] srcBytes = DES3Utils.decryptMode(MyApplication.keyBytes, response.body());
+                            byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                             String result = new String(srcBytes);
                             Log.e("打印-请求成功", result);
                             AssistInfoReplyStatusBean assistInfoReplyStatusBean = gson.fromJson(result, AssistInfoReplyStatusBean.class);

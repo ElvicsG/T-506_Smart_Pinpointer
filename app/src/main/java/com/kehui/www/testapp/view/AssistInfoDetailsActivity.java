@@ -16,7 +16,7 @@ import com.kehui.www.testapp.bean.AssistListBean;
 import com.kehui.www.testapp.bean.RequestBean;
 import com.kehui.www.testapp.database.AssistanceDataInfo;
 import com.kehui.www.testapp.retrofit.APIService;
-import com.kehui.www.testapp.util.DES3Utils;
+import com.kehui.www.testapp.util.TripleDesUtils;
 import com.kehui.www.testapp.util.Utils;
 
 import java.util.List;
@@ -34,9 +34,11 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * 协助详情页面
+ * @author Gong
+ * @date 2019/07/22
  */
-
 public class AssistInfoDetailsActivity extends BaseActivity {
+
     @BindView(R.id.tv_test_time_value)
     TextView tvTestTimeValue;
     @BindView(R.id.tv_test_name)
@@ -63,9 +65,9 @@ public class AssistInfoDetailsActivity extends BaseActivity {
     Button btnBack;
     @BindView(R.id.tv_reply_status)
     TextView tvReplyStatus;
+
     private AssistanceDataInfoDao dao;
     private String infoId;
-    private List<AssistanceDataInfo> assistanceDataInfos;
     AssistanceDataInfo dataInfo;
 
     @Override
@@ -77,6 +79,13 @@ public class AssistInfoDetailsActivity extends BaseActivity {
         infoId = getIntent().getStringExtra("infoId");
         queryData2();
         updateView();
+    }
+
+    private void queryData2() {
+        List<AssistanceDataInfo> assistanceDataInfo = dao.
+                queryBuilder().where(AssistanceDataInfoDao.Properties.InfoId.eq(infoId)).list();
+        dataInfo = assistanceDataInfo.get(0);
+        Log.e("姓名", assistanceDataInfo.get(0).getTestName());
     }
 
     private void updateView() {
@@ -91,7 +100,7 @@ public class AssistInfoDetailsActivity extends BaseActivity {
         tvReportStatus.setText(dataInfo.getReportStatus().trim());
         tvReplyStatus.setText(dataInfo.getReplyStatus().trim());
         tvReplyContent.setText(dataInfo.getReplyContent().trim());
-        if (dataInfo.getReportStatus().equals("0")) {
+        if ("0".equals(dataInfo.getReportStatus())) {
             btnCommit.setVisibility(View.VISIBLE);
             tvReportStatus.setText(getString(R.string.no_report));
             tvReportStatus.setTextColor(getResources().getColor(R.color.yellow2));
@@ -100,7 +109,7 @@ public class AssistInfoDetailsActivity extends BaseActivity {
             tvReportStatus.setText(getString(R.string.reported));
             tvReportStatus.setTextColor(getResources().getColor(R.color.blue5));
         }
-        if (dataInfo.getReplyStatus().equals("0")) {
+        if ("0".equals(dataInfo.getReplyStatus())) {
             tvReplyStatus.setText(getString(R.string.no_reply));
             tvReplyStatus.setTextColor(getResources().getColor(R.color.yellow2));
         } else {
@@ -109,32 +118,38 @@ public class AssistInfoDetailsActivity extends BaseActivity {
         }
     }
 
-    private void queryData2() {
-        assistanceDataInfos = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.InfoId.eq(infoId)).list();
-        dataInfo = assistanceDataInfos.get(0);
-        Log.e("姓名", assistanceDataInfos.get(0).getTestName());
-    }
-
     @OnClick({R.id.btn_commit, R.id.btn_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_commit:
-
                 RequestBean requestBean = new RequestBean();
-                requestBean.InfoDevID = Constant.DeviceId;
+                //设备ID
+                requestBean.infoDevId = Constant.DeviceId;
                 requestBean.InfoID = infoId;
-                requestBean.InfoTime = Utils.formatTimeStamp(dataInfo.getTestTime());
-                requestBean.InfoUName = dataInfo.getTestName();
-                requestBean.InfoAddress = dataInfo.getTestPosition();
-                requestBean.InfoLength = dataInfo.getCableLength();
-                requestBean.InfoLineType = dataInfo.getCableType();
-                requestBean.InfoFaultType = dataInfo.getFaultType();
-                requestBean.InfoFaultLength = dataInfo.getFaultLength();
-                requestBean.InfoCiChang = dataInfo.getDataCollection();
-                requestBean.InfoCiCangVol = dataInfo.getMagneticFieldGain() + "";//磁场增益
-                requestBean.InfoShengYinVol = dataInfo.getVoiceGain() + "";//声音增益
-                requestBean.InfoLvBo = dataInfo.getFilterMode() + "";//滤波模式
-                requestBean.InfoYuYan = dataInfo.getLanguage();//语言类型
+                //测试时间
+                requestBean.infoTime = Utils.formatTimeStamp(dataInfo.getTestTime());
+                //测试人员
+                requestBean.infoName = dataInfo.getTestName();
+                //测试地点
+                requestBean.infoAddress = dataInfo.getTestPosition();
+                //电缆长度
+                requestBean.infoLength = dataInfo.getCableLength();
+                //电压等级
+                requestBean.infoVoltageLevel = dataInfo.getCableType();
+                //故障类型
+                requestBean.infoFaultType = dataInfo.getFaultType();
+                //故障长度
+                requestBean.infoFaultLength = dataInfo.getFaultLength();
+                //磁场数据
+                requestBean.infoMagnetic = dataInfo.getDataCollection();
+                //磁场增益
+                requestBean.infoMagneticGain = dataInfo.getMagneticFieldGain() + "";
+                //声音增益
+                requestBean.infoVoiceGain = dataInfo.getVoiceGain() + "";
+                //滤波模式
+                requestBean.infoFilter = dataInfo.getFilterMode() + "";
+                //语言类型
+                requestBean.infoLanguage = dataInfo.getLanguage();
                 requestBean.InfoMemo = dataInfo.getShortNote();
                 uploadInfo(requestBean);
                 break;
@@ -142,13 +157,15 @@ public class AssistInfoDetailsActivity extends BaseActivity {
                 setResult(100);
                 finish();
                 break;
+            default:
+                break;
         }
     }
 
     private void uploadInfo(final RequestBean requestBean) {
         final Gson gson = new Gson();
         String json = gson.toJson(requestBean);
-        json = DES3Utils.encryptMode(MyApplication.keyBytes, json.getBytes());
+        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -164,7 +181,7 @@ public class AssistInfoDetailsActivity extends BaseActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 try {
-                    byte[] srcBytes = DES3Utils.decryptMode(MyApplication.keyBytes, response.body());
+                    byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                     String result = new String(srcBytes);
                     AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
                     if (responseBean.Code.equals("1")) {
@@ -190,15 +207,21 @@ public class AssistInfoDetailsActivity extends BaseActivity {
         });
     }
 
-    //更据InfoId找到数据库的一条数据
+    /**
+     * @param infoId    数据库Id
+     * @return  数据库的一条数据
+     */
     private AssistanceDataInfo queryData2(String infoId) {
         List<AssistanceDataInfo> assistanceDataInfos = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.InfoId.eq(infoId)).list();
         AssistanceDataInfo dataInfo = assistanceDataInfos.get(0);
         return dataInfo;
     }
 
-    //修改数据库字段
+    /**
+     * 修改数据库字段
+     */
     private void updateData(AssistanceDataInfo assistanceDataInfo) {
         dao.update(assistanceDataInfo);
     }
+
 }

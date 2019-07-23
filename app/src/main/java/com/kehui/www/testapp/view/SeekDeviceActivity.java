@@ -1,7 +1,6 @@
 package com.kehui.www.testapp.view;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -34,7 +33,7 @@ import butterknife.ButterKnife;
 
 /**
  * @author Gong
- * @date 2019/07/18
+ * @date 2019/07/22
  */
 public class SeekDeviceActivity extends BaseActivity {
 
@@ -49,18 +48,16 @@ public class SeekDeviceActivity extends BaseActivity {
     BluetoothSocket socket = null;
     private BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备
     private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // SPP服务UUID号
-
-    private final static int REQUEST_CONNECT_DEVICE = 1; // 宏定义查询设备句柄
-    protected static final int REQUEST_ENABLE = 0;
-    boolean bRun = true;
-    private ArrayAdapter<String> mPairedDevicesArrayAdapter;
-    private Button mBtSeek;
-    private Dialog dialog;
+    public boolean needReconnect;
 
     /**
-     * 是否尝试连接
+     * 宏定义查询设备句柄
      */
-    public boolean isFlag;
+    private final static int REQUEST_CONNECT_DEVICE = 1;
+    protected static final int REQUEST_ENABLE = 0;
+    boolean bRun = true;
+    private ArrayAdapter<String> pairedDevicesArrayAdapter;
+    private Button mBtSeek;
 
 
     @Override
@@ -70,22 +67,21 @@ public class SeekDeviceActivity extends BaseActivity {
         ButterKnife.bind(this);
         initView();
         init();
-
     }
 
     private void initView() {
         //设置字体
         Typeface type = Typeface.createFromAsset(tvAppName.getContext().getAssets(), "founderBlack.ttf");
         tvAppName.setTypeface(type);
-
         Typeface type2 = Typeface.createFromAsset(btSeekDevice.getContext().getAssets(), "microsoft_black.ttf");
         btSeekDevice.setTypeface(type2);
     }
 
     private void init() {
+        //G?
         mBtSeek = (Button) this.findViewById(R.id.bt_seek_device);
 
-        mPairedDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name2);
+        pairedDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name2);
         if (bluetooth == null) {
             Toast.makeText(this, getResources().getString(R.string.does_not_find_device), Toast.LENGTH_LONG)
                     .show();
@@ -158,7 +154,7 @@ public class SeekDeviceActivity extends BaseActivity {
         }
         //如未连接设备则打开DeviceListActivity进行设备搜索
         if (socket == null) {
-            mPairedDevicesArrayAdapter.clear();
+            pairedDevicesArrayAdapter.clear();
             //跳转程序设置
             Intent serverIntent = new Intent(SeekDeviceActivity.this, DeviceListActivity.class);
             //设置返回宏定义
@@ -175,7 +171,7 @@ public class SeekDeviceActivity extends BaseActivity {
         SharedPreferences.Editor sharedata = getSharedPreferences("Add", 0).edit();
         sharedata.clear();
         sharedata.apply();
-        mPairedDevicesArrayAdapter.clear();
+        pairedDevicesArrayAdapter.clear();
         Toast.makeText(this, getResources().getString(R.string.The_line_has_been_disconnected_please_re_connect), Toast.LENGTH_SHORT).show();
         //关闭连接socket
         try {
@@ -215,9 +211,7 @@ public class SeekDeviceActivity extends BaseActivity {
                         MyApplication.getInstances().set_bluetooth(bluetooth);
 
                     } catch (IOException e) {
-
                         Toast.makeText(this, getResources().getString(R.string.Connection_failed_unable_to_get_Socket) + e, Toast.LENGTH_SHORT).show();
-
                     }
 
                     // 连接socket
@@ -226,7 +220,7 @@ public class SeekDeviceActivity extends BaseActivity {
 
                         Toast.makeText(this, getResources().getString(R.string.connect) + " " + device.getName() + " " + getResources().getString(R.string.success),
                                 Toast.LENGTH_SHORT).show();
-                        mPairedDevicesArrayAdapter.add(device.getName() + "\n"
+                        pairedDevicesArrayAdapter.add(device.getName() + "\n"
                                 + device.getAddress());
                         SharedPreferences.Editor sharedata = getSharedPreferences("Add", 0).edit();
                         sharedata.putString(String.valueOf(0), device.getName());
@@ -239,24 +233,16 @@ public class SeekDeviceActivity extends BaseActivity {
                        /* IntentFilter filter = new IntentFilter(BluetoothDevice
                        .ACTION_ACL_DISCONNECTED);
                         this.registerReceiver(mReceiver, filter);*/
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
                     } catch (IOException e) {
                         //btnadd.setText(getResources().getString(R.string.add));
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
                         try {
                             showMain();
-//                            Toast.makeText(this, getResources().getString(R.string.Connection_failed) + e, Toast.LENGTH_SHORT)
-//                                    .show();
                             Toast.makeText(this, getResources().getString(R.string.Connection_failed) + getResources().getString(R.string.demo_notice), Toast.LENGTH_LONG)
                                     .show();
                             socket.close();
                             socket = null;
+                            reconnectThread.start();
 
-                            connectThread.start();
                         } catch (IOException ignored) {
                         }
                         return;
@@ -264,9 +250,6 @@ public class SeekDeviceActivity extends BaseActivity {
                 }
                 break;
             case 100:
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
                 disconnect();
                 try {
                     MyApplication.getInstances().get_socket().close();
@@ -287,20 +270,20 @@ public class SeekDeviceActivity extends BaseActivity {
     }
 
     /**
-     * 自动连接蓝牙线程
+     * 重连蓝牙线程
      */
-    Thread connectThread = new Thread(new Runnable() {
+    Thread reconnectThread = new Thread(new Runnable() {
         @Override
         public void run() {
-            while (!isFlag) {
-                Log.e("蓝牙测试", "connectThread线程，尝试连接");
+            while (!needReconnect) {
+                Log.e("蓝牙测试", "reconnectThread线程，尝试连接");
                 reconnect();
             }
         }
     });
 
     /**
-     * 尝试连接蓝牙
+     * 尝试重新连接蓝牙
      */
     public void reconnect() {
         //读取设置数据
@@ -308,11 +291,9 @@ public class SeekDeviceActivity extends BaseActivity {
         String address = sharedata1.getString(String.valueOf(1), null);
         //得到蓝牙设备句柄
         device = bluetooth.getRemoteDevice(address);
-
         //用服务号得到socket
         try {
             socket = device.createRfcommSocketToServiceRecord(UUID.fromString(MY_UUID));
-
             MyApplication.getInstances().set_socket(socket);
             MyApplication.getInstances().set_device(device);
             MyApplication.getInstances().set_bluetooth(bluetooth);
@@ -320,40 +301,29 @@ public class SeekDeviceActivity extends BaseActivity {
         } catch (IOException e) {
 //            Toast.makeText(this, getResources().getString(R.string.Connection_failed_unable_to_get_Socket) + e, Toast.LENGTH_SHORT).show();
         }
-
         //连接socket
         try {
             socket.connect();
-//            Toast.makeText(this, getResources().getString(R.string.connect) + " " + device.getName() + " " + getResources().getString(R.string.success),
-//                    Toast.LENGTH_SHORT).show();
-            isFlag = true;
-            mPairedDevicesArrayAdapter.add(device.getName() + "\n"
-                    + device.getAddress());
+//            Toast.makeText(this, getResources().getString(R.string.connect) + " " + device.getName() + " " + getResources().getString(R.string
+//                            .success), Toast.LENGTH_SHORT).show();
+            needReconnect = true;
+            pairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             SharedPreferences.Editor sharedata = getSharedPreferences("Add", 0).edit();
             sharedata.putString(String.valueOf(0), device.getName());
             sharedata.putString(String.valueOf(1), device.getAddress());
             sharedata.apply();
-            Log.e("蓝牙测试", "connectThread线程，走到这里");
+            Log.e("蓝牙测试", "reconnectThread线程，走到这里");
             EventBus.getDefault().post(new StartReadThreadEvent(device.getName()));
 
-            //注册异常断开接收器  等连接成功后注册
-             /*IntentFilter filter = new IntentFilter(BluetoothDevice
-                     .ACTION_ACL_DISCONNECTED);this.registerReceiver(mReceiver, filter);*/
-            if (dialog != null) {
-                dialog.dismiss();
-            }
         } catch (IOException e) {
-            //btnadd.setText(getResources().getString(R.string.add));
-            if (dialog != null) {
-                dialog.dismiss();
-            }
             try {
                 socket.close();
                 socket = null;
-                Log.e("蓝牙测试", "connectThread线程，走到异常");
+                Log.e("蓝牙测试", "reconnectThread线程，走到异常");
                 Thread.sleep(10000);
             } catch (Exception ignored) {
             }
         }
     }
+
 }

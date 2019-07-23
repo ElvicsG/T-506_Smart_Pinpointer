@@ -1,5 +1,6 @@
 package com.kehui.www.testapp.ui;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -16,27 +17,26 @@ import com.kehui.www.testapp.R;
 
 import java.text.NumberFormat;
 
-
-
-
+/**
+ * 自定义水平进度条对话框
+ * @author Gong
+ * @date 2019/07/22
+ */
 public class HorizontalProgressDialog extends AlertDialog implements View.OnClickListener {
 
-
     private ProgressBar mProgress;
-    private TextView mProgressNumber;
+    private TextView    mProgressNumber;
     private TextView    mProgressPercent;
     private TextView    mProgressMessage;
 
     private Handler mViewUpdateHandler;
-    private int          mMax;
     private CharSequence mMessage;
+    private int          mMax;
     private boolean      mHasStarted;
     private int          mProgressVal;
 
-    private String TAG = "HorizontalProgressDialog";
     private String       mProgressNumberFormat;
     private NumberFormat mProgressPercentFormat;
-    private TextView tvCancel;
 
     public HorizontalProgressDialog(Context context) {
         super(context);
@@ -44,7 +44,7 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
         initFormats();
     }
 
-
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -54,8 +54,7 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
         mProgressNumber = (TextView) findViewById(R.id.progress_number);
         mProgressPercent = (TextView) findViewById(R.id.progress_percent);
         mProgressMessage = (TextView) findViewById(R.id.progress_message);
-        tvCancel = (TextView) findViewById(R.id.tv_cancel);
-        //      LayoutInflater inflater = LayoutInflater.from(getContext());
+        TextView tvCancel = (TextView) findViewById(R.id.tv_cancel);
         mViewUpdateHandler = new Handler() {
 
 
@@ -95,30 +94,31 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
         if (mProgressVal > 0) {
             setProgress(mProgressVal);
         }
-
         //设置监听
         tvCancel.setOnClickListener(this);
-
     }
+
     private void initFormats() {
         mProgressNumberFormat = "%1.2fM/%2.2fM";
         mProgressPercentFormat = NumberFormat.getPercentInstance();
         mProgressPercentFormat.setMaximumFractionDigits(0);
     }
-    public void onProgressChanged() {
+
+    private void onProgressChanged() {
         mViewUpdateHandler.sendEmptyMessage(0);
-
-
     }
+
     public void setProgressStyle(int style) {
         //mProgressStyle = style;
     }
+
     public int getMax() {
         if (mProgress != null) {
             return mProgress.getMax();
         }
         return mMax;
     }
+
     public void setMax(int max) {
         if (mProgress != null) {
             mProgress.setMax(max);
@@ -127,14 +127,13 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
             mMax = max;
         }
     }
+
     public void setIndeterminate(boolean indeterminate) {
         if (mProgress != null) {
             mProgress.setIndeterminate(indeterminate);
         }
-        //      else {
-        //            mIndeterminate = indeterminate;
-        //        }
     }
+
     public void setProgress(int value) {
         if (mHasStarted) {
             mProgress.setProgress(value);
@@ -144,19 +143,15 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
         }
     }
 
-
     @Override
     public void setMessage(CharSequence message) {
         // TODO Auto-generated method stub
-        //super.setMessage(message);
         if(mProgressMessage!=null){
             mProgressMessage.setText(message);
-        }
-        else{
+        } else {
             mMessage = message;
         }
     }
-
 
     @Override
     protected void onStart() {
@@ -164,7 +159,6 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
         super.onStart();
         mHasStarted = true;
     }
-
 
     @Override
     public void onStop() {
@@ -175,24 +169,29 @@ public class HorizontalProgressDialog extends AlertDialog implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.tv_cancel://取消
-                if (mOnOkAndCancelListener!=null) {
-                    mOnOkAndCancelListener.onCancel(v);
-                }
-                break;
-            default:
-                break;
+        if (v.getId() == R.id.tv_cancel) {
+            //取消
+            if (mOnOkAndCancelListener != null) {
+                mOnOkAndCancelListener.onCancel(v);
+            }
         }
     }
 
-    /**声明成员变量*/
-    public OnOkAndCancelListener mOnOkAndCancelListener;
-    /**暴露接口取消方法,如果需要确定,另行添加*/
+    /**
+     * 声明成员变量
+     */
+    private OnOkAndCancelListener mOnOkAndCancelListener;
+
+    /**
+     * 暴露接口取消方法,如果需要确定,另行添加
+     */
     public interface OnOkAndCancelListener {
         void onCancel(View v);
     }
-    /**暴露方法,设置监听*/
+
+    /**
+     * 暴露方法,设置监听
+     */
     public void setOnOkAndCancelListener(OnOkAndCancelListener mOnOkAndCancelListener) {
         this.mOnOkAndCancelListener = mOnOkAndCancelListener;
     }

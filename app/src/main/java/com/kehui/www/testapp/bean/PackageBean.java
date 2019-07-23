@@ -78,4 +78,5 @@ public class PackageBean {
     public void setCrc(int[] crc) {
         Crc = crc;
     }
+
 }

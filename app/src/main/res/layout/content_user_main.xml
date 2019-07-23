@@ -173,14 +173,14 @@
                                 android:layout_gravity="center"
                                 android:orientation="horizontal">
 
-                                <com.kehui.www.testapp.view.CustomCircleView
+                                <com.kehui.www.testapp.ui.CustomCircleView
                                     android:id="@+id/ccv_first_u"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_centerInParent="true"
                                     android:visibility="visible" />
 
-                                <com.kehui.www.testapp.view.CustomCircleView
+                                <com.kehui.www.testapp.ui.CustomCircleView
                                     android:id="@+id/ccv_second_u"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"

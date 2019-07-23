@@ -10,33 +10,33 @@ import android.widget.TextView;
 
 import com.kehui.www.testapp.R;
 
+/**
+ * @author Gong
+ * @date 2019/07/22
+ */
 public class AboutActivity extends BaseActivity {
-
-    private TextView tvVersion;
-    private ImageButton ibtBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        tvVersion = (TextView) this.findViewById(R.id.tv_version);
+        TextView tvVersion = (TextView) this.findViewById(R.id.tv_version);
         tvVersion.setText(getResources().getString(R.string.version_code) + getVerCode(this));
 
-        ibtBack = (ImageButton) this.findViewById(R.id.back);
+        ImageButton ibtBack = (ImageButton) this.findViewById(R.id.back);
         ibtBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
+
     }
 
     /**
-     * 获取软件版本号
-     *
-     * @param context
-     * @return
+     * @param context   运行环境、场景
+     * @return  软件版本名称
      */
     public String getVerCode(Context context) {
         String verCode = "";
@@ -49,4 +49,5 @@ public class AboutActivity extends BaseActivity {
         }
         return verCode;
     }
+
 }

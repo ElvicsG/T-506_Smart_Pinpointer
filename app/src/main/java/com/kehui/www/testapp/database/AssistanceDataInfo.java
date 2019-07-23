@@ -6,10 +6,12 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
 /**
- * Created by jwj on 2018/4/11.
+ * @author jwj
+ * @date 2018/04/11
  */
 @Entity
 public class AssistanceDataInfo {
+
     @Id(autoincrement = true)
     private Long id;
     private String InfoId;
@@ -167,7 +169,4 @@ public class AssistanceDataInfo {
     public AssistanceDataInfo() {
     }
 
-   
-
 }
-

@@ -25,12 +25,12 @@ import com.kehui.www.testapp.adpter.MyChartAdapterBase;
 import com.kehui.www.testapp.application.Constant;
 import com.kehui.www.testapp.application.MyApplication;
 import com.kehui.www.testapp.bean.PackageBean;
-import com.kehui.www.testapp.event.AcousticMagneticDelay2;
-import com.kehui.www.testapp.event.HandleReceiveNotRespondEvent;
-import com.kehui.www.testapp.event.OperationGuideEvent;
+import com.kehui.www.testapp.event.ResultOfRelevantEvent;
+import com.kehui.www.testapp.event.SendCommandNotRespondEvent;
+import com.kehui.www.testapp.event.ResultOfSvmEvent;
 import com.kehui.www.testapp.event.SendCommandFinishEvent;
 import com.kehui.www.testapp.event.StartReadThreadEvent;
-import com.kehui.www.testapp.event.UINoticeEvent;
+import com.kehui.www.testapp.event.UiHandleEvent;
 import com.kehui.www.testapp.ui.CustomDialog;
 import com.kehui.www.testapp.util.SoundUtils;
 import com.kehui.www.testapp.util.Utils;
@@ -70,10 +70,10 @@ public class BaseActivity extends AppCompatActivity {
      */
     BluetoothDevice device = null;
     BluetoothSocket socket = null;
-    private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备
-    private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB"; // SPP服务UUID号
+    private BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
+    private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB";
     public BluetoothSocket blueSocket;
-    public boolean needReconnect;
+    private boolean needReconnect;
 
     /**
      * 发送蓝牙数据
@@ -126,8 +126,8 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * View布局
      */
-    public MyChartAdapterBase myChartAdapterShengyin;
-    public MyChartAdapterBase myChartAdapterCichang;
+    public MyChartAdapterBase myChartAdapterVoice;
+    public MyChartAdapterBase myChartAdapterMagnetic;
     public int streamVolumeNow;
     public boolean isSilence;
     public boolean isClickMem;
@@ -190,15 +190,14 @@ public class BaseActivity extends AppCompatActivity {
     public static final int WHAT_REFRESH    = 8;
     public static final int LINK_LOST       = 9;
     public static final int LINK_RECONNECT  = 10;
-
-
     @SuppressLint("HandlerLeak")
-    public Handler mHandle = new Handler() {
+    public Handler handle = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            EventBus.getDefault().post(new UINoticeEvent(msg.what));
+            EventBus.getDefault().post(new UiHandleEvent(msg.what));
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -432,7 +431,7 @@ public class BaseActivity extends AppCompatActivity {
         //GC20190613
         Message message = new Message();
         message.what = LINK_RECONNECT;
-        mHandle.sendMessage(message);
+        handle.sendMessage(message);
         Toast.makeText(this, getResources().getString(R.string.connect) + " " + event.device + " " + getResources().getString(R.string.success),
                 Toast.LENGTH_SHORT).show();
         hasGotStream = false;
@@ -454,7 +453,7 @@ public class BaseActivity extends AppCompatActivity {
         } catch (IOException e) {
             Toast.makeText(this, getResources().getString(R.string
                     .Can_not_get_input_stream_via_Bluetooth_socket), Toast.LENGTH_SHORT).show();
-            mHandle.postDelayed(new Runnable() {
+            handle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     finish();
@@ -531,7 +530,7 @@ public class BaseActivity extends AppCompatActivity {
                             } else {
                                 //缓存数据之前先发送初始化控制命令
                                 sendMagneticInitCommand();
-                                mHandle.postDelayed(new Runnable() {
+                                handle.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
                                         sendVoiceInitCommand();
@@ -570,11 +569,11 @@ public class BaseActivity extends AppCompatActivity {
                     leftLen = 0;
                     hasLeft = false;
 
-                    //GN20190407 启动重连
+                    //GC20190407 启动重连
                     needReconnect = false;
                     Message message = new Message();
                     message.what = LINK_LOST;
-                    mHandle.sendMessage(message);
+                    handle.sendMessage(message);
                     //启动重连线程，是否需要单独线程控制，需要观察
                     new Thread(new Runnable() {
                         @Override
@@ -592,24 +591,23 @@ public class BaseActivity extends AppCompatActivity {
     };
 
     /**
-     * 尝试连接蓝牙
+     * 尝试重新连接蓝牙
      */
     public void reconnect() {
         //读取设置数据
         SharedPreferences sharedata1 = getSharedPreferences("Add", 0);
         String address = sharedata1.getString(String.valueOf(1), null);
         //得到蓝牙设备句柄
-        device = adapter.getRemoteDevice(address);
-
+        device = bluetooth.getRemoteDevice(address);
         //用服务号得到socket
         try {
             socket = device.createRfcommSocketToServiceRecord(UUID.fromString(MY_UUID));
             MyApplication.getInstances().set_socket(socket);
             MyApplication.getInstances().set_device(device);
-            MyApplication.getInstances().set_bluetooth(adapter);
+            MyApplication.getInstances().set_bluetooth(bluetooth);
 
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+//            Toast.makeText(this, getResources().getString(R.string.Connection_failed_unable_to_get_Socket) + e, Toast.LENGTH_SHORT).show();
         }
         //连接socket
         try {
@@ -736,7 +734,7 @@ public class BaseActivity extends AppCompatActivity {
      * @return  得到crc码
      */
     public long getCrc(int[] ints) {
-        mHandle.postDelayed(new Runnable() {
+        handle.postDelayed(new Runnable() {
             @Override
             public void run() {
             }
@@ -844,13 +842,13 @@ public class BaseActivity extends AppCompatActivity {
                                     i1 += 6;
                                     if (receivedCommand[2] != 1) {
                                         //Respond：响应值为0，命令未响应
-                                        mHandle.sendEmptyMessage(SEND_ERROR);
-                                        EventBus.getDefault().post(new HandleReceiveNotRespondEvent());
+                                        handle.sendEmptyMessage(SEND_ERROR);
+                                        EventBus.getDefault().post(new SendCommandNotRespondEvent());
                                         seekBarType = 0;
                                     } else if (receivedCommand[1] == sendCommand[1]) {
                                         //接収的命令内容与要发送的命令内容一致
                                         seekBarType = 0;
-                                        mHandle.sendEmptyMessage(SEND_SUCCESS);
+                                        handle.sendEmptyMessage(SEND_SUCCESS);
                                     }
                                 }
                             }
@@ -884,13 +882,13 @@ public class BaseActivity extends AppCompatActivity {
                             hasSentCommand = false;
                             if (receivedCommand[2] != 1) {
                                 //Respond：响应值，命令未响应
-                                mHandle.sendEmptyMessage(SEND_ERROR);
-                                EventBus.getDefault().post(new HandleReceiveNotRespondEvent());
+                                handle.sendEmptyMessage(SEND_ERROR);
+                                EventBus.getDefault().post(new SendCommandNotRespondEvent());
                                 seekBarType = 0;
                             } else if (receivedCommand[1] == sendCommand[1]) {
                                 //接収的命令内容与要发送的命令内容一致
                                 seekBarType = 0;
-                                mHandle.sendEmptyMessage(SEND_SUCCESS);
+                                handle.sendEmptyMessage(SEND_SUCCESS);
                             }
                             i += 6;
                         }
@@ -1014,7 +1012,7 @@ public class BaseActivity extends AppCompatActivity {
                 //触发灯变红
                 Message msg = new Message();
                 msg.what = LIGHT_UP;
-                mHandle.sendMessage(msg);
+                handle.sendMessage(msg);
                 //开始截取声音包
                 mShengyinFlag = true;
                 //Mark后7位，触发时刻数据点所在的位置
@@ -1062,11 +1060,11 @@ public class BaseActivity extends AppCompatActivity {
         } else if (packageBean.getSM() == 77) {
             //探头相对电缆位置的判断   Mark "128"= 10000000 代表位7是1 //GC20171205
             if (packageBean.getMark() >= 128) {
-                mHandle.sendEmptyMessage(POSITION_RIGHT);
+                handle.sendEmptyMessage(POSITION_RIGHT);
                 //令位7为0
                 packageBean.setMark(packageBean.getMark() - 128);
             } else {
-                mHandle.sendEmptyMessage(POSITION_LEFT);
+                handle.sendEmptyMessage(POSITION_LEFT);
             }
             //按照顺序（00 01 10 11）将磁场数据拼接起来，1包含有100个数据点
             for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
@@ -1077,7 +1075,7 @@ public class BaseActivity extends AppCompatActivity {
                 //“同步指示” 灯变灰
                 Message msg = new Message();
                 msg.what = TRIGGERED;
-                mHandle.sendMessage(msg);
+                handle.sendMessage(msg);
                 if (isDraw) {
                     for (int i = 0; i < 400; i++) {
                         magneticDraw[i] = magneticArray[i];
@@ -1110,7 +1108,7 @@ public class BaseActivity extends AppCompatActivity {
                 }
                 Message message = new Message();
                 message.what = WHAT_REFRESH;
-                mHandle.sendMessage(message);
+                handle.sendMessage(message);
             }
         }
 
@@ -1358,7 +1356,7 @@ public class BaseActivity extends AppCompatActivity {
         double result = svm.svm_predict(model, test);
         if (result == 1.0) {
             //是故障点
-            EventBus.getDefault().post(new OperationGuideEvent(true));
+            EventBus.getDefault().post(new ResultOfSvmEvent(true));
             //连续两次判断为故障声开始进行相关
             if(svmPredictCount > 0){
                 //相关判断
@@ -1367,10 +1365,10 @@ public class BaseActivity extends AppCompatActivity {
                     //相关之后再光标定位、计算延时值
                     autoLocate();
                     //相关——判断是故障,虚光标位置和声磁延时值传递   //GC20190218
-                    EventBus.getDefault().post(new AcousticMagneticDelay2(timeDelay,true, cursorPosition));
+                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,true, cursorPosition));
                 }else{
                     //不相关——判断不是故障
-                    EventBus.getDefault().post(new AcousticMagneticDelay2(timeDelay,false, cursorPosition));
+                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,false, cursorPosition));
                 }
             }
             //保留上次预测结果为是的声音数据用做相关计算 //GC20181119
@@ -1379,7 +1377,7 @@ public class BaseActivity extends AppCompatActivity {
 
         } else {
             //判断不是故障
-            EventBus.getDefault().post(new OperationGuideEvent(false));
+            EventBus.getDefault().post(new ResultOfSvmEvent(false));
             svmPredictCount = 0;
             //延时值显示逻辑bug修改  //GC20190720
             isRelatedCount = 0;
@@ -1481,13 +1479,16 @@ public class BaseActivity extends AppCompatActivity {
             Toast.makeText(this, getResources().getString(R.string
                     .You_have_no_memory_data_can_not_compare), Toast.LENGTH_SHORT).show();
         }
-        myChartAdapterShengyin.setmTempArray(voiceDraw);
-        myChartAdapterShengyin.setShowCompareLine(isCom);
-        myChartAdapterShengyin.setmCompareArray(compareDraw);
-        myChartAdapterShengyin.notifyDataSetChanged();
+        myChartAdapterVoice.setmTempArray(voiceDraw);
+        myChartAdapterVoice.setShowCompareLine(isCom);
+        myChartAdapterVoice.setmCompareArray(compareDraw);
+        myChartAdapterVoice.notifyDataSetChanged();
     }
 
-    //弹出滤波对话框   //GN 滤波方式选择， *低通1 *带通2 *高通3 *全通0
+    /**
+     * 滤波方式选择， *低通1 *带通2 *高通3 *全通0
+     * @param llView    滤波对话框
+     */
     protected void showFilterDialog(final LinearLayout llView) {
         customDialog = new CustomDialog(BaseActivity.this);
         customDialog.show();
@@ -1780,6 +1781,7 @@ public class BaseActivity extends AppCompatActivity {
 //GT20180321 蓝牙输入流解读
 
 /*更改记录*/
+//GC20170609    修改增益显示方式（百分比或实际值）
 //GC20171129    修改蓝牙输入流的处理，缩短声音播放的延时问题    //G?
 //GC20171205    添加探头相对电缆位置的左右判断的功能
 //GC20180412    获取需要处理的声音数据并计算其特征值
@@ -1791,11 +1793,12 @@ public class BaseActivity extends AppCompatActivity {
 //GC20181119 添加相关判断
 //GC20181201 自动定位算法优化
 
+
 //GC20190123 智能识别提示优化
 //GC20190216 红色虚光标绘制情况修改
 //GC20190218 专家界面延时值显示和相关结果一致起来（通过相关后计时自动定位数值不一致也不刷新延时值）
 //GC20190307 词条和延时跳动效果
-//GN20190407 硬件关闭重连功能添加
+//GC20190407 硬件关闭重连功能添加
 //GC20190422 "发现故障"提示音添加
 //GC20190613 重连主提示框提示
 //GC20190625 用户界面发现故障UI提示更改 （去掉上次延时值，显示刻度圆圈大小）

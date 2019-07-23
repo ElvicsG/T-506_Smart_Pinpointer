@@ -10,7 +10,7 @@ public class AssistInfoReplyStatusBean {
     /**
      * Code : 1
      * Message : 操作成功
-     * data : [{"InfoID":"6baa8ca4-371c-4871-8a9b-33d8f7ecd788","ReplyStatus":"1","ReplyContent":"未检测到故障嘻嘻,请继续监测"}]
+     * data : [{"InfoID":"6baa8ca4-371c-4871-8a9b-33d8f7ecd788","replyStatus":"1","ReplyContent":"未检测到故障嘻嘻,请继续监测"}]
      * action : GetInfoReplyStatus
      */
 
@@ -22,7 +22,7 @@ public class AssistInfoReplyStatusBean {
     public static class DataBean {
         /**
          * InfoID : 6baa8ca4-371c-4871-8a9b-33d8f7ecd788
-         * ReplyStatus : 1
+         * replyStatus : 1
          * ReplyContent : 未检测到故障嘻嘻,请继续监测
          */
 

@@ -4,7 +4,8 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * Created by 29062 on 2016/11/9.
+ * @author 29062
+ * @date 2016/11/09
  */
 @Entity
 public class ChartInfo {
