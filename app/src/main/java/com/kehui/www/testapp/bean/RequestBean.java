@@ -8,6 +8,7 @@ public class RequestBean {
 
     public String InfoDevID;
     public String InfoID;
+    public String InfoIDS;
     public String InfoTime;
     public String InfoUName;
     public String InfoAddress;

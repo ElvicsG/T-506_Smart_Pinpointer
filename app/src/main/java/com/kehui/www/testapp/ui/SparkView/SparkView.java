@@ -35,9 +35,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.Toast;
-
-import com.kehui.www.testapp.application.MyApplication;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +45,8 @@ import java.util.List;
  * @date 2019/06/28
  */
 public class SparkView extends View implements ScrubGestureDetector.ScrubListener {
-    private static final String TAG = "Spark";
+
+    private static final String TAG = "SparkView";
 
     /**
      * styleable values
@@ -247,10 +245,8 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         }
 
         //画第二条线
-        Log.e("QQQ", "adapter" + ".getIsShowCompare()" + adapter.getCompare());
+        Log.i(TAG, "adapter.getCompare() = " + adapter.getCompare());
         if (adapter.getCompare()) {
-            Toast.makeText(MyApplication.getInstances().getApplicationContext(), "adapter" +
-                    ".getIsShowCompare()=true", Toast.LENGTH_SHORT);
             sparkPath2.reset();
             for (int i = 0; i < adapterCount; i++) {
                 final float x = scaleHelper.getX(adapter.getX(i));
@@ -863,13 +859,11 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
                 scrubListener.onScrubbed(adapter.getItem(index));
             }
         }
-
         //触摸有效范围   //GC2.01.006 蓝牙重连功能优化
         if(x >= 211.86 & x <= 1460) {
             setScrubLine(x);
         }
-        Log.i("cursorPosition", String.valueOf(x));
-
+        Log.i(TAG,"cursorPosition = " + x);
     }
 
     public float getScX() {

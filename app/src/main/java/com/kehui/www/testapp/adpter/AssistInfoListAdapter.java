@@ -44,7 +44,7 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
     /**
      * 上拉加载更多状态-默认为0
      */
-    private int mLoadMoreStatus = 0;
+    private int loadMoreStatus = 0;
 
     public AssistInfoListAdapter(AssistListActivity context, List<AssistanceDataInfo> assistList) {
         this.context = context;
@@ -108,7 +108,7 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
 
         } else if (holder instanceof FooterViewHolder) {
             FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
-            switch (mLoadMoreStatus) {
+            switch (loadMoreStatus) {
                 case LOADING_MORE:
                     footerViewHolder.mPbLoad.setVisibility(View.VISIBLE);
                     footerViewHolder.mTvLoadText.setText(context.getString(R.string.loading_more));
@@ -144,7 +144,7 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
      * @param status    加载更多状态
      */
     public void changeMoreStatus(int status) {
-        mLoadMoreStatus = status;
+        loadMoreStatus = status;
         notifyDataSetChanged();
     }
 

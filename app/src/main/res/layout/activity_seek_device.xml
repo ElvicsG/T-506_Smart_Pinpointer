@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:background="@drawable/btn_find_bluetooth_selector"
-            android:onClick="clickSeekdevice"
+            android:onClick="clickSeekDevice"
             android:text="@string/Find_a_Bluetooth_device"
             android:textColor="@color/blue2"
             android:textSize="14dp" />

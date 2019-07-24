@@ -60,6 +60,8 @@ import libsvm.svm_problem;
  */
 public class BaseActivity extends AppCompatActivity {
 
+    private static final String TAG = "BaseActivity";
+
     /**
      * 声音播放部分
      */
@@ -163,16 +165,13 @@ public class BaseActivity extends AppCompatActivity {
     private double[] feature;
     private double[] normalization;
     private double[] normalization2;
-
-    /**
-     * 相关部分   //GC20181119
-     */
     public int svmPredictCount;
     public int isRelatedCount;
     public boolean firstFind;
     private double p = 0;
     private int cursorPosition;
     private double timeDelay;
+    public boolean isDrawCircle;
 
     /**
      *  提示音功能添加 //GC20190422
@@ -580,7 +579,7 @@ public class BaseActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             while (!needReconnect) {
-                                //Log.e("蓝牙测试", "connectThread线程，尝试连接");
+                                Log.e(TAG, "connectThread线程，尝试连接");
                                 reconnect();
                             }
                         }
@@ -596,8 +595,8 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void reconnect() {
         //读取设置数据
-        SharedPreferences sharedata1 = getSharedPreferences("Add", 0);
-        String address = sharedata1.getString(String.valueOf(1), null);
+        SharedPreferences shareData = getSharedPreferences("Add", 0);
+        String address = shareData.getString(String.valueOf(1), null);
         //得到蓝牙设备句柄
         device = bluetooth.getRemoteDevice(address);
         //用服务号得到socket
@@ -1380,8 +1379,6 @@ public class BaseActivity extends AppCompatActivity {
             //判断不是故障
             EventBus.getDefault().post(new ResultOfSvmEvent(false));
             svmPredictCount = 0;
-            //延时值显示逻辑bug修改  //GC20190720
-            isRelatedCount = 0;
         }
 
     }
@@ -1441,6 +1438,10 @@ public class BaseActivity extends AppCompatActivity {
         var = var / 50;
         //标准差
         double sta = Math.sqrt(var);
+        //GC20190720
+        if (sta < 1) {
+            sta = 1;
+        }
 
         //从触发时刻（第101个点i=100）之后，找出越出置信边界的第一个极值点（屏幕波形显示触发时刻前50个点和后349个点）
         int n = 0;
@@ -1804,8 +1805,9 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190613 重连主提示框提示
 //GC20190625 用户界面发现故障UI提示更改 （去掉上次延时值，显示刻度圆圈大小）
 //GC20190627 触发灯闪烁bug原因
-//GC20190717 用户界面布局修改
+//GC20190717 用户界面布局修改（去掉最小延时值、改变当前上次延时值布局位置等）
 //GC20190720    延时值显示逻辑bug修改
+//GC20190724    用户界面圆圈动画去掉，与词条跳动效果一致
 
 //版本变动
 //GC2.01.005 界面无缝切换

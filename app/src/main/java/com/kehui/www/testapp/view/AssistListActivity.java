@@ -116,7 +116,9 @@ public class AssistListActivity extends BaseActivity {
      */
     private boolean isRequest;
     private boolean isRefreshing;
-    //是否是查询状态
+    /**
+     * 是否是查询状态
+     */
     private boolean isSearch;
     /**
      * 线程循环和停止的标志
@@ -124,7 +126,9 @@ public class AssistListActivity extends BaseActivity {
     private boolean isFlag;
     private boolean isStop;
 
-    //处理线程ui
+    /**
+     * 处理线程ui
+     */
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -193,7 +197,6 @@ public class AssistListActivity extends BaseActivity {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE
                         && lastVisibleItem + 1 == assistInfoListAdapter.getItemCount()
                         && !isRefreshing) {
-                    Log.e("aaaaaaaaaaaa", isRefreshing + "");
                     //设置正在加载更多
                     assistInfoListAdapter.changeMoreStatus(AssistInfoListAdapter.LOADING_MORE);
                     if (isRequest) {
@@ -230,10 +233,12 @@ public class AssistListActivity extends BaseActivity {
     Thread doRequestStatus = new Thread(new Runnable() {
         @Override
         public void run() {
-            Log.e(TAG, "走到这");
+            Log.e(TAG, "doRequestStatus线程启动");
             while (!isStop && !isFlag) {
                 isFlag = true;
                 final RequestBean requestBean = new RequestBean();
+                //查询所列表中所有未回复的id
+                requestBean.InfoIDS = getNoReplyList();
                 final Gson gson = new Gson();
                 String json = gson.toJson(requestBean);
                 json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
@@ -254,7 +259,7 @@ public class AssistListActivity extends BaseActivity {
                         try {
                             byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                             String result = new String(srcBytes);
-                            Log.e("打印-请求成功", result);
+                            Log.e(TAG,"请求服务器成功" + result);
                             AssistInfoReplyStatusBean assistInfoReplyStatusBean = gson.fromJson(result, AssistInfoReplyStatusBean.class);
                             if ("1".equals(assistInfoReplyStatusBean.Code)) {
                                 if (assistInfoReplyStatusBean.data.size() > 0) {
@@ -295,6 +300,24 @@ public class AssistListActivity extends BaseActivity {
             }
         }
     });
+
+    /**
+     * @return  查询所列表中所有未回复的id
+     */
+    private String getNoReplyList() {
+        String requestInfoIds = "";
+        for (int i = 0; i < assistList.size(); i++) {
+            if ("0".equals(assistList.get(i).getReplyStatus())) {
+                if (assistList.size() - 1 == i) {
+                    requestInfoIds = requestInfoIds + assistList.get(i).getInfoId();
+                } else {
+                    requestInfoIds = requestInfoIds + assistList.get(i).getInfoId() + ",";
+                }
+            }
+        }
+        Log.e(TAG,"打印请求参数" + requestInfoIds);
+        return requestInfoIds;
+    }
 
     /**
      * 修改数据库字段

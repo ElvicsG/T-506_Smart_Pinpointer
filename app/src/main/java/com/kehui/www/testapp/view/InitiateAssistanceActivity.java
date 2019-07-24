@@ -62,7 +62,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  */
 public class InitiateAssistanceActivity extends BaseActivity {
 
-    private static final String TAG = "InitiateAssistance-位置";
+    private static final String TAG = "InitiateAssistance";
 
     @BindView(R.id.tv_test_time_value)
     TextView tvTestTimeValue;
@@ -248,7 +248,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
         @Override
         public void run() {
             int i = 0;
-            Log.e("打印-线程", "线程开始");
+            Log.e(TAG, "截取数据线程开始");
             for (i = 0; i < 35; i++) {
                 try {
                     //设置进度值
@@ -282,7 +282,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
                 counter = 100;
                 tvDataCollectionProgress.setText(counter + "%");
                 pbDataCollection.setProgress(counter);
-                Log.e("打印字符串", Constant.sbData.toString());
+                Log.e(TAG,"打印字符串" + Constant.sbData.toString());
 
             } else if (msg.what == 1) {
                 if (counter > 100) {

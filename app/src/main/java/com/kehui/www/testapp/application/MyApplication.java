@@ -16,12 +16,20 @@ import com.kehui.www.testapp.util.PrefUtils;
 import java.util.Locale;
 
 /**
- * Created by 29062 on 2016/11/9.
+ * @author 29062
+ * @date 2016/11/09
  */
-
 public class MyApplication extends Application {
-    public static final String key = TripleDesUtils.MD5Encode("KH_Key_*", "").substring(3, 27).toUpperCase();//秘钥
-    public static final byte[] keyBytes = TripleDesUtils.hexToBytes(TripleDesUtils.byte2hex(key.getBytes()));//24位密钥
+
+    /**
+     * 秘钥
+     */
+    public static final String key = TripleDesUtils.md5Encode("KH_Key_*", "").substring(3, 27).toUpperCase();
+
+    /**
+     * 24位密钥
+     */
+    public static final byte[] keyBytes = TripleDesUtils.hexToBytes(TripleDesUtils.byte2hex(key.getBytes()));
     private DaoMaster.DevOpenHelper mHelper;
     private SQLiteDatabase db;
     private DaoMaster mDaoMaster;
@@ -30,9 +38,7 @@ public class MyApplication extends Application {
     private BluetoothSocket _socket;
     private BluetoothDevice _device;
     private BluetoothAdapter _bluetooth; // 获取本地蓝牙适配器，即蓝牙设备
-    public final Locale Locale_Russia = new Locale("RU", "ru", "");
-    public final Locale Locale_French = new Locale("FR", "fr", "");
-    public final Locale Locale_Spanisch = new Locale("Es", "es", "");
+
 
     @Override
     public void onCreate() {

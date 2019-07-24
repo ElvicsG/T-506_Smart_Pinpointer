@@ -59,7 +59,6 @@ public class SeekDeviceActivity extends BaseActivity {
     protected static final int REQUEST_ENABLE = 0;
     boolean bRun = true;
     private ArrayAdapter<String> pairedDevicesArrayAdapter;
-    private Button mBtSeek;
 
 
     @Override
@@ -81,7 +80,7 @@ public class SeekDeviceActivity extends BaseActivity {
 
     private void init() {
         //G?
-        mBtSeek = (Button) this.findViewById(R.id.bt_seek_device);
+        Button mBtSeek = (Button) this.findViewById(R.id.bt_seek_device);
 
         pairedDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name2);
         if (bluetooth == null) {
@@ -131,18 +130,7 @@ public class SeekDeviceActivity extends BaseActivity {
 
     }
 
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                //disconnect();
-            }
-        }
-    };
-
-    public void clickSeekdevice(View view) {
+    public void clickSeekDevice(View view) {
         connect();
     }
 
@@ -161,18 +149,13 @@ public class SeekDeviceActivity extends BaseActivity {
             Intent serverIntent = new Intent(SeekDeviceActivity.this, DeviceListActivity.class);
             //设置返回宏定义
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-        } else {
-            //disconnect();
         }
-
     }
 
     public void disconnect() {
-        //取消注册异常断开接收器
-        //this.unregisterReceiver(mReceiver);
-        SharedPreferences.Editor sharedata = getSharedPreferences("Add", 0).edit();
-        sharedata.clear();
-        sharedata.apply();
+        SharedPreferences.Editor shareData = getSharedPreferences("Add", 0).edit();
+        shareData.clear();
+        shareData.apply();
         pairedDevicesArrayAdapter.clear();
         Toast.makeText(this, getResources().getString(R.string.The_line_has_been_disconnected_please_re_connect), Toast.LENGTH_SHORT).show();
         //关闭连接socket
@@ -266,7 +249,6 @@ public class SeekDeviceActivity extends BaseActivity {
 
     private void showMain() {
         Intent intent = new Intent(this, MainActivity.class);
-        //G?
         startActivityForResult(intent, 100);
         finish();
     }
@@ -278,7 +260,7 @@ public class SeekDeviceActivity extends BaseActivity {
         @Override
         public void run() {
             while (!needReconnect) {
-                Log.e("蓝牙测试", "reconnectThread线程，尝试连接");
+                Log.e(TAG, "reconnectThread线程，尝试连接");
                 reconnect();
             }
         }
@@ -289,8 +271,8 @@ public class SeekDeviceActivity extends BaseActivity {
      */
     public void reconnect() {
         //读取设置数据
-        SharedPreferences sharedata1 = getSharedPreferences("Add", 0);
-        String address = sharedata1.getString(String.valueOf(1), null);
+        SharedPreferences shareData = getSharedPreferences("Add", 0);
+        String address = shareData.getString(String.valueOf(1), null);
         //得到蓝牙设备句柄
         device = bluetooth.getRemoteDevice(address);
         //用服务号得到socket

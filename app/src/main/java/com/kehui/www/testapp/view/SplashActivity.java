@@ -127,6 +127,7 @@ public class SplashActivity extends BaseActivity {
         tvAppName.setTypeface(type);
         //获取设备序列号
         Constant.DeviceId = Utils.getAndroidId(SplashActivity.this);
+        //8633a57a4299d974
         Log.e("设备序列号", Constant.DeviceId);
     }
 

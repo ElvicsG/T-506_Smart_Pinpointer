@@ -2,10 +2,10 @@ package com.kehui.www.testapp.adpter;
 
 import com.kehui.www.testapp.ui.SparkView.BaseSparkAdapter;
 
-/*
- * Created by 29062 on 2017/2/17.
+/**
+ * @author 29062
+ * @date 2017/02/17
  */
-
 public class MyChartAdapterBase extends BaseSparkAdapter {
 
     private int[] mTempArray;
@@ -18,7 +18,6 @@ public class MyChartAdapterBase extends BaseSparkAdapter {
     public void setmTempArray(int[] mTempArray) {
         this.mTempArray = mTempArray;
     }
-
 
     public void setShowCompareLine(boolean showCompareLine) {
         isShowCompareLine = showCompareLine;
@@ -58,7 +57,6 @@ public class MyChartAdapterBase extends BaseSparkAdapter {
         return super.getX(index);
     }
 
-
     public boolean isShowCompareLine() {
         return isShowCompareLine;
     }
@@ -72,4 +70,5 @@ public class MyChartAdapterBase extends BaseSparkAdapter {
     public boolean getCompare() {
         return isShowCompareLine;
     }
+
 }
