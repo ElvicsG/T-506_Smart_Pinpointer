@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2009 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.kehui.www.testapp.view;
 
 import android.app.Activity;
@@ -49,13 +33,14 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * @author Gong
+ * @date 2019/07/22
+ */
 public class DeviceListActivity extends BaseActivity {
-    // 调试用
-    private static final String TAG = "DeviceListActivity";
-    private static final boolean D = true;
 
-    // 返回时数据标签
-    public static String EXTRA_DEVICE_ADDRESS = "设备地址";
+    private static final String TAG = "DeviceListActivity";
+
     @BindView(R.id.tv_app_name)
     TextView tvAppName;
     @BindView(R.id.paired_devices)
@@ -74,6 +59,11 @@ public class DeviceListActivity extends BaseActivity {
     LinearLayout llList;
     @BindView(R.id.ll_no_device)
     LinearLayout llNoDevice;
+
+    /**
+     * 返回时数据标签
+     */
+    public static String EXTRA_DEVICE_ADDRESS = "设备地址";
 
     // 成员域
     private BluetoothAdapter mBtAdapter;
@@ -216,7 +206,7 @@ public class DeviceListActivity extends BaseActivity {
      * 开始服务和设备查找
      */
     private void doDiscovery() {
-        if (D) Log.d(TAG, "doDiscovery()");
+        Log.d(TAG, "doDiscovery()");
 
         // 在窗口显示查找中信息
         setProgressBarIndeterminateVisibility(true);

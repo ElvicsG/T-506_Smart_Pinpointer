@@ -7,6 +7,7 @@ package com.kehui.www.testapp.application;
 public class Constant {
 
     public static int DEFAULT_TIMEOUT = 20;
+
     /**
      * 是否截取上传数据的标志
      */

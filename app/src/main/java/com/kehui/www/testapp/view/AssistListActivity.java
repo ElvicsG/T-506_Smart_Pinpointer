@@ -1,5 +1,6 @@
 package com.kehui.www.testapp.view;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +40,6 @@ import com.kehui.www.testapp.bean.RequestBean;
 import com.kehui.www.testapp.database.AssistanceDataInfo;
 import com.kehui.www.testapp.retrofit.APIService;
 import com.kehui.www.testapp.ui.CLinearLayoutManager;
-import com.kehui.www.testapp.ui.CustomDialog;
 import com.kehui.www.testapp.util.TripleDesUtils;
 import com.kehui.www.testapp.util.Utils;
 
@@ -60,8 +60,12 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * 协助列表页面
+ * @author Gong
+ * @date 2019/07/22
  */
 public class AssistListActivity extends BaseActivity {
+
+    private static final String TAG = "AssistListActivity";
 
     @BindView(R.id.tv_choose_test_time)
     TextView tvChooseTestTime;
@@ -93,38 +97,41 @@ public class AssistListActivity extends BaseActivity {
     TextView tvException;
     @BindView(R.id.ll_exception)
     LinearLayout llException;
-    //    private LinearLayoutManager linearLayoutManager;
+
     private AssistInfoListAdapter assistInfoListAdapter;
-    //    private List<AssistListBean.DataBean> assistList;
     private List<AssistanceDataInfo> assistList;
-    public int page = 0;//代表请求第几页
-    private boolean isRequest;//判断是否还有下拉数据
-    private static long startTime = 0; //查询的开始时间
-    private static long endTime = 0; //查询的开始时间
-    public String replyStatus = ""; //回复状态
-    public String reportStatus = ""; //上报状态
-    private View replyView;
+    private AssistanceDataInfoDao dao;
+    public int page = 0;
+    private static long startTime = 0;
+    private static long endTime = 0;
+    public String replyStatus = "";
+    public String reportStatus = "";
     private PopupWindow replyPopupWindow;
     private PopupWindow reportPopupWindow;
     public int screenWidth;
     public int screenHeight;
-    private View reportView;
-    private AssistanceDataInfoDao dao;
-    private CustomDialog customDialog;
-    private Boolean isRefreshing;
+
+    /**
+     * 判断是否还有下拉数据
+     */
+    private boolean isRequest;
+    private boolean isRefreshing;
     //是否是查询状态
     private boolean isSearch;
-    //线程停止的标志
+    /**
+     * 线程循环和停止的标志
+     */
+    private boolean isFlag;
     private boolean isStop;
 
     //处理线程ui
-    Handler mHandler = new Handler(new Handler.Callback() {
+    Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what == 0) {
                 assistInfoListAdapter.notifyDataSetChanged();
                 srlRefresh.setRefreshing(false);
-            } else if (msg.what == 1) { //toast无未上报数据
+            } else if (msg.what == 1) {
                 Utils.showToast(AssistListActivity.this, getString(R.string.no_report_data));
             } else if (msg.what == 2) {
                 llException.setVisibility(View.VISIBLE);
@@ -146,8 +153,8 @@ public class AssistListActivity extends BaseActivity {
         setContentView(R.layout.activity_assist_list);
         ButterKnife.bind(this);
 
-        WindowManager wm = (WindowManager) this
-                .getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+        assert wm != null;
         screenWidth = wm.getDefaultDisplay().getWidth();
         screenHeight = wm.getDefaultDisplay().getHeight();
         initView();
@@ -157,139 +164,43 @@ public class AssistListActivity extends BaseActivity {
         }
     }
 
-
-    private void initData() {
-        assistList = new ArrayList<>();
-        assistInfoListAdapter = new AssistInfoListAdapter(AssistListActivity.this, assistList);
-        dao = MyApplication.getInstances().getDaoSession().getAssistanceDataInfoDao();
-        rvList.setAdapter(assistInfoListAdapter);
-        page = 0;
-        loadData(true);
-
-
-    }
-
-
-    //同步协助列表数据的方法
-    private void requestAssist() {
-        final RequestBean requestBean = new RequestBean();
-        requestBean.infoDevId = Constant.DeviceId;
-        final Gson gson = new Gson();
-        String json = gson.toJson(requestBean);
-        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLs.AppUrl + URLs.AppPort)
-                .addConverterFactory(ScalarsConverterFactory.create()).client(client)
-                .build();
-        APIService service = retrofit.create(APIService.class);
-        Call<String> call = service.api("GetInfoTopList", json);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, final Response<String> response) {
-                try {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
-                            String result = new String(srcBytes);
-                            AssistListBean assistListBean = gson.fromJson(result, AssistListBean.class);
-                            List<AssistanceDataInfo> tempList = new ArrayList<AssistanceDataInfo>();
-                            if (assistListBean.Code.equals("1")) {
-                                if (assistListBean.data.size() > 0) {
-                                    for (int i = 0; i < assistListBean.data.size(); i++) {
-                                        AssistanceDataInfo assistanceDataInfo = new AssistanceDataInfo(null, assistListBean.data.get(i).InfoID
-                                                , Utils.getTime(assistListBean.data.get(i).InfoTime), assistListBean.data.get(i).InfoUName, assistListBean.data.get(i).InfoAddress
-                                                , assistListBean.data.get(i).InfoLength, assistListBean.data.get(i).InfoLineType, assistListBean.data.get(i).InfoFaultType
-                                                , assistListBean.data.get(i).InfoFaultLength, assistListBean.data.get(i).InfoMemo, assistListBean.data.get(i).InfoCiChang
-                                                , "1", assistListBean.data.get(i).ReplyStatus, assistListBean.data.get(i).ReplyContent, Integer.parseInt(assistListBean.data.get(i).InfoCiCangVol),
-                                                Integer.parseInt(assistListBean.data.get(i).InfoShengYinVol), Integer.parseInt(assistListBean.data.get(i).InfoLvBo), assistListBean.data.get(i).InfoYuYan);
-                                        tempList.add(assistanceDataInfo);
-                                        dao.insert(assistanceDataInfo);
-                                    }
-                                    assistList.addAll(tempList);
-                                    mHandler.sendEmptyMessage(0);
-//                            assistInfoListAdapter.notifyDataSetChanged();
-                                } else {
-                                    mHandler.sendEmptyMessage(2);
-//                            ivException.setVisibility(View.VISIBLE);
-//                            srlRefresh.setVisibility(View.GONE);
-//                            ivException.setImageResource(R.drawable.ic_no_data);
-
-                                }
-//                        srlRefresh.setRefreshing(false);
-                                mHandler.sendEmptyMessage(4);
-                            } else {
-                                Message message = new Message();
-                                message.obj = assistListBean.Message;
-                                message.what = 3;
-                                mHandler.sendMessage(message);
-//                        Utils.showToast(AssistListActivity.this, assistListBean.Message);
-//                        srlRefresh.setRefreshing(false);
-                            }
-                        }
-                    }).start();
-
-                } catch (Exception e) {
-                    Log.e("打印-请求报异常-检查代码", "AppInfoList");
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Utils.showToast(AssistListActivity.this, getString(R.string.check_net_retry));
-//                srlRefresh.setRefreshing(false);
-                mHandler.sendEmptyMessage(4);
-            }
-        });
-
-
-    }
-
     private void initView() {
         initReplyPopupWindow();
         initReportPopupWindow();
         srlRefresh.setColorSchemeResources(R.color.main_color);
         srlRefresh.setDistanceToTriggerSync(0);
-        srlRefresh.setProgressBackgroundColor(R.color.white); // 设定下拉圆圈的背景
-        srlRefresh.setSize(2); // 设置圆圈的大小
-//        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        rvList.setItemAnimator(new DefaultItemAnimator());
-//        rvList.setLayoutManager(linearLayoutManager);
-        rvList.setLayoutManager(new CLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        // 设定下拉圆圈的背景
+        srlRefresh.setProgressBackgroundColorSchemeResource(R.color.white);
+        // 设置圆圈的大小
+        srlRefresh.setSize(2);
         srlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 isRefreshing = true;
                 page = 0;
                 loadData(false);
-//                request(page + "", startTime, replyStatus, "");
             }
         });
 
+        rvList.setItemAnimator(new DefaultItemAnimator());
+        rvList.setLayoutManager(new CLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvList.setOnScrollListener(new RecyclerView.OnScrollListener() {
             int lastVisibleItem;
-
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 //判断RecyclerView的状态 是空闲时，同时，是最后一个可见的ITEM时才加载
-
-                if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == assistInfoListAdapter.getItemCount() && !isRefreshing) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE
+                        && lastVisibleItem + 1 == assistInfoListAdapter.getItemCount()
+                        && !isRefreshing) {
                     Log.e("aaaaaaaaaaaa", isRefreshing + "");
-
                     //设置正在加载更多
-                    assistInfoListAdapter.changeMoreStatus(assistInfoListAdapter.LOADING_MORE);
+                    assistInfoListAdapter.changeMoreStatus(AssistInfoListAdapter.LOADING_MORE);
                     if (isRequest) {
                         page++;
                         loadData(false);
                     } else {
-                        assistInfoListAdapter.changeMoreStatus(assistInfoListAdapter.NO_LOAD_MORE);
+                        assistInfoListAdapter.changeMoreStatus(AssistInfoListAdapter.NO_LOAD_MORE);
                     }
                 }
             }
@@ -304,11 +215,100 @@ public class AssistListActivity extends BaseActivity {
         });
     }
 
+    private void initData() {
+        assistList = new ArrayList<>();
+        assistInfoListAdapter = new AssistInfoListAdapter(AssistListActivity.this, assistList);
+        dao = MyApplication.getInstances().getDaoSession().getAssistanceDataInfoDao();
+        rvList.setAdapter(assistInfoListAdapter);
+        page = 0;
+        loadData(true);
+    }
+
+    /**
+     * 后台去改变回复状态和回复内容线程
+     */
+    Thread doRequestStatus = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            Log.e(TAG, "走到这");
+            while (!isStop && !isFlag) {
+                isFlag = true;
+                final RequestBean requestBean = new RequestBean();
+                final Gson gson = new Gson();
+                String json = gson.toJson(requestBean);
+                json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                        .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                        .readTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                        .build();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(URLs.AppUrl + URLs.AppPort)
+                        .addConverterFactory(ScalarsConverterFactory.create()).client(client)
+                        .build();
+                APIService service = retrofit.create(APIService.class);
+                Call<String> call = service.api("GetInfoReplyStatus", json);
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+                            byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
+                            String result = new String(srcBytes);
+                            Log.e("打印-请求成功", result);
+                            AssistInfoReplyStatusBean assistInfoReplyStatusBean = gson.fromJson(result, AssistInfoReplyStatusBean.class);
+                            if ("1".equals(assistInfoReplyStatusBean.Code)) {
+                                if (assistInfoReplyStatusBean.data.size() > 0) {
+                                    for (int i = 0; i < assistInfoReplyStatusBean.data.size(); i++) {
+                                        AssistanceDataInfo assistanceDataInfo = queryData2(assistInfoReplyStatusBean.data.get(i).InfoID);
+                                        assistanceDataInfo.setReplyStatus("1");
+                                        assistanceDataInfo.setReplyContent(assistInfoReplyStatusBean.data.get(i).ReplyContent);
+                                        updateData(assistanceDataInfo);
+                                        for (int j = 0; j < assistList.size(); j++) {
+                                            if (assistList.get(j).getInfoId().equals(assistInfoReplyStatusBean.data.get(i).InfoID)) {
+                                                assistList.set(j, assistanceDataInfo);
+                                            }
+                                        }
+                                        //更改完本地去刷新数据
+                                        handler.sendEmptyMessage(0);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e("打印-请求报异常-检查代码", "GetInfoReplyStatus");
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Utils.showToast(AssistListActivity.this, getString(R.string.check_net_retry));
+                        srlRefresh.setRefreshing(false);
+                    }
+                });
+
+                try {
+                    Thread.sleep(20000);
+                    isFlag = false;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
+    /**
+     * 修改数据库字段
+     */
+    private void updateData(AssistanceDataInfo assistanceDataInfo) {
+        dao.update(assistanceDataInfo);
+    }
+
     @OnClick({R.id.rl_test_time, R.id.rl_report_status, R.id.rl_reply_status, R.id.btn_initiate_assistance, R.id.btn_upload_data, R.id.btn_back, R.id.btn_search})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             //点击选择时间
-            case R.id.rl_test_time://DatePickerDialog.THEME_DEVICE_DEFAULT_LIGHT
+            case R.id.rl_test_time:
+                //DatePickerDialog.THEME_DEVICE_DEFAULT_LIGHT
                 showDatePickerDialog(AssistListActivity.this, R.style.MyDatePickerDialogTheme, tvChooseTestTime, Calendar.getInstance());
                 break;
             //点击选择上报状态
@@ -341,40 +341,16 @@ public class AssistListActivity extends BaseActivity {
         }
     }
 
-    private void uploadAllAssist() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<AssistanceDataInfo> tempList = queryNoReport();
-                if (tempList.size() == 0) { //本地数据库查出无未上报数据
-                    mHandler.sendEmptyMessage(1);
-                    return;
-                }
-                //有未上报数据
-                for (int i = 0; i < tempList.size(); i++) {
-                    RequestBean requestBean = new RequestBean();
-                    requestBean.infoDevId = Constant.DeviceId;
-                    requestBean.InfoID = tempList.get(i).getInfoId();
-                    requestBean.infoTime = Utils.formatTimeStamp(tempList.get(i).getTestTime());
-                    requestBean.infoName = tempList.get(i).getTestName();
-                    requestBean.infoAddress = tempList.get(i).getTestPosition();
-                    requestBean.infoLength = tempList.get(i).getCableLength();
-                    requestBean.infoVoltageLevel = tempList.get(i).getCableType();
-                    requestBean.infoFaultType = tempList.get(i).getFaultType();
-                    requestBean.infoFaultLength = tempList.get(i).getFaultLength();
-                    requestBean.infoMagnetic = tempList.get(i).getDataCollection();
-                    requestBean.infoMagneticGain = tempList.get(i).getMagneticFieldGain() + "";//磁场增益
-                    requestBean.infoVoiceGain = tempList.get(i).getVoiceGain() + "";//声音增益
-                    requestBean.infoFilter = tempList.get(i).getFilterMode() + "";//滤波模式
-                    requestBean.infoLanguage = tempList.get(i).getLanguage();//语言类型
-                    requestBean.InfoMemo = tempList.get(i).getShortNote();
-                    uploadInfo(requestBean);
-                }
-            }
-        }).start();
+    /**
+     * @return  从本地数据库查找未上报数据
+     */
+    private List<AssistanceDataInfo> queryNoReport() {
+        return dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReportStatus.eq("0")).list();
     }
 
-    //上传服务器数据的方法
+    /**
+     * 上传服务器数据的方法
+     */
     private void uploadInfo(final RequestBean requestBean) {
         final Gson gson = new Gson();
         String json = gson.toJson(requestBean);
@@ -395,18 +371,20 @@ public class AssistListActivity extends BaseActivity {
             public void onResponse(Call<String> call, Response<String> response) {
                 try {
                     byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
+                    assert srcBytes != null;
                     String result = new String(srcBytes);
                     AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
-                    if (responseBean.Code.equals("1")) {
+                    if ("1".equals(responseBean.Code)) {
                         AssistanceDataInfo assistanceDataInfo = queryData2(requestBean.InfoID);
                         assistanceDataInfo.setReportStatus("1");
                         updateData(assistanceDataInfo);
-                        mHandler.sendEmptyMessage(0);
-                    } else if (responseBean.Code.equals("2")) {//数据库里有数据
+                        handler.sendEmptyMessage(0);
+                    } else if ("2".equals(responseBean.Code)) {
+                        //数据库里有数据
                         AssistanceDataInfo assistanceDataInfo = queryData2(requestBean.InfoID);
                         assistanceDataInfo.setReportStatus("1");
                         updateData(assistanceDataInfo);
-                        mHandler.sendEmptyMessage(0);
+                        handler.sendEmptyMessage(0);
                     } else {
                         Utils.showToast(AssistListActivity.this, responseBean.Message);
                     }
@@ -425,21 +403,13 @@ public class AssistListActivity extends BaseActivity {
     }
 
     /**
-     * 弹出对话框，提示用户更新
+     * 根据InfoId找到数据库的一条数据
+     * @param infoId    数据库Id
+     * @return  数据库的一条数据
      */
-    protected void showSuccessDialog() {
-        customDialog = new CustomDialog(AssistListActivity.this);
-        customDialog.show();
-
-        customDialog.setHintText(getString(R.string.upload_success));
-        customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customDialog.dismiss();
-
-            }
-        });
-        customDialog.setRightGone();
+    private AssistanceDataInfo queryData2(String infoId) {
+        List<AssistanceDataInfo> assistanceDataInfo = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.InfoId.eq(infoId)).list();
+        return assistanceDataInfo.get(0);
     }
 
     @Override
@@ -454,77 +424,6 @@ public class AssistListActivity extends BaseActivity {
             loadData(true);
         }
     }
-
-
-    /**
-     * 加载数据
-     *
-     * @param isFlag //是否显示加载转圈
-     */
-    private void loadData(final boolean isFlag) {
-
-        new AsyncTask<Void, Boolean, List<AssistanceDataInfo>>() {
-
-
-            @Override
-            protected void onPreExecute() {
-                if (isFlag) {
-                    srlRefresh.setRefreshing(true);
-                }
-                super.onPreExecute();
-            }
-
-            @Override
-            protected List<AssistanceDataInfo> doInBackground(Void... params) {
-
-                List<AssistanceDataInfo> tempAssistList = getTwentyRec(page, startTime, endTime, replyStatus, reportStatus);
-                return tempAssistList;
-            }
-
-            @Override
-            protected void onPostExecute(List<AssistanceDataInfo> tempAssistList) {
-                if (page == 0) {
-                    assistList.clear();
-                }
-                assistList.addAll(tempAssistList);
-
-                if (tempAssistList.size() < Constant.PageSize) {
-                    isRequest = false;
-                } else {
-                    isRequest = true;
-                }
-                //加载数据
-                if (tempAssistList.size() != 0) {
-                    srlRefresh.setVisibility(View.VISIBLE);
-                    llException.setVisibility(View.GONE);
-                    assistInfoListAdapter.notifyDataSetChanged();
-                    srlRefresh.setRefreshing(false);
-                } else {
-
-                    assistInfoListAdapter.notifyDataSetChanged();
-                    llException.setVisibility(View.VISIBLE);
-                    ivException.setImageResource(R.drawable.ic_no_data);
-                    tvException.setText(R.string.no_data);
-
-                }
-                //请求状态
-                if (!isRequest) {
-                    assistInfoListAdapter.changeMoreStatus(assistInfoListAdapter.NO_LOAD_MORE);
-                }
-                //是否去服务器同步
-                if (!isSearch && startTime == 0 && assistList.size() == 0 && page == 0) {
-                    //去服务器同步20条数据
-                    requestAssist();
-                } else {
-                    srlRefresh.setRefreshing(false);
-                }
-                isRefreshing = false;
-                super.onPostExecute(tempAssistList);
-            }
-        }.execute();
-
-    }
-
 
     /**
      * 日期选择
@@ -546,7 +445,6 @@ public class AssistListActivity extends BaseActivity {
                 textView.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                 startTime = Utils.getTime(time);
                 endTime = Utils.getTime(time2);
-
             }
         }
                 // 设置初始日期
@@ -555,43 +453,12 @@ public class AssistListActivity extends BaseActivity {
                 , calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void initReportPopupWindow() {
-        reportView = LayoutInflater.from(AssistListActivity.this).inflate(R.layout.dialog_select_report_content_layout, null);
-        final TextView tvReported = (TextView) reportView.findViewById(R.id.tv_reported);
-        final TextView tvNoReport = (TextView) reportView.findViewById(R.id.tv_no_report);
-        reportPopupWindow = new PopupWindow(reportView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        // 设置以下代码，即背景颜色还有外部点击事件的处理才可以点击外部消失,
-        reportPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        reportPopupWindow.setOutsideTouchable(true);
-        reportPopupWindow.setWidth((int) (screenWidth / 4.8));
-//        replyPopupWindow.setHeight((int) (400));
-        tvReported.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isSearch = true;
-                reportStatus = "1";
-                tvChooseReportStatus.setText(tvReported.getText());
-                reportPopupWindow.dismiss();
-            }
-        });
-
-        tvNoReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isSearch = true;
-                reportStatus = "0";
-                tvChooseReportStatus.setText(tvNoReport.getText());
-                reportPopupWindow.dismiss();
-            }
-        });
-    }
-
     private void showReportStatusDialog() {
         reportPopupWindow.showAsDropDown(rlReportStatus);
     }
 
     private void initReplyPopupWindow() {
-        replyView = LayoutInflater.from(AssistListActivity.this).inflate(R.layout.dialog_select_reply_content_layout, null);
+        View replyView = LayoutInflater.from(AssistListActivity.this).inflate(R.layout.dialog_select_reply_content_layout, null);
         final TextView tvReplied = (TextView) replyView.findViewById(R.id.tv_replied);
         final TextView tvNoReply = (TextView) replyView.findViewById(R.id.tv_no_reply);
         replyPopupWindow = new PopupWindow(replyView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
@@ -621,84 +488,192 @@ public class AssistListActivity extends BaseActivity {
         });
     }
 
+    private void initReportPopupWindow() {
+        View reportView = LayoutInflater.from(AssistListActivity.this).inflate(R.layout.dialog_select_report_content_layout, null);
+        final TextView tvReported = (TextView) reportView.findViewById(R.id.tv_reported);
+        final TextView tvNoReport = (TextView) reportView.findViewById(R.id.tv_no_report);
+        reportPopupWindow = new PopupWindow(reportView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        // 设置以下代码，即背景颜色还有外部点击事件的处理才可以点击外部消失,
+        reportPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        reportPopupWindow.setOutsideTouchable(true);
+        reportPopupWindow.setWidth((int) (screenWidth / 4.8));
+//        replyPopupWindow.setHeight((int) (400));
+        tvReported.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSearch = true;
+                reportStatus = "1";
+                tvChooseReportStatus.setText(tvReported.getText());
+                reportPopupWindow.dismiss();
+            }
+        });
+
+        tvNoReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSearch = true;
+                reportStatus = "0";
+                tvChooseReportStatus.setText(tvNoReport.getText());
+                reportPopupWindow.dismiss();
+            }
+        });
+    }
+
     private void showReplyStatusDialog() {
         replyPopupWindow.showAsDropDown(rlReplyStatus);
     }
 
-
-    public String requestInfoIds = "";
-
-    //查询所列表中所有未回复的id
-    private String getNoReplyList() {
-        String requestInfoIds = "";
-        for (int i = 0; i < assistList.size(); i++) {
-            if (assistList.get(i).getReplyStatus().equals("0")) {
-                if (assistList.size() - 1 == i) {
-                    requestInfoIds = requestInfoIds + assistList.get(i).getInfoId();
-                } else {
-                    requestInfoIds = requestInfoIds + assistList.get(i).getInfoId() + ",";
+    /**
+     * 下载更新本地数据库
+     */
+    private void uploadAllAssist() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<AssistanceDataInfo> tempList = queryNoReport();
+                if (tempList.size() == 0) {
+                    //本地数据库查出无未上报数据
+                    handler.sendEmptyMessage(1);
+                    return;
+                }
+                //有未上报数据
+                for (int i = 0; i < tempList.size(); i++) {
+                    RequestBean requestBean = new RequestBean();
+                    requestBean.InfoDevID = Constant.DeviceId;
+                    requestBean.InfoID = tempList.get(i).getInfoId();
+                    requestBean.InfoTime = Utils.formatTimeStamp(tempList.get(i).getTestTime());
+                    requestBean.InfoUName = tempList.get(i).getTestName();
+                    requestBean.InfoAddress = tempList.get(i).getTestPosition();
+                    requestBean.InfoLength = tempList.get(i).getCableLength();
+                    requestBean.InfoLineType = tempList.get(i).getCableType();
+                    requestBean.InfoFaultType = tempList.get(i).getFaultType();
+                    requestBean.InfoFaultLength = tempList.get(i).getFaultLength();
+                    requestBean.InfoMemo = tempList.get(i).getShortNote();
+                    requestBean.InfoCiChang = tempList.get(i).getDataCollection();
+                    requestBean.InfoCiCangVol = tempList.get(i).getMagneticFieldGain() + "";
+                    requestBean.InfoShengYinVol = tempList.get(i).getVoiceGain() + "";
+                    requestBean.InfoLvBo = tempList.get(i).getFilterMode() + "";
+                    requestBean.InfoYuYan = tempList.get(i).getLanguage();
+                    uploadInfo(requestBean);
                 }
             }
-        }
-        this.requestInfoIds = requestInfoIds;
-        Log.e("打印-请求参数", requestInfoIds);
-        return requestInfoIds;
+        }).start();
     }
 
+    /**
+     * 加载数据
+     *
+     * @param isFlag 是否显示加载转圈
+     */
+    @SuppressLint("StaticFieldLeak")
+    private void loadData(final boolean isFlag) {
+        new AsyncTask<Void, Boolean, List<AssistanceDataInfo>>() {
+            @Override
+            protected void onPreExecute() {
+                if (isFlag) {
+                    srlRefresh.setRefreshing(true);
+                }
+                super.onPreExecute();
+            }
 
-    //根据条件查询
+            @Override
+            protected List<AssistanceDataInfo> doInBackground(Void... params) {
+                return getTwentyRec(page, startTime, endTime, replyStatus, reportStatus);
+            }
+
+            @Override
+            protected void onPostExecute(List<AssistanceDataInfo> tempAssistList) {
+                if (page == 0) {
+                    assistList.clear();
+                }
+                assistList.addAll(tempAssistList);
+                isRequest = tempAssistList.size() >= Constant.PageSize;
+                //加载数据
+                if (tempAssistList.size() != 0) {
+                    srlRefresh.setVisibility(View.VISIBLE);
+                    llException.setVisibility(View.GONE);
+                    assistInfoListAdapter.notifyDataSetChanged();
+                    srlRefresh.setRefreshing(false);
+                } else {
+
+                    assistInfoListAdapter.notifyDataSetChanged();
+                    llException.setVisibility(View.VISIBLE);
+                    ivException.setImageResource(R.drawable.ic_no_data);
+                    tvException.setText(R.string.no_data);
+
+                }
+                //请求状态
+                if (!isRequest) {
+                    assistInfoListAdapter.changeMoreStatus(AssistInfoListAdapter.NO_LOAD_MORE);
+                }
+                //是否去服务器同步
+                if (!isSearch && startTime == 0 && assistList.size() == 0 && page == 0) {
+                    //去服务器同步20条数据
+                    requestAssist();
+                } else {
+                    srlRefresh.setRefreshing(false);
+                }
+                isRefreshing = false;
+                super.onPostExecute(tempAssistList);
+            }
+        }.execute();
+    }
+
+    /**
+     * 根据条件查询
+     */
     public List<AssistanceDataInfo> getTwentyRec(int page, long startTime, long endTime, String replyStatus, String reportStatus) {
-        List<AssistanceDataInfo> listMsg = null;
-        if (startTime == 0 && replyStatus.equals("") && reportStatus.equals("")) {
+        List<AssistanceDataInfo> listMsg;
+        if (startTime == 0 && "".equals(replyStatus) && "".equals(reportStatus)) {
             listMsg = dao.queryBuilder()
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime == 0 && replyStatus.equals("") && !reportStatus.equals("")) {
+        } else if (startTime == 0 && "".equals(replyStatus)) {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReportStatus.eq(reportStatus))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime == 0 && !replyStatus.equals("") && reportStatus.equals("")) {
+        } else if (startTime == 0 && "".equals(reportStatus)) {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReplyStatus.eq(replyStatus))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime == 0 && !replyStatus.equals("") && !reportStatus.equals("")) {
+        } else if (startTime == 0) {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReplyStatus.eq(replyStatus), AssistanceDataInfoDao.Properties.ReportStatus.eq(reportStatus))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime != 0 && replyStatus.equals("") && !reportStatus.equals("")) {
+        } else if ("".equals(replyStatus) && !"".equals(reportStatus)) {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.TestTime.between(startTime, endTime), AssistanceDataInfoDao.Properties.ReportStatus.eq(reportStatus))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime != 0 && replyStatus.equals("") && reportStatus.equals("")) {
+        } else if ("".equals(replyStatus)) {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.TestTime.between(startTime, endTime))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime != 0 && !replyStatus.equals("") && !reportStatus.equals("")) {
+        } else if (!"".equals(reportStatus)) {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.TestTime.between(startTime, endTime), AssistanceDataInfoDao.Properties.ReplyStatus.eq(replyStatus), AssistanceDataInfoDao.Properties.ReportStatus.eq(reportStatus))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
                     .orderDesc(AssistanceDataInfoDao.Properties.TestTime)
                     .limit(Constant.PageSize)
                     .list();
-        } else if (startTime != 0 && !replyStatus.equals("") && reportStatus.equals("")) {
+        } else {
             listMsg = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.TestTime.between(startTime, endTime), AssistanceDataInfoDao.Properties.ReplyStatus.eq(replyStatus))
                     .offset(page * Constant.PageSize)
                     .orderAsc(AssistanceDataInfoDao.Properties.ReplyStatus, AssistanceDataInfoDao.Properties.ReportStatus)
@@ -710,95 +685,76 @@ public class AssistListActivity extends BaseActivity {
 
     }
 
-    //修改数据库字段
-    private void updateData(AssistanceDataInfo assistanceDataInfo) {
-        dao.update(assistanceDataInfo);
-    }
-
-
-    //后台去改变回复状态和回复内容线程
-    private boolean isFlag;//线程循环标志
-    Thread doRequestStatus = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            Log.e("ddddddddddd", "走我");
-            while (!isStop && !isFlag) {
-                getNoReplyList();
-                isFlag = true;
-                final RequestBean requestBean = new RequestBean();
-                requestBean.InfoIDS = requestInfoIds;
-                final Gson gson = new Gson();
-                String json = gson.toJson(requestBean);
-                json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                        .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                        .readTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                        .build();
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(URLs.AppUrl + URLs.AppPort)
-                        .addConverterFactory(ScalarsConverterFactory.create()).client(client)
-                        .build();
-                APIService service = retrofit.create(APIService.class);
-                Call<String> call = service.api("GetInfoReplyStatus", json);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        try {
+    /**
+     * 同步协助列表数据的方法
+     */
+    private void requestAssist() {
+        final RequestBean requestBean = new RequestBean();
+        requestBean.InfoDevID = Constant.DeviceId;
+        final Gson gson = new Gson();
+        String json = gson.toJson(requestBean);
+        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.AppUrl + URLs.AppPort)
+                .addConverterFactory(ScalarsConverterFactory.create()).client(client)
+                .build();
+        APIService service = retrofit.create(APIService.class);
+        Call<String> call = service.api("GetInfoTopList", json);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, final Response<String> response) {
+                try {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
                             byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                             String result = new String(srcBytes);
-                            Log.e("打印-请求成功", result);
-                            AssistInfoReplyStatusBean assistInfoReplyStatusBean = gson.fromJson(result, AssistInfoReplyStatusBean.class);
-                            if (assistInfoReplyStatusBean.Code.equals("1")) {
-                                if (assistInfoReplyStatusBean.data.size() > 0) {
-                                    for (int i = 0; i < assistInfoReplyStatusBean.data.size(); i++) {
-                                        AssistanceDataInfo assistanceDataInfo = queryData2(assistInfoReplyStatusBean.data.get(i).InfoID);
-                                        assistanceDataInfo.setReplyStatus("1");
-                                        assistanceDataInfo.setReplyContent(assistInfoReplyStatusBean.data.get(i).ReplyContent);
-                                        updateData(assistanceDataInfo);
-                                        for (int j = 0; j < assistList.size(); j++) {
-                                            if (assistList.get(j).getInfoId().equals(assistInfoReplyStatusBean.data.get(i).InfoID))
-                                                assistList.set(j, assistanceDataInfo);
-                                        }
-                                        //更改完本地去刷新数据
-                                        mHandler.sendEmptyMessage(0);
+                            AssistListBean assistListBean = gson.fromJson(result, AssistListBean.class);
+                            List<AssistanceDataInfo> tempList = new ArrayList<AssistanceDataInfo>();
+                            if ("1".equals(assistListBean.Code)) {
+                                if (assistListBean.data.size() > 0) {
+                                    for (int i = 0; i < assistListBean.data.size(); i++) {
+                                        AssistanceDataInfo assistanceDataInfo = new AssistanceDataInfo(null, assistListBean.data.get(i).InfoID
+                                                , Utils.getTime(assistListBean.data.get(i).InfoTime), assistListBean.data.get(i).InfoUName, assistListBean.data.get(i).InfoAddress
+                                                , assistListBean.data.get(i).InfoLength, assistListBean.data.get(i).InfoLineType, assistListBean.data.get(i).InfoFaultType
+                                                , assistListBean.data.get(i).InfoFaultLength, assistListBean.data.get(i).InfoMemo, assistListBean.data.get(i).InfoCiChang
+                                                , "1", assistListBean.data.get(i).ReplyStatus, assistListBean.data.get(i).ReplyContent, Integer.parseInt(assistListBean.data.get(i).InfoCiCangVol),
+                                                Integer.parseInt(assistListBean.data.get(i).InfoShengYinVol), Integer.parseInt(assistListBean.data.get(i).InfoLvBo), assistListBean.data.get(i).InfoYuYan);
+                                        tempList.add(assistanceDataInfo);
+                                        dao.insert(assistanceDataInfo);
                                     }
+                                    assistList.addAll(tempList);
+                                    handler.sendEmptyMessage(0);
+                                } else {
+                                    handler.sendEmptyMessage(2);
                                 }
+                                handler.sendEmptyMessage(4);
+                            } else {
+                                Message message = new Message();
+                                message.obj = assistListBean.Message;
+                                message.what = 3;
+                                handler.sendMessage(message);
                             }
-                        } catch (Exception e) {
-                            Log.e("打印-请求报异常-检查代码", "GetInfoReplyStatus");
                         }
+                    }).start();
 
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Utils.showToast(AssistListActivity.this, getString(R.string.check_net_retry));
-                        srlRefresh.setRefreshing(false);
-                    }
-                });
-
-                try {
-                    Thread.sleep(20000);
-                    isFlag = false;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    Log.e("打印-请求报异常-检查代码", "AppInfoList");
                 }
             }
-        }
-    });
 
-    //更据InfoId找到数据库的一条数据
-    private AssistanceDataInfo queryData2(String infoId) {
-        List<AssistanceDataInfo> assistanceDataInfos = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.InfoId.eq(infoId)).list();
-        AssistanceDataInfo dataInfo = assistanceDataInfos.get(0);
-        return dataInfo;
-    }
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Utils.showToast(AssistListActivity.this, getString(R.string.check_net_retry));
+                handler.sendEmptyMessage(4);
+            }
+        });
 
-    //从本地数据库查找未上报数据
-    private List<AssistanceDataInfo> queryNoReport() {
-        List<AssistanceDataInfo> assistanceDataInfos = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReportStatus.eq("0")).list();
-        return assistanceDataInfos;
     }
 
     @Override
@@ -819,4 +775,5 @@ public class AssistListActivity extends BaseActivity {
         isStop = true;
         super.onDestroy();
     }
+
 }

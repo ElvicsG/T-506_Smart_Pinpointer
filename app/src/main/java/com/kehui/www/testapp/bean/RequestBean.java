@@ -6,24 +6,20 @@ package com.kehui.www.testapp.bean;
  */
 public class RequestBean {
 
-    public String pageIndex;
-    public String pageSize;
-    public String replyStatus;
-    public String infoDevId;
+    public String InfoDevID;
     public String InfoID;
-    public String InfoIDS;
-    public String infoTime;
-    public String infoName;
-    public String infoAddress;
-    public String infoLength;
-    public String infoVoltageLevel;
-    public String infoFaultType;
-    public String infoFaultLength;
-    public String infoMagnetic;
-    public String infoMagneticGain;
-    public String infoVoiceGain;
-    public String infoFilter;
-    public String infoLanguage;
-    public String InfoMemo;//备注
+    public String InfoTime;
+    public String InfoUName;
+    public String InfoAddress;
+    public String InfoLength;
+    public String InfoLineType;
+    public String InfoFaultType;
+    public String InfoFaultLength;
+    public String InfoMemo;
+    public String InfoCiChang;
+    public String InfoCiCangVol;
+    public String InfoShengYinVol;
+    public String InfoLvBo;
+    public String InfoYuYan;
 
 }

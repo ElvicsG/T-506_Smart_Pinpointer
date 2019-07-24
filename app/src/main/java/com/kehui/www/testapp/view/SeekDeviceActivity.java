@@ -37,6 +37,8 @@ import butterknife.ButterKnife;
  */
 public class SeekDeviceActivity extends BaseActivity {
 
+    private static final String TAG = "SeekDeviceActivity";
+
     @BindView(R.id.tv_app_name)
     TextView tvAppName;
     @BindView(R.id.bt_seek_device)

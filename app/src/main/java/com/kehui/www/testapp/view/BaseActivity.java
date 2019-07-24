@@ -5,7 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
 /**
- * 解决屏幕长亮
+ * @author Gong
+ * @date 2019/07/22
  */
 public class BaseActivity extends AppCompatActivity {
 

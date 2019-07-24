@@ -72,7 +72,7 @@
     <string name="fault_type">故障类型</string>
     <string name="fault_length">故障长度</string>
     <string name="short_note">简注</string>
-    <string name="short_note_info">简注信息</string>
+    <string name="short_note_info">备注信息</string>
     <string name="data_collection">数据收集</string>
     <string name="notifyTitle">提示</string>
     <string name="commit">提交</string>

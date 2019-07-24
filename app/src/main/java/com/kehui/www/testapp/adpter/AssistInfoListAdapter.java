@@ -22,24 +22,29 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by jwj on 2018/4/25.
+ * @author jwj
+ * @date 2018/04/25
  */
-
 public class AssistInfoListAdapter extends RecyclerView.Adapter {
 
     private AssistListActivity context;
-    //    List<AssistListBean.DataBean> assistList;
-    List<AssistanceDataInfo> assistList;
+    private List<AssistanceDataInfo> assistList;
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_FOOTER = 1;
 
-    //正在加载中
+    /**
+     * 正在加载中
+     */
     public static final int LOADING_MORE = 1;
-    //没有加载更多 隐藏
+    /**
+     * 没有加载更多 隐藏
+     */
     public static final int NO_LOAD_MORE = 2;
 
-    //上拉加载更多状态-默认为0
-    public int mLoadMoreStatus = 0;
+    /**
+     * 上拉加载更多状态-默认为0
+     */
+    private int mLoadMoreStatus = 0;
 
     public AssistInfoListAdapter(AssistListActivity context, List<AssistanceDataInfo> assistList) {
         this.context = context;
@@ -65,7 +70,8 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
             final ViewHolder viewHolder = (ViewHolder) holder;
             viewHolder.tvTestTime.setText(Utils.formatTimeStamp(assistList.get(position).getTestTime()));
             viewHolder.tvTestName.setText(assistList.get(position).getTestName().trim());
-            if (assistList.get(position).getReplyStatus().equals("0")) {//未回复
+            if ("0".equals(assistList.get(position).getReplyStatus())) {
+                //未回复
                 viewHolder.ivReplyStatus.setImageResource(R.drawable.ic_assist_no_reply);
                 viewHolder.tvReplyStatus.setTextColor(context.getResources().getColor(R.color.yellow2));
                 viewHolder.tvReplyStatusText.setTextColor(context.getResources().getColor(R.color.yellow2));
@@ -78,7 +84,8 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
                 viewHolder.tvReplyStatusTextColon.setTextColor(context.getResources().getColor(R.color.blue5));
                 viewHolder.tvReplyStatus.setText(context.getString(R.string.replied));
             }
-            if (assistList.get(position).getReportStatus().equals("1")) {//1已上报 0未上报 从服务器取下来的都是上报后的
+            if ("1".equals(assistList.get(position).getReportStatus())) {
+                //1已上报 0未上报 从服务器取下来的都是上报后的
                 viewHolder.tvReportStatus.setTextColor(context.getResources().getColor(R.color.blue5));
                 viewHolder.tvReportStatusText.setTextColor(context.getResources().getColor(R.color.blue5));
                 viewHolder.tvReportStatusTextColon.setTextColor(context.getResources().getColor(R.color.blue5));
@@ -111,7 +118,8 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
                     footerViewHolder.mPbLoad.setVisibility(View.GONE);
                     footerViewHolder.mTvLoadText.setText(context.getString(R.string.no_load_more));
                     break;
-
+                default:
+                    break;
             }
         }
     }
@@ -132,18 +140,15 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
         }
     }
 
-
     /**
-     * 更新加载更多状态
-     *
-     * @param status
+     * @param status    加载更多状态
      */
     public void changeMoreStatus(int status) {
         mLoadMoreStatus = status;
         notifyDataSetChanged();
     }
 
-    public class FooterViewHolder extends RecyclerView.ViewHolder {
+    class FooterViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.pbLoad)
         ProgressBar mPbLoad;
         @BindView(R.id.tvLoadText)
@@ -151,8 +156,7 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
         @BindView(R.id.loadLayout)
         LinearLayout mLoadLayout;
 
-
-        public FooterViewHolder(View itemView) {
+        FooterViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
@@ -179,8 +183,6 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
         TextView tvReplyStatusTextColon;
         @BindView(R.id.tv_reply_status)
         TextView tvReplyStatus;
-        //        @BindView(R.id.rl_container)
-//        RelativeLayout rlContainer;
         @BindView(R.id.rl_container)
         LinearLayout rlContainer;
 
@@ -189,4 +191,5 @@ public class AssistInfoListAdapter extends RecyclerView.Adapter {
             ButterKnife.bind(this, view);
         }
     }
+
 }

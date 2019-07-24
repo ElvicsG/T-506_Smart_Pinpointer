@@ -3,9 +3,9 @@ package com.kehui.www.testapp.bean;
 import java.util.List;
 
 /**
- * Created by jwj on 2018/4/16.
+ * @author jwj
+ * @date 2018/04/16
  */
-
 public class AssistListBean {
 
     public String Code;
@@ -37,4 +37,5 @@ public class AssistListBean {
         public String InfoYuYan;//语言
         public String InTime;//上传时间
     }
+
 }

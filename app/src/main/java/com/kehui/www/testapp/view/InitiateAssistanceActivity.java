@@ -1,5 +1,6 @@
 package com.kehui.www.testapp.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -55,10 +56,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
+ * 发起协助页面
  * @author Gong
  * @date 2019/07/22
  */
 public class InitiateAssistanceActivity extends BaseActivity {
+
+    private static final String TAG = "InitiateAssistance-位置";
 
     @BindView(R.id.tv_test_time_value)
     TextView tvTestTimeValue;
@@ -87,25 +91,18 @@ public class InitiateAssistanceActivity extends BaseActivity {
 
     private AssistanceDataInfoDao dao;
     private LocationManager lm;
-    private static final String TAG = "打印-位置";
     private static boolean isFinish;
-
-
-    /**
-     * 判断是否需要检测，防止不停的弹框
-     */
-    private boolean isNeedCheck = true;
     private int counter;
-    private String dataCollection;
-    private String isReport;
     private CustomDialog customDialog;
     private long currentTimeStamp;
     private int resultCode = 0;
     private PopupWindow faultTypeWindow;
-    private View faultTypeView;//回复内容弹窗view
-
     public int screenWidth;
     public int screenHeight;
+
+
+    public InitiateAssistanceActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +112,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
         dao = MyApplication.getInstances().getDaoSession().getAssistanceDataInfoDao();
         WindowManager wm = (WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE);
+        assert wm != null;
         screenWidth = wm.getDefaultDisplay().getWidth();
         screenHeight = wm.getDefaultDisplay().getHeight();
         initData();
@@ -131,7 +129,6 @@ public class InitiateAssistanceActivity extends BaseActivity {
 
     private void initView() {
         tvTestTimeValue.setText(Utils.formatTimeStamp(currentTimeStamp));
-
         etFaultType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,343 +137,14 @@ public class InitiateAssistanceActivity extends BaseActivity {
         });
     }
 
-    private void initData() {
-        currentTimeStamp = System.currentTimeMillis();
-//        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//
-//        // 判断GPS是否正常启动
-//        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            Toast.makeText(this, "请开启GPS导航...", Toast.LENGTH_SHORT).show();
-//            // 返回开启GPS导航设置界面
-//            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//            startActivityForResult(intent, 0);
-//            return;
-//        }
-//
-//        // 为获取地理位置信息时设置查询条件
-//        String bestProvider = lm.getBestProvider(getCriteria(), true);
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        Location location = lm.getLastKnownLocation(bestProvider);
-//        updateView(location);
+    private void showFaultTypeDialog() {
+        faultTypeWindow.showAsDropDown(etFaultType);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    /**
-     * 实时更新文本内容
-     *
-     * @param location
-     */
-    private void updateView(Location location) {
-        if (location != null) {
-            Log.e(TAG, "设备位置信息\n\n经度：");
-            Log.e(TAG, String.valueOf(location.getLongitude()));
-            Log.e(TAG, "\n纬度：");
-            Log.e(TAG, String.valueOf(location.getLatitude()));
-        } else {
-            // 清空EditText对象
-            Log.e(TAG, "清空");
-        }
-    }
-
-    /**
-     * 返回查询条件
-     *
-     * @return
-     */
-    private Criteria getCriteria() {
-        Criteria criteria = new Criteria();
-        // 设置定位精确度 Criteria.ACCURACY_COARSE比较粗略，Criteria.ACCURACY_FINE则比较精细
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        // 设置是否要求速度
-        criteria.setSpeedRequired(false);
-        // 设置是否允许运营商收费
-        criteria.setCostAllowed(false);
-        // 设置是否需要方位信息
-        criteria.setBearingRequired(false);
-        // 设置是否需要海拔信息
-        criteria.setAltitudeRequired(false);
-        // 设置对电源的需求
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        return criteria;
-    }
-
-    @OnClick({R.id.btn_commit, R.id.btn_back, R.id.tv_test_time_value})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btn_commit:
-                btnCommit.setEnabled(false);
-                insertData();
-                break;
-            case R.id.btn_back:
-                showBackDialog();
-                break;
-            case R.id.tv_test_time_value:
-                showDatePickerDialog(InitiateAssistanceActivity.this, 2, tvTestTimeValue, Calendar.getInstance());
-                break;
-        }
-    }
-
-    Thread startInterceptionThread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            int i = 0;
-            Log.e("打印-线程", "线程开始");
-            for (i = 0; i < 35; i++) {
-                try {
-                    //设置进度值
-                    counter = i * 3;
-                    //睡眠1000毫秒
-                    Thread.sleep(1000);
-                    handler.sendEmptyMessage(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (i == 34) {
-                    handler.sendEmptyMessage(0);
-                }
-                //GC2.01.006 蓝牙重连功能优化
-                if (Constant.BluetoothState == false) {
-                    handler.sendEmptyMessage(2);
-                    return;
-                }
-
-            }
-
-
-        }
-    });
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0) {
-                Constant.isStartInterception = false;
-                isFinish = true;
-                counter = 100;
-
-                tvDataCollectionProgress.setText(counter + "%");
-                pbDataCollection.setProgress(counter);
-
-                Log.e("打印字符串", Constant.sbData.toString());
-            } else if (msg.what == 1) {
-
-                if (counter > 100) {
-                    counter = 99;
-                }
-                pbDataCollection.setProgress(counter);
-                tvDataCollectionProgress.setText(counter + "%");
-            }else if (msg.what == 2) {  //GC2.01.006 蓝牙重连功能优化
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Utils.showToast(InitiateAssistanceActivity.this,getResources().getString(R.string
-                        .Link_Lost_Reconnect));
-                finish();
-            }
-            super.handleMessage(msg);
-        }
-    };
-
-    /**
-     * 日期选择
-     *
-     * @param activity
-     * @param themeResId
-     * @param tv
-     * @param calendar
-     */
-    public static void showDatePickerDialog(final Activity activity, int themeResId, final TextView tv, Calendar calendar) {
-        // 直接创建一个DatePickerDialog对话框实例，并将它显示出来
-        new DatePickerDialog(activity, themeResId, new DatePickerDialog.OnDateSetListener() {
-            // 绑定监听器(How the parent is notified that the date is set.)
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                // 此处得到选择的时间，可以进行你想要的操作
-                tv.setText(year + activity.getString(R.string.year) + (monthOfYear + 1) + activity.getString(R.string.month) + dayOfMonth + activity.getString(R.string.day));
-
-            }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                .show();
-    }
-
-    private void insertData() {
-        long testTime = currentTimeStamp;
-        String testName = etTestName.getText().toString().trim();
-        String testPosition = etTestPosition.getText().toString().trim();
-        String cableLength = etCableLength.getText().toString().trim();
-        String cableType = etCableType.getText().toString().trim();
-        String faultType = etFaultType.getText().toString().trim();
-        String faultLength = etFaultLength.getText().toString().trim();
-        String shortNote = etShortNote.getText().toString().trim();
-        String infoId = java.util.UUID.randomUUID().toString();
-        String language = PrefUtils.getString(InitiateAssistanceActivity.this, AppConfig.CURRENT_LANGUAGE, "ch");
-        if (TextUtils.isEmpty(testName)) {
-            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.test_name_is_empty));
-            btnCommit.setEnabled(true);
-            return;
-        } else if (!isFinish) {
-            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.test_data_time_no_finish));
-            btnCommit.setEnabled(true);
-            return;
-        }
-//        else if (TextUtils.isEmpty(testPosition)) {
-//            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.test_position_is_empty));
-//            return;
-//        }
-        RequestBean requestBean = new RequestBean();
-        requestBean.infoDevId = Constant.DeviceId;
-        requestBean.InfoID = infoId;
-        requestBean.infoTime = Utils.formatTimeStamp(currentTimeStamp);
-        requestBean.infoName = testName;
-        requestBean.infoAddress = testPosition;
-        requestBean.infoLength = cableLength;
-        requestBean.infoVoltageLevel = cableType;
-        requestBean.infoFaultType = faultType;
-        requestBean.infoFaultLength = faultLength;
-        requestBean.infoMagnetic = Constant.sbData.toString();
-        requestBean.infoMagneticGain = Constant.magneticFieldGain + "";//磁场增益
-        requestBean.infoVoiceGain = Constant.voiceGain + "";//声音增益
-        requestBean.infoFilter = Constant.filterType + "";//滤波模式
-        requestBean.infoLanguage = language;//语言类型
-        requestBean.InfoMemo = shortNote;
-        //0是未回复
-
-        //0是未上报1是已上报
-        if (!Utils.isNetVisible(InitiateAssistanceActivity.this)) {//无网
-            if (queryData() < 20) {
-                isReport = "0";
-                resultCode = 1;
-                AssistanceDataInfo info = new AssistanceDataInfo(null, infoId, testTime, testName, testPosition, cableLength, cableType, faultType, faultLength
-                        , shortNote, Constant.sbData.toString(), isReport, "0", "", Constant.magneticFieldGain, Constant.voiceGain, Constant.filterType, language);
-                dao.insert(info);
-                setResult(resultCode);
-                finish();
-            } else {
-                Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.over_20_notice));
-            }
-            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.no_net_wait_uploader));
-        } else {//有网
-            isReport = "1";
-            AssistanceDataInfo info = new AssistanceDataInfo(null, infoId, testTime, testName, testPosition, cableLength, cableType, faultType, faultLength
-                    , shortNote, Constant.sbData.toString(), isReport, "0", "", Constant.magneticFieldGain, Constant.voiceGain, Constant.filterType, language);
-            dao.insert(info);
-            resultCode = 1;
-            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.uploading_waiting));
-            uploadInfo(requestBean);
-        }
-
-    }
-
-    private void uploadInfo(RequestBean requestBean) {
-        final Gson gson = new Gson();
-        String json = gson.toJson(requestBean);
-        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLs.AppUrl + URLs.AppPort)
-                .addConverterFactory(ScalarsConverterFactory.create()).client(client)
-                .build();
-        APIService service = retrofit.create(APIService.class);
-        Call<String> call = service.api("UploadInfo", json);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                try {
-                    byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
-                    String result = new String(srcBytes);
-                    AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
-                    if (responseBean.Code.equals("1")) {
-                        showSuccessDialog();
-                        btnCommit.setEnabled(true);
-                    } else {
-                        Utils.showToast(InitiateAssistanceActivity.this, responseBean.Message);
-                    }
-
-                } catch (Exception e) {
-                    Log.e("打印-请求报异常-检查代码", "AppInfoList");
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.check_net_retry));
-            }
-        });
-    }
-
-    /**
-     * 弹出对话框，提示用户更新
-     */
-    protected void showSuccessDialog() {
-        customDialog = new CustomDialog(InitiateAssistanceActivity.this);
-        customDialog.setCanceledOnTouchOutside(false);
-
-        customDialog.show();
-
-        customDialog.setHintText(getString(R.string.upload_success));
-        customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResult(resultCode);
-                customDialog.dismiss();
-                finish();
-            }
-        });
-        customDialog.setRightGone();
-    }
-
-    /**
-     * 弹出对话框，提示用户更新
-     */
-    protected void showBackDialog() {
-        customDialog = new CustomDialog(InitiateAssistanceActivity.this);
-        customDialog.show();
-
-        customDialog.setHintText(getString(R.string.confirm_cancel_assist));
-        customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customDialog.dismiss();
-                finish();
-            }
-        });
-        customDialog.setRightButton(getString(R.string.cancel), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customDialog.dismiss();
-
-            }
-        });
-    }
-
-    //查
-    private int queryData() {
-        return dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReportStatus.eq("0")).list().size();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            showBackDialog();
-        }
-        return false;
-    }
 
     private void initFaultTypePopupWindow() {
-        faultTypeView = LayoutInflater.from(InitiateAssistanceActivity.this).inflate(R.layout.dialog_fault_type_layout, null);
+        //回复内容弹窗view
+        View faultTypeView = LayoutInflater.from(InitiateAssistanceActivity.this).inflate(R.layout.dialog_fault_type_layout, null);
         final TextView tvFaultType1 = (TextView) faultTypeView.findViewById(R.id.tv_fault_type_1);
         final TextView tvFaultType2 = (TextView) faultTypeView.findViewById(R.id.tv_fault_type_2);
         final TextView tvFaultType3 = (TextView) faultTypeView.findViewById(R.id.tv_fault_type_3);
@@ -516,9 +184,343 @@ public class InitiateAssistanceActivity extends BaseActivity {
         faultTypeWindow.setWidth(screenWidth / 4 - Utils.dp2px(InitiateAssistanceActivity.this, 15));
     }
 
-    private void showFaultTypeDialog() {
-        faultTypeWindow.showAsDropDown(etFaultType);
+    private void initData() {
+        currentTimeStamp = System.currentTimeMillis();
+//        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//
+//        // 判断GPS是否正常启动
+//        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//            Toast.makeText(this, "请开启GPS导航...", Toast.LENGTH_SHORT).show();
+//            // 返回开启GPS导航设置界面
+//            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//            startActivityForResult(intent, 0);
+//            return;
+//        }
+//
+//        // 为获取地理位置信息时设置查询条件
+//        String bestProvider = lm.getBestProvider(getCriteria(), true);
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        Location location = lm.getLastKnownLocation(bestProvider);
+//        updateView(location);
+    }
 
+    /**
+     * @return  返回查询条件
+     */
+    private Criteria getCriteria() {
+        Criteria criteria = new Criteria();
+        // 设置定位精确度 Criteria.ACCURACY_COARSE比较粗略，Criteria.ACCURACY_FINE则比较精细
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        // 设置是否要求速度
+        criteria.setSpeedRequired(false);
+        // 设置是否允许运营商收费
+        criteria.setCostAllowed(false);
+        // 设置是否需要方位信息
+        criteria.setBearingRequired(false);
+        // 设置是否需要海拔信息
+        criteria.setAltitudeRequired(false);
+        // 设置对电源的需求
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        return criteria;
+    }
+
+    /**
+     * @param location  实时更新文本内容
+     */
+    private void updateView(Location location) {
+        if (location != null) {
+            Log.e(TAG, "设备位置信息\n\n经度：");
+            Log.e(TAG, String.valueOf(location.getLongitude()));
+            Log.e(TAG, "\n纬度：");
+            Log.e(TAG, String.valueOf(location.getLatitude()));
+        } else {
+            // 清空EditText对象
+            Log.e(TAG, "清空");
+        }
+    }
+
+    /**
+     * 截取数据的线程
+     */
+    Thread startInterceptionThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            int i = 0;
+            Log.e("打印-线程", "线程开始");
+            for (i = 0; i < 35; i++) {
+                try {
+                    //设置进度值
+                    counter = i * 3;
+                    //睡眠1000毫秒
+                    Thread.sleep(1000);
+                    handler.sendEmptyMessage(1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (i == 34) {
+                    handler.sendEmptyMessage(0);
+                }
+                //GC2.01.006 蓝牙重连功能优化
+                if (!Constant.BluetoothState) {
+                    handler.sendEmptyMessage(2);
+                    return;
+                }
+
+            }
+        }
+    });
+
+    @SuppressLint("HandlerLeak")
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 0) {
+                Constant.isStartInterception = false;
+                isFinish = true;
+                counter = 100;
+                tvDataCollectionProgress.setText(counter + "%");
+                pbDataCollection.setProgress(counter);
+                Log.e("打印字符串", Constant.sbData.toString());
+
+            } else if (msg.what == 1) {
+                if (counter > 100) {
+                    counter = 99;
+                }
+                pbDataCollection.setProgress(counter);
+                tvDataCollectionProgress.setText(counter + "%");
+
+            }else if (msg.what == 2) {
+                //GC2.01.006 蓝牙重连功能优化
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Utils.showToast(InitiateAssistanceActivity.this,getResources().getString(R.string
+                        .Link_Lost_Reconnect));
+                finish();
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+    @OnClick({R.id.btn_commit, R.id.btn_back, R.id.tv_test_time_value})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_commit:
+                btnCommit.setEnabled(false);
+                insertData();
+                break;
+            case R.id.btn_back:
+                showBackDialog();
+                break;
+            case R.id.tv_test_time_value:
+                showDatePickerDialog(InitiateAssistanceActivity.this, 2, tvTestTimeValue, Calendar.getInstance());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void insertData() {
+        long testTime = currentTimeStamp;
+        String testName = etTestName.getText().toString().trim();
+        String testPosition = etTestPosition.getText().toString().trim();
+        String cableLength = etCableLength.getText().toString().trim();
+        String cableType = etCableType.getText().toString().trim();
+        String faultType = etFaultType.getText().toString().trim();
+        String faultLength = etFaultLength.getText().toString().trim();
+        String shortNote = etShortNote.getText().toString().trim();
+        String infoId = java.util.UUID.randomUUID().toString();
+        String language = PrefUtils.getString(InitiateAssistanceActivity.this, AppConfig.CURRENT_LANGUAGE, "ch");
+        if (TextUtils.isEmpty(testName)) {
+            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.test_name_is_empty));
+            btnCommit.setEnabled(true);
+            return;
+        } else if (!isFinish) {
+            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.test_data_time_no_finish));
+            btnCommit.setEnabled(true);
+            return;
+        }
+//        else if (TextUtils.isEmpty(testPosition)) {
+//            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.test_position_is_empty));
+//            return;
+//        }
+        RequestBean requestBean = new RequestBean();
+        requestBean.InfoDevID = Constant.DeviceId;
+        requestBean.InfoID = infoId;
+        requestBean.InfoTime = Utils.formatTimeStamp(currentTimeStamp);
+        requestBean.InfoUName = testName;
+        requestBean.InfoAddress = testPosition;
+        requestBean.InfoLength = cableLength;
+        requestBean.InfoLineType = cableType;
+        requestBean.InfoFaultType = faultType;
+        requestBean.InfoFaultLength = faultLength;
+        requestBean.InfoMemo = shortNote;
+        requestBean.InfoCiChang = Constant.sbData.toString();
+        requestBean.InfoCiCangVol = Constant.magneticFieldGain + "";
+        requestBean.InfoShengYinVol = Constant.voiceGain + "";
+        requestBean.InfoLvBo = Constant.filterType + "";
+        requestBean.InfoYuYan = language;
+
+        //0是未上报1是已上报
+        String isReport;
+        if (!Utils.isNetVisible(InitiateAssistanceActivity.this)) {
+            //无网
+            if (queryData() < 20) {
+                isReport = "0";
+                resultCode = 1;
+                AssistanceDataInfo info = new AssistanceDataInfo(null, infoId, testTime, testName, testPosition, cableLength, cableType, faultType, faultLength
+                        , shortNote, Constant.sbData.toString(), isReport, "0", "", Constant.magneticFieldGain, Constant.voiceGain, Constant.filterType, language);
+                dao.insert(info);
+                setResult(resultCode);
+                finish();
+            } else {
+                Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.over_20_notice));
+            }
+            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.no_net_wait_uploader));
+        } else {
+            //有网
+            isReport = "1";
+            AssistanceDataInfo info = new AssistanceDataInfo(null, infoId, testTime, testName, testPosition, cableLength, cableType, faultType, faultLength
+                    , shortNote, Constant.sbData.toString(), isReport, "0", "", Constant.magneticFieldGain, Constant.voiceGain, Constant.filterType, language);
+            dao.insert(info);
+            resultCode = 1;
+            Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.uploading_waiting));
+            uploadInfo(requestBean);
+        }
+
+    }
+
+    /**
+     * @return  查询本地数据库离线数据个数
+     */
+    private int queryData() {
+        return dao.queryBuilder().where(AssistanceDataInfoDao.Properties.ReportStatus.eq("0")).list().size();
+    }
+
+    private void uploadInfo(RequestBean requestBean) {
+        final Gson gson = new Gson();
+        String json = gson.toJson(requestBean);
+        json = TripleDesUtils.encryptMode(MyApplication.keyBytes, json.getBytes());
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(Constant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.AppUrl + URLs.AppPort)
+                .addConverterFactory(ScalarsConverterFactory.create()).client(client)
+                .build();
+        APIService service = retrofit.create(APIService.class);
+        Call<String> call = service.api("UploadInfo", json);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
+                    String result = new String(srcBytes);
+                    AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
+                    if ("1".equals(responseBean.Code)) {
+                        showSuccessDialog();
+                        btnCommit.setEnabled(true);
+                    } else {
+                        Utils.showToast(InitiateAssistanceActivity.this, responseBean.Message);
+                    }
+
+                } catch (Exception e) {
+                    Log.e("打印-请求报异常-检查代码", "AppInfoList");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Utils.showToast(InitiateAssistanceActivity.this, getString(R.string.check_net_retry));
+            }
+        });
+    }
+
+    /**
+     * 弹出对话框，上传成功
+     */
+    protected void showSuccessDialog() {
+        customDialog = new CustomDialog(InitiateAssistanceActivity.this);
+        customDialog.setCanceledOnTouchOutside(false);
+
+        customDialog.show();
+
+        customDialog.setHintText(getString(R.string.upload_success));
+        customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResult(resultCode);
+                customDialog.dismiss();
+                finish();
+            }
+        });
+        customDialog.setRightGone();
+    }
+
+    /**
+     * 弹出对话框，返回
+     */
+    protected void showBackDialog() {
+        customDialog = new CustomDialog(InitiateAssistanceActivity.this);
+        customDialog.show();
+
+        customDialog.setHintText(getString(R.string.confirm_cancel_assist));
+        customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customDialog.dismiss();
+                finish();
+            }
+        });
+        customDialog.setRightButton(getString(R.string.cancel), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customDialog.dismiss();
+
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            showBackDialog();
+        }
+        return false;
+    }
+
+    /**
+     * 日期选择
+     *
+     * @param activity
+     * @param themeResId
+     * @param tv
+     * @param calendar
+     */
+    public static void showDatePickerDialog(final Activity activity, int themeResId, final TextView tv, Calendar calendar) {
+        // 直接创建一个DatePickerDialog对话框实例，并将它显示出来
+        new DatePickerDialog(activity, themeResId, new DatePickerDialog.OnDateSetListener() {
+            // 绑定监听器(How the parent is notified that the date is set.)
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                // 此处得到选择的时间，可以进行你想要的操作
+                tv.setText(year + activity.getString(R.string.year) + (monthOfYear + 1) + activity.getString(R.string.month) + dayOfMonth + activity.getString(R.string.day));
+
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+                .show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
 }

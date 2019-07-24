@@ -124,33 +124,35 @@ public class AssistInfoDetailsActivity extends BaseActivity {
             case R.id.btn_commit:
                 RequestBean requestBean = new RequestBean();
                 //设备ID
-                requestBean.infoDevId = Constant.DeviceId;
+                requestBean.InfoDevID = Constant.DeviceId;
+                //数据库数据ID
                 requestBean.InfoID = infoId;
                 //测试时间
-                requestBean.infoTime = Utils.formatTimeStamp(dataInfo.getTestTime());
+                requestBean.InfoTime = Utils.formatTimeStamp(dataInfo.getTestTime());
                 //测试人员
-                requestBean.infoName = dataInfo.getTestName();
+                requestBean.InfoUName = dataInfo.getTestName();
                 //测试地点
-                requestBean.infoAddress = dataInfo.getTestPosition();
+                requestBean.InfoAddress = dataInfo.getTestPosition();
                 //电缆长度
-                requestBean.infoLength = dataInfo.getCableLength();
+                requestBean.InfoLength = dataInfo.getCableLength();
                 //电压等级
-                requestBean.infoVoltageLevel = dataInfo.getCableType();
+                requestBean.InfoLineType = dataInfo.getCableType();
                 //故障类型
-                requestBean.infoFaultType = dataInfo.getFaultType();
+                requestBean.InfoFaultType = dataInfo.getFaultType();
                 //故障长度
-                requestBean.infoFaultLength = dataInfo.getFaultLength();
-                //磁场数据
-                requestBean.infoMagnetic = dataInfo.getDataCollection();
-                //磁场增益
-                requestBean.infoMagneticGain = dataInfo.getMagneticFieldGain() + "";
-                //声音增益
-                requestBean.infoVoiceGain = dataInfo.getVoiceGain() + "";
-                //滤波模式
-                requestBean.infoFilter = dataInfo.getFilterMode() + "";
-                //语言类型
-                requestBean.infoLanguage = dataInfo.getLanguage();
+                requestBean.InfoFaultLength = dataInfo.getFaultLength();
+                //备注信息
                 requestBean.InfoMemo = dataInfo.getShortNote();
+                //磁场数据
+                requestBean.InfoCiChang = dataInfo.getDataCollection();
+                //磁场增益
+                requestBean.InfoCiCangVol = dataInfo.getMagneticFieldGain() + "";
+                //声音增益
+                requestBean.InfoShengYinVol = dataInfo.getVoiceGain() + "";
+                //滤波模式
+                requestBean.InfoLvBo = dataInfo.getFilterMode() + "";
+                //语言类型
+                requestBean.InfoYuYan = dataInfo.getLanguage();
                 uploadInfo(requestBean);
                 break;
             case R.id.btn_back:
@@ -184,7 +186,7 @@ public class AssistInfoDetailsActivity extends BaseActivity {
                     byte[] srcBytes = TripleDesUtils.decryptMode(MyApplication.keyBytes, response.body());
                     String result = new String(srcBytes);
                     AssistListBean responseBean = gson.fromJson(result, AssistListBean.class);
-                    if (responseBean.Code.equals("1")) {
+                    if ("1".equals(responseBean.Code)) {
                         Utils.showToast(AssistInfoDetailsActivity.this, getString(R.string.upload_success));
                         AssistanceDataInfo assistanceDataInfo = queryData2(requestBean.InfoID);
                         assistanceDataInfo.setReportStatus("1");
@@ -208,13 +210,13 @@ public class AssistInfoDetailsActivity extends BaseActivity {
     }
 
     /**
+     * 根据InfoId找到数据库的一条数据
      * @param infoId    数据库Id
      * @return  数据库的一条数据
      */
     private AssistanceDataInfo queryData2(String infoId) {
         List<AssistanceDataInfo> assistanceDataInfos = dao.queryBuilder().where(AssistanceDataInfoDao.Properties.InfoId.eq(infoId)).list();
-        AssistanceDataInfo dataInfo = assistanceDataInfos.get(0);
-        return dataInfo;
+        return assistanceDataInfos.get(0);
     }
 
     /**

@@ -54,6 +54,7 @@ import libsvm.svm_parameter;
 import libsvm.svm_problem;
 
 /**
+ * 专家模式和用户模式的基类
  * @author Gong
  * @date 2019/07/17
  */
