@@ -103,10 +103,10 @@ public class UserMainActivity extends BaseActivity {
     private double lastDelayValue = -1; //上次的声磁延时值
     private double minDelayValue = 43.625;  //GC20181115 历史最小延时值（最大349*0.125=43.625ms）
     private Dialog dialog;
-    public int currentPosition;     //GN 当前增益进度条的位置
-    private boolean firstFind = true;   //GC20181119
-    private int positionState = -1;  //GC20181119 故障圈的大小状态
-    private int isRelatedCount = 0; //GC20181119 相关次数计数
+    public int currentPosition;
+    private boolean firstFind = true;
+    private int positionState = -1;
+    private int isRelatedCount = 0;
 
 
     @Override
@@ -264,7 +264,7 @@ public class UserMainActivity extends BaseActivity {
     }
 
     /**
-     * @param event 接收控制命令未响应   //GC20181118
+     * @param event 接收控制命令未响应
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(SendCommandNotRespondEvent event) {

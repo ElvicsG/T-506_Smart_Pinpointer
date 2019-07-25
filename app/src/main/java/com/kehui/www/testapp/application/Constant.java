@@ -24,7 +24,7 @@ public class Constant {
     public static String DeviceId = "";
 
     /**
-     * 硬件断开后，当前显示的声音、磁场、滤波模式参数  //GC2.01.006 蓝牙重连功能优化
+     * 硬件断开后，当前显示的声音、磁场、滤波模式参数  //GC20190407 蓝牙重连功能优化
      */
     public static byte[] CurrentVoiceParam;
     public static byte[] CurrentMagParam;

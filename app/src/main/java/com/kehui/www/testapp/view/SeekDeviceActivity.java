@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -19,7 +17,7 @@ import android.widget.Toast;
 
 import com.kehui.www.testapp.R;
 import com.kehui.www.testapp.application.MyApplication;
-import com.kehui.www.testapp.event.StartReadThreadEvent;
+import com.kehui.www.testapp.event.RestartGetStreamEvent;
 import com.kehui.www.testapp.ui.PercentLinearLayout;
 
 import org.greenrobot.eventbus.EventBus;
@@ -79,9 +77,6 @@ public class SeekDeviceActivity extends BaseActivity {
     }
 
     private void init() {
-        //G?
-        Button mBtSeek = (Button) this.findViewById(R.id.bt_seek_device);
-
         pairedDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name2);
         if (bluetooth == null) {
             Toast.makeText(this, getResources().getString(R.string.does_not_find_device), Toast.LENGTH_LONG)
@@ -260,7 +255,7 @@ public class SeekDeviceActivity extends BaseActivity {
         @Override
         public void run() {
             while (!needReconnect) {
-                Log.e(TAG, "reconnectThread线程，尝试连接");
+                Log.e(TAG, "reconnectThread线程，尝试重新连接");
                 reconnect();
             }
         }
@@ -297,7 +292,7 @@ public class SeekDeviceActivity extends BaseActivity {
             sharedata.putString(String.valueOf(1), device.getAddress());
             sharedata.apply();
             Log.e("蓝牙测试", "reconnectThread线程，走到这里");
-            EventBus.getDefault().post(new StartReadThreadEvent(device.getName()));
+            EventBus.getDefault().post(new RestartGetStreamEvent(device.getName()));
 
         } catch (IOException e) {
             try {

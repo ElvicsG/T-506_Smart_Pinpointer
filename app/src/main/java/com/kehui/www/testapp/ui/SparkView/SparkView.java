@@ -101,8 +101,9 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
 
     private float scX;
     public int startPoint;
+
     /**
-     * //GC20190216
+     * 红光标是否移动  //GC20190216
      */
     private boolean startMove;
 
@@ -158,7 +159,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         scrubLinePaint.setStyle(Paint.Style.STROKE);
         scrubLinePaint.setStrokeWidth(scrubLineWidth);
         scrubLinePaint.setColor(Color.RED);
-        //GC20190216 变为虚光标
+        //红色可移动光标变虚 //GC20190216
         scrubLinePaint.setAntiAlias(true);
         scrubLinePaint.setStrokeCap(Paint.Cap.SQUARE);
         scrubLinePaint.setPathEffect(new DashPathEffect(new float[]{6,20},0));
@@ -379,12 +380,13 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         canvas.drawPath(scrubLinePath, scrubLinePaint);
         canvas.drawPath(scrubLinePath2, scrubLinePaint2);
 
-        //GC20190216
+        //光标初始位置定义  //GC20190216
         if(scrubEnabled) {
+            //只在声音布局中画紫色实光标
             setScrubLine2(50);
         }
         if(!startMove && scrubEnabled) {
-            //setScrubLine(283);
+            //红色虚光标初始位置
             setScrubLine3(70);
         }
         //绘制灰色箭头图像
@@ -859,7 +861,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
                 scrubListener.onScrubbed(adapter.getItem(index));
             }
         }
-        //触摸有效范围   //GC2.01.006 蓝牙重连功能优化
+        //红色虚光标触摸有效范围    //GC20190216
         if(x >= 211.86 & x <= 1460) {
             setScrubLine(x);
         }

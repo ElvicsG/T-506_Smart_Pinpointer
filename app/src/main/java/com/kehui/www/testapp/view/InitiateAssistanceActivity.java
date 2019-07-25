@@ -262,7 +262,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
                 if (i == 34) {
                     handler.sendEmptyMessage(0);
                 }
-                //GC2.01.006 蓝牙重连功能优化
+                //硬件关闭重连功能添加    //GC20190407
                 if (!Constant.BluetoothState) {
                     handler.sendEmptyMessage(2);
                     return;
@@ -292,14 +292,13 @@ public class InitiateAssistanceActivity extends BaseActivity {
                 tvDataCollectionProgress.setText(counter + "%");
 
             }else if (msg.what == 2) {
-                //GC2.01.006 蓝牙重连功能优化
+                //硬件关闭重连功能添加    //GC20190407
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Utils.showToast(InitiateAssistanceActivity.this,getResources().getString(R.string
-                        .Link_Lost_Reconnect));
+                Utils.showToast(InitiateAssistanceActivity.this,getResources().getString(R.string.Link_Lost_Reconnect));
                 finish();
             }
             super.handleMessage(msg);
