@@ -13,8 +13,6 @@ import com.kehui.www.testapp.util.TripleDesUtils;
 import com.kehui.www.testapp.util.MultiLanguageUtil;
 import com.kehui.www.testapp.util.PrefUtils;
 
-import java.util.Locale;
-
 /**
  * @author 29062
  * @date 2016/11/09
@@ -30,14 +28,13 @@ public class MyApplication extends Application {
      * 24位密钥
      */
     public static final byte[] keyBytes = TripleDesUtils.hexToBytes(TripleDesUtils.byte2hex(key.getBytes()));
-    private DaoMaster.DevOpenHelper mHelper;
+
     private SQLiteDatabase db;
-    private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
     public static MyApplication instances;
-    private BluetoothSocket _socket;
-    private BluetoothDevice _device;
-    private BluetoothAdapter _bluetooth; // 获取本地蓝牙适配器，即蓝牙设备
+    private BluetoothSocket bluetoothSocket;
+    private BluetoothDevice bluetoothDevice;
+    private BluetoothAdapter bluetoothAdapter;
 
 
     @Override
@@ -46,14 +43,14 @@ public class MyApplication extends Application {
         MultiLanguageUtil.init(getApplicationContext());
         instances = this;
         MultiLanguageUtil.getInstance().updateLanguage(PrefUtils.getString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE, "follow_sys"));
-//        switchLanguage(PrefUtils.getString(MyApplication.getInstances(), AppConfig.CURRENT_LANGUAGE, "follow_sys"));
 
         setDatabase();
-        _socket = null;
-        _device = null; // 蓝牙设备
-        _bluetooth = BluetoothAdapter.getDefaultAdapter(); // 获取本地蓝牙适配器，即蓝牙设备// ...
-        // Do it on main process
-//        BlockCanary.install(this, new AppBlockCanaryContext()).start();
+        //蓝牙通信socket
+        bluetoothSocket = null;
+        //远程蓝牙设备
+        bluetoothDevice = null;
+        //本地蓝牙设备    获得本设备的蓝牙适配器实例
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     }
 
@@ -76,11 +73,11 @@ public class MyApplication extends Application {
         // 可能你已经注意到了，你并不需要去编写「CREATE TABLE」这样的 SQL 语句，因为 greenDAO 已经帮你做了。
         // 注意：默认的 DaoMaster.DevOpenHelper 会在数据库升级时，删除所有的表，意味着这将导致数据的丢失。
         // 所以，在正式的项目中，你还应该做一层封装，来实现数据库的安全升级。
-        mHelper = new DaoMaster.DevOpenHelper(this, "notes-db", null);
-        db = mHelper.getWritableDatabase();
+        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(this, "notes-db", null);
+        db = devOpenHelper.getWritableDatabase();
         // 注意：该数据库连接属于 DaoMaster，所以多个 Session 指的是相同的数据库连接。
-        mDaoMaster = new DaoMaster(db);
-        mDaoSession = mDaoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        mDaoSession = daoMaster.newSession();
     }
 
     public DaoSession getDaoSession() {
@@ -91,30 +88,28 @@ public class MyApplication extends Application {
         return db;
     }
 
-    public BluetoothSocket get_socket() {
-        return _socket;
+    public BluetoothSocket getBluetoothSocket() {
+        return bluetoothSocket;
     }
 
-    public void set_socket(BluetoothSocket _socket) {
-        this._socket = _socket;
+    public void setBluetoothSocket(BluetoothSocket bluetoothSocket) {
+        this.bluetoothSocket = bluetoothSocket;
     }
 
-    public BluetoothAdapter get_bluetooth() {
-        return _bluetooth;
+    public BluetoothAdapter getBluetoothAdapter() {
+        return bluetoothAdapter;
     }
 
-    public void set_bluetooth(BluetoothAdapter _bluetooth) {
-        this._bluetooth = _bluetooth;
+    public void setBluetoothAdapter(BluetoothAdapter bluetoothAdapter) {
+        this.bluetoothAdapter = bluetoothAdapter;
     }
 
-    public BluetoothDevice get_device() {
-        return _device;
+    public BluetoothDevice getBluetoothDevice() {
+        return bluetoothDevice;
     }
 
-    public void set_device(BluetoothDevice _device) {
-        this._device = _device;
+    public void setBluetoothDevice(BluetoothDevice bluetoothDevice) {
+        this.bluetoothDevice = bluetoothDevice;
     }
-
-
 
 }

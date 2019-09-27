@@ -1162,7 +1162,7 @@ public class MainActivity extends BaseActivity {
             finish();
             //按键返回bug  //GC20190407 蓝牙重连功能优化
             System.exit(0);
-            MyApplication.getInstances().get_bluetooth().disable();
+            MyApplication.getInstances().getBluetoothAdapter().disable();
             return true;
 
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {

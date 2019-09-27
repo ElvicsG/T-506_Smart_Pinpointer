@@ -74,11 +74,14 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * 蓝牙相关部分
      */
-    BluetoothDevice device = null;
-    BluetoothSocket socket = null;
-    private BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothSocket bluetoothSocket;
+    private BluetoothSocket reconnectSocket = null;
+
+    /**
+     * 获得本设备的蓝牙适配器实例      返回值：如果设备具备蓝牙功能，返回BluetoothAdapter 实例；否则，返回null对象
+     */
+    private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB";
-    public BluetoothSocket blueSocket;
     private boolean needReconnect;
 
     /**
@@ -105,7 +108,7 @@ public class BaseActivity extends AppCompatActivity {
     public boolean hasLeft;
 
     /**
-     * 解密packageBean需要的解析常量数组
+     * 解码packageBean需要的解析常量数组
      */
     public int[] indexTable = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
     public int[] stepSizeTable = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31,
@@ -219,7 +222,6 @@ public class BaseActivity extends AppCompatActivity {
      */
     private void initData() {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        blueSocket = MyApplication.getInstances().get_socket();
 
         sendCommand = new byte[7];
         //缓存的蓝牙数据
@@ -415,11 +417,10 @@ public class BaseActivity extends AppCompatActivity {
      */
     private void startGetStream() {
         try {
-            //进入演示模式后打开仪器依旧可以正常连接
-            blueSocket = MyApplication.getInstances().get_socket();
-            if (blueSocket != null) {
+            bluetoothSocket = MyApplication.getInstances().getBluetoothSocket();
+            if (bluetoothSocket != null) {
                 //通过蓝牙socket获得输入流
-                inputStream = blueSocket.getInputStream();
+                inputStream = bluetoothSocket.getInputStream();
             }
         } catch (IOException e) {
             Toast.makeText(this, getResources().getString(R.string
@@ -549,7 +550,6 @@ public class BaseActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             while (!needReconnect) {
-                                Log.e(TAG, "尝试重新连接");
                                 reconnect();
                             }
                         }
@@ -567,30 +567,31 @@ public class BaseActivity extends AppCompatActivity {
         //读取设置数据
         SharedPreferences shareData = getSharedPreferences("Add", 0);
         String address = shareData.getString(String.valueOf(1), null);
-        //得到蓝牙设备句柄
-        device = bluetooth.getRemoteDevice(address);
+        //获取远程蓝牙设备
+        BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
         //用服务号得到socket
         try {
-            socket = device.createRfcommSocketToServiceRecord(UUID.fromString(MY_UUID));
-            MyApplication.getInstances().set_socket(socket);
-            MyApplication.getInstances().set_device(device);
-            MyApplication.getInstances().set_bluetooth(bluetooth);
+            reconnectSocket = bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString(MY_UUID));
+            MyApplication.getInstances().setBluetoothSocket(reconnectSocket);
+            MyApplication.getInstances().setBluetoothDevice(bluetoothDevice);
+            MyApplication.getInstances().setBluetoothAdapter(bluetoothAdapter);
 
         } catch (IOException e) {
 //            Toast.makeText(this, getResources().getString(R.string.Connection_failed_unable_to_get_Socket) + e, Toast.LENGTH_SHORT).show();
         }
         //连接socket
         try {
-            if (socket != null) {
-                socket.connect();
+            if (reconnectSocket != null) {
+                reconnectSocket.connect();
                 needReconnect = true;
-                EventBus.getDefault().post(new RestartGetStreamEvent(device.getName()));
+                EventBus.getDefault().post(new RestartGetStreamEvent(bluetoothDevice.getName()));
+                Log.e(TAG, "尝试重新连接成功");
             }
 
         } catch (IOException e) {
             try {
-                socket.close();
-                socket = null;
+                reconnectSocket.close();
+                reconnectSocket = null;
                 Log.e(TAG, "尝试重新连接走到异常");
                 Thread.sleep(10000);
             } catch (Exception ignored) {
@@ -747,13 +748,12 @@ public class BaseActivity extends AppCompatActivity {
     public void sendCommand(byte[] command) {
         if (!hasSentCommand) {
             System.arraycopy(command, 0, sendCommand, 0, command.length);
-            if (blueSocket == null) {
-                Toast.makeText(this, getResources().getString(R.string.Bluetooth_is_not_connected),
-                        Toast.LENGTH_SHORT).show();
+            if (bluetoothSocket == null) {
+                Toast.makeText(this, getResources().getString(R.string.Bluetooth_is_not_connected), Toast.LENGTH_SHORT).show();
             }
             try {
                 //蓝牙输出流
-                OutputStream os = blueSocket.getOutputStream();
+                OutputStream os = bluetoothSocket.getOutputStream();
                 os.write(command);
                 EventBus.getDefault().post(new SendCommandFinishEvent());
                 hasSentCommand = true;
@@ -1751,7 +1751,7 @@ public class BaseActivity extends AppCompatActivity {
             // 关闭并释放资源
             mAudioTrack.release();
             try {
-                blueSocket.close();
+                bluetoothSocket.close();
                 if (inputStream != null) {
                     inputStream.close();
                 }

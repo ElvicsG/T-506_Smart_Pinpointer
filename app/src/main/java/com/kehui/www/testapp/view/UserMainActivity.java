@@ -728,7 +728,7 @@ public class UserMainActivity extends BaseActivity {
             isExit = true;
             mAudioTrack.release();// 关闭并释放资源
             finish();
-            MyApplication.getInstances().get_bluetooth().disable();
+            MyApplication.getInstances().getBluetoothAdapter().disable();
 
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             handle.postDelayed(new Runnable() {
