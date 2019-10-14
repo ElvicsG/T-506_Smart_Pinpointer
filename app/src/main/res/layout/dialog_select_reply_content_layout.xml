@@ -18,7 +18,7 @@
             android:padding="8dp"
             android:text="@string/replied"
             android:textColor="@color/gray4"
-            android:textSize="12dp" />
+            android:textSize="@dimen/base_dimen_12sp" />
 
         <View
             android:layout_width="match_parent"
@@ -32,7 +32,6 @@
             android:padding="8dp"
             android:text="@string/no_reply"
             android:textColor="@color/gray4"
-            android:textSize="12dp" />
+            android:textSize="@dimen/base_dimen_12sp" />
     </LinearLayout>
-
 </LinearLayout>

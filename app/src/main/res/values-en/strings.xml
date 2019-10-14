@@ -70,7 +70,7 @@
     <string name="cable_length">Cable length</string>
     <string name="cable_type2">Voltage level</string>
     <string name="fault_type">Fault Type</string>
-    <string name="fault_length">Location of fault</string>
+    <string name="fault_length">Fault Location</string>
     <string name="short_note">Notes</string>
     <string name="short_note_info">Notes</string>
     <string name="data_collection">Collect data</string>

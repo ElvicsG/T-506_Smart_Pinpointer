@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_expert">
 
-
     <com.kehui.www.testapp.ui.PercentLinearLayout
         android:id="@+id/ll_right"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:orientation="vertical"
         app:layout_widthPercent="16%">
 
@@ -20,24 +19,24 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_heightPercent="15%">
+            app:layout_heightPercent="13%">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawablePadding="10dp"
-                android:drawableRight="@drawable/ic_synchronize_light"
+                android:drawableEnd="@drawable/ic_synchronize_light"
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="@string/synchronize_light"
                 android:textColor="@color/blue7"
                 android:visibility="gone"
-                android:textSize="14dp" />
+                android:textSize="@dimen/base_dimen_14sp" />
 
             <ImageView
                 android:id="@+id/iv_synchronize_status"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/base_dimen_50dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/light_gray"/>
 
@@ -53,21 +52,21 @@
                     android:layout_height="wrap_content"
                     android:text="@string/status"
                     android:textColor="@color/blue7"
-                    android:textSize="14dp" />
+                    android:textSize="@dimen/base_dimen_14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=" : "
                     android:textColor="@color/blue7"
-                    android:textSize="14dp" />
+                    android:textSize="@dimen/base_dimen_14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2525Oe"
                     android:textColor="@color/blue7"
-                    android:textSize="14dp" />
+                    android:textSize="@dimen/base_dimen_14sp" />
             </LinearLayout>
         </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -89,18 +88,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/mute"
-
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
 
                 <ImageView
                     android:id="@+id/iv_silence"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_open_voice" />
             </LinearLayout>
 
@@ -118,17 +115,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/pause"
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
 
                 <ImageView
                     android:id="@+id/iv_play"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_stop" />
             </LinearLayout>
 
@@ -145,16 +141,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/memory"
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_memory" />
             </LinearLayout>
 
@@ -172,15 +167,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/compare"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_compare" />
             </LinearLayout>
 
@@ -198,15 +192,15 @@
                     android:layout_height="wrap_content"
                     android:drawablePadding="10dp"
                     android:gravity="center"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/filter"
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_filter" />
             </LinearLayout>
 
@@ -224,14 +218,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/assist"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_assist" />
             </LinearLayout>
 
@@ -249,14 +243,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/setting"
-                    android:maxWidth="50dp"
-                    android:minWidth="50dp"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
                     android:textColor="@color/blue3"
-                    android:textSize="12dp" />
+                    android:textSize="@dimen/base_dimen_13sp" />
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_setting" />
             </LinearLayout>
 
@@ -267,12 +261,10 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-
                 <LinearLayout
                     android:id="@+id/ll_mode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:background="@drawable/bg_mode">
 
                     <ImageView
@@ -292,19 +284,18 @@
 
                     <TextView
                         android:id="@+id/tv_mode"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="@string/user_mode"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:textColor="@color/blue8"
-                        android:textSize="12dp" />
+                        android:textSize="@dimen/base_dimen_12sp" />
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
     </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -312,7 +303,7 @@
         android:id="@+id/rl_left"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@id/ll_right"
+        android:layout_toStartOf="@id/ll_right"
         android:orientation="vertical">
 
         <LinearLayout
@@ -331,14 +322,14 @@
                 android:layout_gravity="center"
                 android:text="@string/message_notice_5"
                 android:textColor="@color/blue9"
-                android:textSize="18dp" />
+                android:textSize="@dimen/base_dimen_18sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="7dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="7dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_expert_gain"
             android:gravity="center_vertical"
@@ -354,30 +345,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:drawableLeft="@drawable/ic_magnetic_field"
+                    android:drawableStart="@drawable/ic_magnetic_field"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
                     android:text="@string/magnetic_field"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
-
-                <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:gravity="center_vertical"-->
-                <!--android:text="252e0"-->
-                <!--android:textColor="@color/white"-->
-                <!--android:textSize="16dp" />-->
-
+                    android:textSize="@dimen/base_dimen_15sp"
+                    tools:ignore="RtlSymmetry" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
+                android:layout_marginEnd="15dp"
                 android:layout_weight="1.5"
                 android:gravity="center_vertical">
 
@@ -386,16 +367,16 @@
                     android:layout_height="wrap_content"
                     android:text="0%"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
+                    android:textSize="@dimen/base_dimen_16sp" />
 
                 <SeekBar
                     android:id="@+id/seekbar_cichang"
                     style="@style/Widget.SeekBar.Normal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_weight="1"
-                    android:thumb="@drawable/seek_bar_thumb3" />
+                    android:thumb="@drawable/seek_bar_thumb3"
+                    tools:ignore="NestedWeights" />
 
                 <TextView
                     android:id="@+id/tv_cichang_value"
@@ -403,9 +384,8 @@
                     android:layout_height="wrap_content"
                     android:text="70%"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
+                    android:textSize="@dimen/base_dimen_16sp" />
             </LinearLayout>
-
         </LinearLayout>
 
         <RelativeLayout
@@ -420,25 +400,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
-                app:spark_lineColor="@color/blue3"></com.kehui.www.testapp.ui.SparkView.SparkView>
+                app:spark_lineColor="@color/blue3" />
 
             <TextView
                 android:id="@+id/tv_position"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="25dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="25dp"
                 android:text=""
                 android:textColor="@color/blue3"
-                android:textSize="@dimen/activity_vertical_margin" />
-
+                android:textSize="@dimen/base_dimen_16sp"
+                tools:text="@string/left" />
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="7dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="7dp"
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_expert_gain"
             android:gravity="center_vertical"
@@ -454,30 +434,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:drawableLeft="@drawable/ic_voice"
+                    android:drawableStart="@drawable/ic_voice"
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
-                    android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
                     android:text="@string/shengyin_name"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
-
-                <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:gravity="center_vertical"-->
-                <!--android:text="442Hz"-->
-                <!--android:textColor="@color/white"-->
-                <!--android:textSize="16dp" />-->
-
+                    android:textSize="@dimen/base_dimen_15sp"
+                    tools:ignore="RtlSymmetry" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
+                android:layout_marginEnd="15dp"
                 android:layout_weight="1.5"
                 android:gravity="center_vertical">
 
@@ -486,16 +456,16 @@
                     android:layout_height="wrap_content"
                     android:text="0%"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
+                    android:textSize="@dimen/base_dimen_16sp" />
 
                 <SeekBar
                     android:id="@+id/seekbar_shengyin"
                     style="@style/Widget.SeekBar.Normal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_weight="1"
-                    android:thumb="@drawable/seek_bar_thumb3" />
+                    android:thumb="@drawable/seek_bar_thumb3"
+                    tools:ignore="NestedWeights" />
 
                 <TextView
                     android:id="@+id/tv_shengyin_value"
@@ -503,9 +473,8 @@
                     android:layout_height="wrap_content"
                     android:text="70%"
                     android:textColor="@color/white"
-                    android:textSize="16dp" />
+                    android:textSize="@dimen/base_dimen_16sp" />
             </LinearLayout>
-
         </LinearLayout>
 
         <RelativeLayout
@@ -521,20 +490,20 @@
                 android:layout_height="match_parent"
                 android:padding="10dp"
                 app:spark_lineColor="@color/blue3"
-                app:spark_scrubEnabled="true"></com.kehui.www.testapp.ui.SparkView.SparkView>
+                app:spark_scrubEnabled="true" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="25dp">
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="25dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/Sound_field_delay"
                     android:textColor="@color/blue3"
-                    android:textSize="@dimen/activity_vertical_margin" />
+                    android:textSize="@dimen/base_dimen_16sp" />
 
                 <TextView
                     android:id="@+id/tv_yan_shi"
@@ -542,15 +511,14 @@
                     android:layout_height="wrap_content"
                     android:text="2.5ms"
                     android:textColor="@color/blue3"
-                    android:textSize="@dimen/activity_vertical_margin"/>
+                    android:textSize="@dimen/base_dimen_16sp"/>
             </LinearLayout>
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_heightPercent="0.3%"></LinearLayout>
+            app:layout_heightPercent="1%"></LinearLayout>
 
     </com.kehui.www.testapp.ui.PercentLinearLayout>
-
 </android.support.percent.PercentRelativeLayout>

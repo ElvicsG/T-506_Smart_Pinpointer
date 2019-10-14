@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.kehui.www.testapp.ui.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                              xmlns:tools="http://schemas.android.com/tools"
-                                              android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_user_main2"
     android:orientation="vertical">
@@ -18,11 +18,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/iv_assist_list_text" />
-
     </LinearLayout>
 
     <com.kehui.www.testapp.ui.PercentLinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal">
@@ -52,12 +51,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:drawableLeft="@drawable/ic_voice"
+                        android:drawableStart="@drawable/ic_voice"
                         android:drawablePadding="5dp"
                         android:gravity="center"
                         android:text="@string/shengyin_name"
                         android:textColor="@color/white"
-                        android:textSize="16dp" />
+                        android:textSize="@dimen/base_dimen_15sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -68,8 +67,8 @@
 
                     <com.kehui.www.testapp.ui.TempControlView
                         android:id="@+id/voice_gain_control_u"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="@dimen/base_dimen_120dp"
+                        android:layout_height="@dimen/base_dimen_120dp"
                         android:layout_gravity="center" />
                 </LinearLayout>
 
@@ -86,7 +85,6 @@
                         android:src="@drawable/ic_voice_gain_0" />
                 </LinearLayout>
             </com.kehui.www.testapp.ui.PercentLinearLayout>
-
         </com.kehui.www.testapp.ui.PercentLinearLayout>
 
         <RelativeLayout
@@ -102,24 +100,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_user_main_notice"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/tv_notice_u"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="40dp"
-                    android:layout_weight="1"
+                    android:layout_marginBottom="@dimen/base_dimen_5dp"
                     android:gravity="center"
                     android:text="@string/message_notice_5"
                     android:textColor="@color/blue"
-                    android:textSize="18dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    app:layout_heightPercent="4%"></LinearLayout>
-
+                    android:textSize="@dimen/base_dimen_18sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
             <LinearLayout
@@ -143,33 +135,30 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
                             android:orientation="horizontal">
 
                             <TextView
                                 android:id="@+id/tv_current_delay_u"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="5dp"
                                 android:layout_weight="1"
-                                android:gravity="center_vertical"
+                                android:gravity="center"
                                 android:padding="5dp"
                                 android:text=""
                                 android:textColor="@color/blue3"
-                                android:textSize="14dp"
+                                android:textSize="@dimen/base_dimen_14sp"
                                 android:textStyle="bold" />
-
                         </LinearLayout>
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="0dp"
                             android:layout_weight="1">
 
                             <RelativeLayout
                                 android:id="@+id/rl_wave_u"
-                                android:layout_width="130dp"
-                                android:layout_height="135dp"
+                                android:layout_width="@dimen/base_dimen_130dp"
+                                android:layout_height="@dimen/base_dimen_135dp"
                                 android:layout_gravity="center"
                                 android:orientation="horizontal">
 
@@ -184,9 +173,10 @@
                                     android:id="@+id/ccv_second_u"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_centerInParent="true"
+                                    android:layout_alignTop="@+id/ccv_first_u"
+                                    android:layout_centerHorizontal="true"
+                                    android:layout_marginTop="0dp"
                                     android:visibility="visible" />
-
                             </RelativeLayout>
 
                             <LinearLayout
@@ -202,13 +192,14 @@
                                     android:layout_height="wrap_content"
                                     android:text="@string/message_notice_5"
                                     android:textColor="@color/yellow5"
-                                    android:textStyle="bold" />
+                                    android:textStyle="bold"
+                                    android:textSize="@dimen/base_dimen_14sp" />
 
                                 <ImageView
                                     android:id="@+id/iv_scan_u"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginStart="5dp"
                                     android:src="@drawable/ic_wait_empty" />
                             </LinearLayout>
                         </RelativeLayout>
@@ -216,7 +207,6 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
                             android:orientation="horizontal">
 
                             <TextView
@@ -225,11 +215,11 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="5dp"
                                 android:layout_weight="1"
-                                android:gravity="center_vertical"
+                                android:gravity="center"
                                 android:padding="6dp"
                                 android:text=""
                                 android:textColor="@color/yellow3"
-                                android:textSize="13dp"
+                                android:textSize="@dimen/base_dimen_13sp"
                                 android:textStyle="bold"
                                 tools:visibility="invisible"/>
                         </LinearLayout>
@@ -248,7 +238,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/min_delay"
                                 android:textColor="@color/yellow3"
-                                android:textSize="14dp"/>
+                                android:textSize="@dimen/base_dimen_14sp"/>
 
                             <TextView
                                 android:id="@+id/tv_min_delay_value_u"
@@ -256,9 +246,8 @@
                                 android:layout_height="wrap_content"
                                 android:text="1.256"
                                 android:textColor="@color/yellow3"
-                                android:textSize="14dp"/>
+                                android:textSize="@dimen/base_dimen_14sp"/>
                         </LinearLayout>
-
                     </LinearLayout>
 
                     <TextView
@@ -268,13 +257,13 @@
                         android:padding="3dp"
                         android:text="@string/Sound_field_delay2"
                         android:textColor="@color/yellow3"
-                        android:textSize="16dp" />
+                        android:textSize="@dimen/base_dimen_16sp" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"></LinearLayout>
+                    android:layout_weight="1" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -310,7 +299,30 @@
                                 android:layout_gravity="center"
                                 android:layout_weight="1"
                                 android:src="@drawable/bg_user_main_right" />
+                        </LinearLayout>
 
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_user_main_positon">
+
+                            <ImageView
+                                android:id="@+id/iv_position_left"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                android:src="@drawable/ic_user_main_notice_point"
+                                android:visibility="invisible" />
+
+                            <ImageView
+                                android:id="@+id/iv_position_right"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                android:src="@drawable/ic_user_main_notice_point"
+                                android:visibility="visible" />
                         </LinearLayout>
 
                         <ImageView
@@ -318,8 +330,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:layout_marginLeft="50dp"
-                            android:src="@drawable/ic_user_main_notice_point" />
+                            android:layout_marginStart="50dp"
+                            android:src="@drawable/ic_user_main_notice_point"
+                            android:visibility="invisible" />
                     </RelativeLayout>
 
                     <TextView
@@ -329,9 +342,8 @@
                         android:padding="3dp"
                         android:text="@string/pinpointer_position"
                         android:textColor="@color/blue3"
-                        android:textSize="16dp" />
+                        android:textSize="@dimen/base_dimen_16sp" />
                 </LinearLayout>
-
             </LinearLayout>
         </RelativeLayout>
 
@@ -359,14 +371,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:drawableLeft="@drawable/ic_magnetic_field"
+                        android:drawableStart="@drawable/ic_magnetic_field"
                         android:drawablePadding="5dp"
                         android:gravity="center"
                         android:text="@string/magnetic_field"
                         android:textColor="@color/white"
-                        android:textSize="16dp" />
+                        android:textSize="@dimen/base_dimen_15sp" />
                 </LinearLayout>
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -376,8 +387,8 @@
 
                     <com.kehui.www.testapp.ui.TempControlView
                         android:id="@+id/magnetic_field_gain_control_u"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="@dimen/base_dimen_120dp"
+                        android:layout_height="@dimen/base_dimen_120dp"
                         android:layout_gravity="center" />
                 </LinearLayout>
 
@@ -394,10 +405,7 @@
                         android:src="@drawable/ic_magnetic_field_gain_0" />
                 </LinearLayout>
             </com.kehui.www.testapp.ui.PercentLinearLayout>
-
-
         </com.kehui.www.testapp.ui.PercentLinearLayout>
-
 
     </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -416,7 +424,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginRight="5dp"
+                android:layout_marginStart="5dp"
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -432,16 +440,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
-
                     android:text="@string/mute"
                     android:textColor="@color/blue3"
-                    android:textSize="14dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    app:layout_heightPercent="3%"></LinearLayout>
-
+                    android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
             <com.kehui.www.testapp.ui.PercentLinearLayout
@@ -449,7 +450,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -464,12 +465,7 @@
                     android:gravity="center"
                     android:text="@string/filter"
                     android:textColor="@color/blue3"
-                    android:textSize="14dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    app:layout_heightPercent="3%"></LinearLayout>
+                    android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
             <com.kehui.www.testapp.ui.PercentLinearLayout
@@ -477,7 +473,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -492,12 +488,7 @@
                     android:gravity="center"
                     android:text="@string/assist"
                     android:textColor="@color/blue3"
-                    android:textSize="14dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    app:layout_heightPercent="3%"></LinearLayout>
+                    android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
             <com.kehui.www.testapp.ui.PercentLinearLayout
@@ -505,7 +496,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -520,12 +511,7 @@
                     android:gravity="center"
                     android:text="@string/setting"
                     android:textColor="@color/blue3"
-                    android:textSize="14dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    app:layout_heightPercent="3%"></LinearLayout>
+                    android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
         </LinearLayout>
@@ -535,10 +521,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginBottom="20dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginEnd="30dp"
             android:background="@drawable/bg_mode">
 
             <ImageView
@@ -558,17 +544,16 @@
 
             <TextView
                 android:id="@+id/tv_mode_u"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:gravity="center"
                 android:text="@string/expert_mode"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:textColor="@color/blue8"
-                android:textSize="12dp" />
+                android:textSize="@dimen/base_dimen_12sp" />
         </LinearLayout>
     </RelativeLayout>
-
-
 </com.kehui.www.testapp.ui.PercentLinearLayout>

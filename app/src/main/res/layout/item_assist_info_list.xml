@@ -20,8 +20,9 @@
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
-            android:paddingRight="10dp"
-            android:layout_marginLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/ic_assist_no_reply" />
 
         <TextView
@@ -30,7 +31,7 @@
             android:layout_gravity="center"
             android:text="@string/test_time"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,7 +39,7 @@
             android:layout_gravity="center"
             android:text=" : "
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_test_time"
@@ -47,16 +48,16 @@
             android:layout_gravity="center"
             android:text="2018-4-25 10:52"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:text="@string/test_name2"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -64,37 +65,36 @@
             android:layout_gravity="center"
             android:text=" : "
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_test_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="黎明"
+            android:ellipsize="end"
             android:maxEms="10"
             android:singleLine="true"
-            android:ellipsize="end"
+            android:text="科汇"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:orientation="horizontal"
-        android:layout_centerVertical="true">
+        android:orientation="horizontal">
+
         <ImageView
             android:id="@+id/iv_reply_status2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
-            android:paddingRight="10dp"
-            android:layout_marginLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/ic_assist_no_reply" />
-        <!--android:layout_marginLeft="10dp"-->
 
         <TextView
             android:id="@+id/tv_report_status_text"
@@ -103,7 +103,7 @@
             android:layout_gravity="center"
             android:text="@string/report_status"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_report_status_text_colon"
@@ -112,7 +112,7 @@
             android:layout_gravity="center"
             android:text=" : "
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_report_status"
@@ -121,17 +121,17 @@
             android:layout_gravity="center"
             android:text="未上报"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_reply_status_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:text="@string/reply_status"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_reply_status_text_colon"
@@ -140,7 +140,7 @@
             android:layout_gravity="center"
             android:text=" : "
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
 
         <TextView
             android:id="@+id/tv_reply_status"
@@ -149,17 +149,15 @@
             android:layout_gravity="center"
             android:text="未回复"
             android:textColor="@color/white"
-            android:textSize="14dp" />
+            android:textSize="@dimen/base_dimen_14sp" />
     </LinearLayout>
 
     <com.fang.dashview.DashView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/ll_container"
         app:dashOrientation="0"
         app:dashWidth="2dp"
         app:lineColor="@color/blue4"
         app:lineHeight="0.5dp"
         app:lineWidth="5dp" />
-
 </LinearLayout>

@@ -32,7 +32,7 @@
             android:layout_margin="10dp"
             android:textColor="@color/blue2"
             android:id="@+id/tv_app_name"
-            android:textSize="35dp" />
+            android:textSize="@dimen/base_dimen_34sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -41,22 +41,18 @@
             android:layout_marginBottom="10dp"
             android:text="@string/company_name2"
             android:textColor="@color/blue2"
-            android:textSize="18dp" />
+            android:textSize="@dimen/base_dimen_18sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-
             android:src="@drawable/ic_mark" />
-
 
         <TextView
             android:id="@+id/tv_version2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:text="@string/version_code"
@@ -75,5 +71,5 @@
         android:layout_marginBottom="15dp"
         android:text="@string/start_to_use"
         android:textColor="@color/blue3"
-        android:textSize="18sp" />
+        android:textSize="@dimen/base_dimen_18sp" />
 </com.kehui.www.testapp.ui.PercentLinearLayout>

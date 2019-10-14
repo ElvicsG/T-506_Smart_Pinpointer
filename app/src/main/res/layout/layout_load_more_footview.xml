@@ -20,18 +20,17 @@
             android:indeterminate="false"
             android:visibility="invisible" />
 
-
         <TextView
             android:id="@+id/tvLoadText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/pbLoad"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/pbLoad"
             android:clickable="true"
             android:textColor="@color/gray2"
-            android:textSize="13sp" />
+            android:textSize="@dimen/base_dimen_13sp"
+            android:focusable="true" />
     </RelativeLayout>
-
 </LinearLayout>

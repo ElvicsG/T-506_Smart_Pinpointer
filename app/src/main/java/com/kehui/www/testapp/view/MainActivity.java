@@ -131,6 +131,10 @@ public class MainActivity extends BaseActivity {
     TextView tvNoticeU;
     @BindView(R.id.iv_position_u)
     ImageView ivPositionU;
+    @BindView(R.id.iv_position_right)
+    ImageView ivPositionRight;
+    @BindView(R.id.iv_position_left)
+    ImageView ivPositionLeft;
     @BindView(R.id.ll_voice_u)
     PercentLinearLayout llVoiceU;
     @BindView(R.id.ll_filter_u)
@@ -244,14 +248,14 @@ public class MainActivity extends BaseActivity {
         ivScanU.setVisibility(View.GONE);
         //画动画2
         //颜色改动之前——灰色"#555555"  "黄色#e1de04"
-        ccvFirstU.updateView("#00ffde", 8, 33);
+        ccvFirstU.updateView("#00ffde", 8, 19);
         //GC20190724
         ccvFirstU.setVisibility(View.VISIBLE);
         tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
         tvCurrentDelayU.setText(getString(R.string.current) + currentDelayValue + "ms");*/
 
         //设置探头位置
-        layoutParams = new ViewGroup.MarginLayoutParams(ivPositionU.getLayoutParams());
+        //GC20191011 layoutParams = new ViewGroup.MarginLayoutParams(ivPositionU.getLayoutParams());
         //设置磁场增益显示
         magneticFieldGainControlU.setArcColor("#a03225");
         magneticFieldGainControlU.setDialColor1("#a03225");
@@ -636,16 +640,22 @@ public class MainActivity extends BaseActivity {
         if (event.status == POSITION_RIGHT) {
             tvPosition.setText(getResources().getString(R.string.right));
             //GC20190215 界面无缝切换
-            layoutParams.setMargins(Utils.dp2px(MainActivity.this, 100), Utils.dp2px(MainActivity.this, 50), 0, 0);
+            /*layoutParams.setMargins(Utils.dp2px(MainActivity.this, 100), Utils.dp2px(MainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
-            ivPositionU.setLayoutParams(params);
+            ivPositionU.setLayoutParams(params);*/
+            //设置探头位置 //GC20191011
+            ivPositionRight.setVisibility(View.VISIBLE);
+            ivPositionLeft.setVisibility(View.INVISIBLE);
         }
         if (event.status == POSITION_LEFT) {
             tvPosition.setText(getResources().getString(R.string.left));
             //GC20190215 界面无缝切换
-            layoutParams.setMargins(Utils.dp2px(MainActivity.this, 40), Utils.dp2px(MainActivity.this, 50), 0, 0);
+            /*layoutParams.setMargins(Utils.dp2px(MainActivity.this, 40), Utils.dp2px(MainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
-            ivPositionU.setLayoutParams(params);
+            ivPositionU.setLayoutParams(params);*/
+            //设置探头位置 //GC20191011
+            ivPositionRight.setVisibility(View.INVISIBLE);
+            ivPositionLeft.setVisibility(View.VISIBLE);
         }
 
         if (event.status == LIGHT_UP) {

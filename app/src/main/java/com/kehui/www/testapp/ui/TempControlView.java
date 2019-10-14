@@ -97,7 +97,8 @@ public class TempControlView extends View {
 
         arcPaint = new Paint();
         arcPaint.setAntiAlias(true);
-        arcPaint.setColor(Color.parseColor(arcColor));//#a03225
+        //#a03225
+        arcPaint.setColor(Color.parseColor(arcColor));
         arcPaint.setStrokeWidth(dp2px(1));
         arcPaint.setStyle(Paint.Style.STROKE);
 
@@ -110,7 +111,8 @@ public class TempControlView extends View {
         tempFlagPaint = new Paint();
         tempFlagPaint.setAntiAlias(true);
         tempFlagPaint.setTextSize(sp2px(10));
-        tempFlagPaint.setColor(Color.parseColor(valueColor));//d0210e
+        //d0210e
+        tempFlagPaint.setColor(Color.parseColor(valueColor));
         tempFlagPaint.setStyle(Paint.Style.STROKE);
 
         buttonPaint = new Paint();
@@ -120,10 +122,10 @@ public class TempControlView extends View {
         tempPaint = new Paint();
         tempPaint.setAntiAlias(true);
         tempPaint.setTextSize(sp2px(10));
-        tempPaint.setColor(Color.parseColor(currentValueColor));//#a03225
+        //#a03225
+        tempPaint.setColor(Color.parseColor(currentValueColor));
         tempPaint.setStyle(Paint.Style.STROKE);
     }
-
 
     private String arcColor = "#000000";
 
@@ -133,7 +135,8 @@ public class TempControlView extends View {
         arcPaint.reset();
         arcPaint = new Paint();
         arcPaint.setAntiAlias(true);
-        arcPaint.setColor(Color.parseColor(arcColor));//#a03225
+        //#a03225
+        arcPaint.setColor(Color.parseColor(arcColor));
         arcPaint.setStrokeWidth(dp2px(1));
         arcPaint.setStyle(Paint.Style.STROKE);
 

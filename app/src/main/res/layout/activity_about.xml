@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="300dp"
-                android:layout_height="200dp"
-                android:background="@android:color/white">
+    android:layout_width="300dp"
+    android:layout_height="200dp"
+    android:background="@android:color/white">
 
     <RelativeLayout
         android:id="@+id/top_relative"
@@ -15,11 +15,10 @@
             android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="7.0dip"
-            android:layout_marginTop="2.0dip"
+            android:layout_marginStart="7.0dp"
+            android:layout_marginTop="2.0dp"
             android:background="@drawable/return_back"
-            android:visibility="invisible"
-        />
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/title_text"
@@ -41,7 +40,7 @@
         <LinearLayout
             android:id="@+id/unit_clear"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <ImageView
@@ -50,8 +49,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="15dp"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/app_icon"
-            />
+                android:background="@drawable/app_icon" />
+
             <RelativeLayout
                 android:id="@+id/more_page_update"
                 android:layout_width="match_parent"
@@ -59,8 +58,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@android:color/white"
                 android:clickable="true"
-            >
-
+                android:focusable="true">
 
                 <me.grantland.widget.AutofitTextView
                     android:id="@+id/tv_version"
@@ -68,12 +66,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:singleLine="true"
                     android:text="@string/version_code"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"/>
-
             </RelativeLayout>
 
             <RelativeLayout
@@ -83,8 +80,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@android:color/white"
                 android:clickable="true"
-            >
-
+                android:focusable="true">
 
                 <me.grantland.widget.AutofitTextView
                     android:id="@+id/tv_mingcheng"
@@ -92,12 +88,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:singleLine="true"
                     android:text="@string/t_506"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"/>
-
             </RelativeLayout>
 
             <RelativeLayout
@@ -107,8 +102,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@android:color/white"
                 android:clickable="true"
-            >
-
+                android:focusable="true">
 
                 <me.grantland.widget.AutofitTextView
                     android:id="@+id/tv_gongsimingcheng"
@@ -116,12 +110,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:singleLine="true"
                     android:text="@string/company_name"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"/>
-
             </RelativeLayout>
 
             <RelativeLayout
@@ -131,8 +124,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@android:color/white"
                 android:clickable="true"
-            >
-
+                android:focusable="true">
 
                 <me.grantland.widget.AutofitTextView
                     android:id="@+id/tv_gongsiwangzhi"
@@ -140,16 +132,12 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:singleLine="true"
                     android:text="@string/company_website"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"/>
-
             </RelativeLayout>
-
-
         </LinearLayout>
     </ScrollView>
-
 </RelativeLayout>

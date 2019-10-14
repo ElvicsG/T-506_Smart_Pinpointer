@@ -8,8 +8,8 @@ android {
         applicationId "com.kehui.www.testapp"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 10
-        versionName "2.01.009"
+        versionCode 11
+        versionName "2.01.010"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
