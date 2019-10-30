@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -278,14 +280,14 @@ public class MainActivity extends BaseActivity {
                 int[] ints = {96, 0, 128 + b2s(temp)};
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
-                StringBuffer ss = new StringBuffer();
+                StringBuilder ss = new StringBuilder();
                 if (s.length() <= 32) {
                     for (int i = 0; i < (32 - s.length()); i++) {
                         ss.append("0");
                     }
                     s = ss.toString() + s;
                 } else {
-                    s = s.substring(s.length() - 32, s.length());
+                    s = s.substring(s.length() - 32);
                 }
                 String substring1 = s.substring(0, 8);
                 String substring2 = s.substring(8, 16);
@@ -332,14 +334,14 @@ public class MainActivity extends BaseActivity {
                 int[] ints = {96, 0, b2s(temp)};
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
-                StringBuffer ss = new StringBuffer();
+                StringBuilder ss = new StringBuilder();
                 if (s.length() <= 32) {
                     for (int i = 0; i < (32 - s.length()); i++) {
                         ss.append("0");
                     }
                     s = ss.toString() + s;
                 } else {
-                    s = s.substring(s.length() - 32, s.length());
+                    s = s.substring(s.length() - 32);
                 }
                 String substring1 = s.substring(0, 8);
                 String substring2 = s.substring(8, 16);
@@ -396,14 +398,14 @@ public class MainActivity extends BaseActivity {
                 int[] ints = {96, 0, 128 + b2s(seekBar.getProgress())};
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
-                StringBuffer ss = new StringBuffer();
+                StringBuilder ss = new StringBuilder();
                 if (s.length() <= 32) {
                     for (int i = 0; i < (32 - s.length()); i++) {
                         ss.append("0");
                     }
                     s = ss.toString() + s;
                 } else {
-                    s = s.substring(s.length() - 32, s.length());
+                    s = s.substring(s.length() - 32);
                 }
                 String substring1 = s.substring(0, 8);
                 String substring2 = s.substring(8, 16);
@@ -452,14 +454,14 @@ public class MainActivity extends BaseActivity {
                 int[] ints = {96, 0, b2s(seekBarVoice.getProgress())};
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
-                StringBuffer ss = new StringBuffer();
+                StringBuilder ss = new StringBuilder();
                 if (s.length() <= 32) {
                     for (int i = 0; i < (32 - s.length()); i++) {
                         ss.append("0");
                     }
                     s = ss.toString() + s;
                 } else {
-                    s = s.substring(s.length() - 32, s.length());
+                    s = s.substring(s.length() - 32);
                 }
                 String substring1 = s.substring(0, 8);
                 String substring2 = s.substring(8, 16);
@@ -485,6 +487,9 @@ public class MainActivity extends BaseActivity {
 
         });
 
+        //GC20191022 初始化滤波方式为带通
+        Constant.filterType = currentFilter;
+        clickDaitong();
     }
 
     /**
@@ -558,7 +563,7 @@ public class MainActivity extends BaseActivity {
             public void onScrubbed(Object value) {
                 if ((int) value >= 50) {
                     tvYanShi.setText((((int) value - 50) * 0.125) + "ms");
-//                    Log.e("VALUE","" + value); //数值从0到399
+                    Log.e("VALUE","" + value); //数值从0到399
                 } else {
                     tvYanShi.setText(0 + "ms");
                 }
@@ -601,7 +606,7 @@ public class MainActivity extends BaseActivity {
     public void onEventMainThread(SendCommandNotRespondEvent event) {
         if (seekBarType == 1) {
             seekBarMagnetic.setProgress(this.seekBarMagneticInt[0]);
-            this.seekBarMagneticInt[1] = this.seekBarMagneticInt[0];;
+            this.seekBarMagneticInt[1] = this.seekBarMagneticInt[0];
         } else if (seekBarType == 2) {
             seekBarVoice.setProgress(this.seekBarVoiceInt[0]);
             this.seekBarVoiceInt[1] = this.seekBarVoiceInt[0];
@@ -927,8 +932,16 @@ public class MainActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ResultOfRelevantEvent event) {
         if (event.isRelated) {
-            //播放提示音 //GC20190422
-            soundSystem.play(soundSystem.SONAR);
+            /*//播放提示音 //GC20190422
+            soundSystem.play(soundSystem.SONAR);*/
+            //播放提示音改进 //GC20191024
+            handle.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    soundSystem.play(soundSystem.SONAR);
+                }
+            }, 2000);
+
             //是故障，判断“已发现故障”
             tvNotice.setText(getString(R.string.message_notice_7));
             tvNoticeU.setText(getString(R.string.message_notice_7));
@@ -1039,22 +1052,22 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.ll_memory:
                 clickMemory();
-                llMemory.setBackground(getResources().getDrawable(R.drawable.bg_expert_btn_select));
+                llMemory.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.bg_expert_btn_select));
                 llMemory.setClickable(false);
                 handle.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        llMemory.setBackground(getResources().getDrawable(R.drawable.ic_btn_expert));
+                        llMemory.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.ic_btn_expert));
                         llMemory.setClickable(true);
                     }
-                }, 250);
+                }, 400);
                 break;
             case R.id.ll_compare:
                 clickCompare();
                 if (!isCom) {
-                    llCompare.setBackground(getResources().getDrawable(R.drawable.ic_btn_expert));
+                    llCompare.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.ic_btn_expert));
                 } else {
-                    llCompare.setBackground(getResources().getDrawable(R.drawable.bg_expert_btn_select));
+                    llCompare.setBackground(ContextCompat.getDrawable(MainActivity.this,R.drawable.bg_expert_btn_select));
                 }
                 break;
             case R.id.ll_filter:

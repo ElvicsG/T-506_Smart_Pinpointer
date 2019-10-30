@@ -3,13 +3,14 @@ apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion "24.0.3"
     defaultConfig {
         applicationId "com.kehui.www.testapp"
         minSdkVersion 19
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 24
         versionCode 11
-        versionName "2.01.010"
+        versionName "2.01.011"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -47,13 +48,13 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.0.2'
     compile 'com.android.support:design:24.0.2'
     //网络框架
-    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
     //gson格式
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     //表单格式
     compile 'com.squareup.retrofit2:converter-scalars:2.0.0-beta4'
     compile files('libs/sun.misc.BASE64Decoder.jar')
-    compile 'com.android.support:percent:25.3.1'
+    compile 'com.android.support:percent:24.2.1'
     //虚线的引用
     compile 'com.fang:dashview:v1.0.0'
     compile files('libs/xUtils-2.6.14.jar')

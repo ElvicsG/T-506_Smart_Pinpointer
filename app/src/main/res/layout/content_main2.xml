@@ -333,7 +333,8 @@
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_expert_gain"
             android:gravity="center_vertical"
-            android:paddingBottom="5dp">
+            android:paddingBottom="5dp"
+            android:baselineAligned="false">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -391,15 +392,15 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="@dimen/base_dimen_20dp"
+            android:layout_marginEnd="@dimen/base_dimen_20dp"
             android:layout_weight="2">
 
             <com.kehui.www.testapp.ui.SparkView.SparkView
                 android:id="@+id/linechart_cichang"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
+                android:padding="@dimen/base_dimen_10dp"
                 app:spark_lineColor="@color/blue3" />
 
             <TextView
@@ -411,7 +412,8 @@
                 android:text=""
                 android:textColor="@color/blue3"
                 android:textSize="@dimen/base_dimen_16sp"
-                tools:text="@string/left" />
+                tools:text="@string/left"
+                tools:ignore="RelativeOverlap" />
         </RelativeLayout>
 
         <LinearLayout
@@ -422,7 +424,8 @@
             android:layout_marginTop="2dp"
             android:background="@drawable/bg_expert_gain"
             android:gravity="center_vertical"
-            android:paddingBottom="5dp">
+            android:paddingBottom="5dp"
+            android:baselineAligned="false">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -480,15 +483,15 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginStart="@dimen/base_dimen_20dp"
+            android:layout_marginEnd="@dimen/base_dimen_20dp"
             android:layout_weight="2">
 
             <com.kehui.www.testapp.ui.SparkView.SparkView
                 android:id="@+id/linechart_shengyin"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
+                android:padding="@dimen/base_dimen_10dp"
                 app:spark_lineColor="@color/blue3"
                 app:spark_scrubEnabled="true" />
 
@@ -496,7 +499,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="25dp">
+                android:layout_marginEnd="25dp"
+                tools:ignore="RelativeOverlap">
 
                 <TextView
                     android:layout_width="wrap_content"

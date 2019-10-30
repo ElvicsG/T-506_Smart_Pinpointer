@@ -296,7 +296,7 @@ public class SplashActivity extends BaseActivity {
         // 1，判断sd卡是否可用，是否挂载上
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 2,获取sd卡路径，File.separator相当于”/“
-            String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "kehuiPadApp.apk";
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "kehuipadApp.apk";
             // 3,发送请求，获取apk，并放置在指定目录
             HttpUtils httpUtils = new HttpUtils();
             // 4，发送请求，传递参数（下载地址，下载应用放置位置）

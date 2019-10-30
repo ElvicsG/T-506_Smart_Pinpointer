@@ -177,6 +177,7 @@ public class BaseActivity extends AppCompatActivity {
     private CustomDialog customDialog;
     public int clickTongNum;
     public int currentFilter;
+    public int filter;
 
     /**
      * 全局的handler对象用来执行UI更新
@@ -263,8 +264,10 @@ public class BaseActivity extends AppCompatActivity {
         seekBarType = 0;
         seekBarVoiceInt = new int[]{22, 22};
         seekBarMagneticInt = new int[]{22, 22};
-        //初始化滤波方式为全通
-        clickTongNum = 0;
+        //GC20191022 初始化滤波方式为带通
+        clickTongNum = 2;
+        //GC20191023 滤波方式音量控制
+        filter = 2;
     }
 
     /**
@@ -649,7 +652,7 @@ public class BaseActivity extends AppCompatActivity {
             }
             s = ss.toString() + s;
         } else {
-            s = s.substring(s.length() - 32, s.length());
+            s = s.substring(s.length() - 32);
         }
         String substring1 = s.substring(0, 8);
         String substring2 = s.substring(8, 16);
@@ -687,7 +690,7 @@ public class BaseActivity extends AppCompatActivity {
             }
             s = ss.toString() + s;
         } else {
-            s = s.substring(s.length() - 32, s.length());
+            s = s.substring(s.length() - 32);
         }
         String substring1 = s.substring(0, 8);
         String substring2 = s.substring(8, 16);
@@ -1125,8 +1128,8 @@ public class BaseActivity extends AppCompatActivity {
     public int[] decodeDataSecond(int index, int pred, int[] dateArray) {
         int prevsample = pred;
         int previndex = index;
-        int PREDSAMPLE = 0;
-        int INDEX = 0;
+        int PREDSAMPLE;
+        int INDEX;
         int[] result = new int[dateArray.length];
         for (int i = 0; i < dateArray.length; i++) {
             PREDSAMPLE = prevsample;
@@ -1185,7 +1188,7 @@ public class BaseActivity extends AppCompatActivity {
      */
     public Integer getMarkLastSeven(int mark) {
         String tString = Integer.toBinaryString((mark & 0xFF) + 0x100).substring(1);
-        String substring = tString.substring(1, tString.length());
+        String substring = tString.substring(1);
         return Integer.valueOf(substring, 2);
     }
 
@@ -1195,7 +1198,8 @@ public class BaseActivity extends AppCompatActivity {
     public void playSound(int[] results) {
         byte[] bytes = new byte[results.length * 2];
         for (int i = 0; i < results.length; i++) {
-            short sh = (short) ((results[i] - 2048) * 16);
+            //GC20191023 滤波方式音量控制
+            short sh = (short) ((results[i] - 2048) * 16 * filter);
             byte[] bytes1 = shortToByte(sh);
             //Log.e("FILE", "byte.length:  " + bytes1.length);
             bytes[i * 2] = bytes1[0];
@@ -1213,7 +1217,7 @@ public class BaseActivity extends AppCompatActivity {
         int temp = number;
         byte[] b = new byte[2];
         for (int i = 0; i < b.length; i++) {
-            b[i] = new Integer(temp & 0xff).byteValue();
+            b[i] = Integer.valueOf(temp & 0xff).byteValue();
             // 向右移8位
             temp = temp >> 8;
         }
@@ -1536,18 +1540,23 @@ public class BaseActivity extends AppCompatActivity {
                 switch (currentFilter) {
                     case 0:
                         Constant.filterType = currentFilter;
+                        //GC20191023 滤波方式音量控制
+                        filter = 1;
                         clickQuantong();
                         break;
                     case 1:
                         Constant.filterType = currentFilter;
+                        filter = 2;
                         clickDitong();
                         break;
                     case 2:
                         Constant.filterType = currentFilter;
+                        filter = 2;
                         clickDaitong();
                         break;
                     case 3:
                         Constant.filterType = currentFilter;
+                        filter = 1;
                         clickGaotong();
                         break;
                     default:
@@ -1580,14 +1589,14 @@ public class BaseActivity extends AppCompatActivity {
 
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
-        StringBuffer ss = new StringBuffer();
+        StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
             for (int i = 0; i < (32 - s.length()); i++) {
                 ss.append("0");
             }
             s = ss.toString() + s;
         } else {
-            s = s.substring(s.length() - 32, s.length());
+            s = s.substring(s.length() - 32);
         }
         String substring1 = s.substring(0, 8);
         String substring2 = s.substring(8, 16);
@@ -1618,14 +1627,14 @@ public class BaseActivity extends AppCompatActivity {
 
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
-        StringBuffer ss = new StringBuffer();
+        StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
             for (int i = 0; i < (32 - s.length()); i++) {
                 ss.append("0");
             }
             s = ss.toString() + s;
         } else {
-            s = s.substring(s.length() - 32, s.length());
+            s = s.substring(s.length() - 32);
         }
         String substring1 = s.substring(0, 8);
         String substring2 = s.substring(8, 16);
@@ -1656,14 +1665,14 @@ public class BaseActivity extends AppCompatActivity {
 
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
-        StringBuffer ss = new StringBuffer();
+        StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
             for (int i = 0; i < (32 - s.length()); i++) {
                 ss.append("0");
             }
             s = ss.toString() + s;
         } else {
-            s = s.substring(s.length() - 32, s.length());
+            s = s.substring(s.length() - 32);
         }
         String substring1 = s.substring(0, 8);
         String substring2 = s.substring(8, 16);
@@ -1694,14 +1703,14 @@ public class BaseActivity extends AppCompatActivity {
 
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
-        StringBuffer ss = new StringBuffer();
+        StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
             for (int i = 0; i < (32 - s.length()); i++) {
                 ss.append("0");
             }
             s = ss.toString() + s;
         } else {
-            s = s.substring(s.length() - 32, s.length());
+            s = s.substring(s.length() - 32);
         }
         String substring1 = s.substring(0, 8);
         String substring2 = s.substring(8, 16);
@@ -1728,7 +1737,7 @@ public class BaseActivity extends AppCompatActivity {
 
     //增益数值和百分比的转化 100转32
     public int b2s(int b) {
-        int s = 0;
+        int s;
         float v = (float) b / 100.0f;
         float v1 = v * 32;
         s = (int) v1;
@@ -1737,7 +1746,7 @@ public class BaseActivity extends AppCompatActivity {
 
     //32转100
     public int s2b(int s) {
-        int b = 0;
+        int b;
         float v = (float) s / 32.0f;
         float v1 = v * 100;
         b = (int) v1;
@@ -1803,5 +1812,9 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190717    用户界面布局修改（去掉最小延时值、改变当前、上次延时值显示位置等）
 //GC20190720    延时值显示逻辑bug修改
 //GC20190724    去掉圆圈动画，与词条跳动效果一致
-//GC2.01.010————新平板适配
+//GC2.01.010————多平台平板适配
 //GC20191011    设置探头位置
+//GC2.01.011————多平台平板适配
+//GC20191022    初始化滤波方式为带通
+//GC20191023    滤波方式音量控制
+//GC20191024    发现故障提示音改进

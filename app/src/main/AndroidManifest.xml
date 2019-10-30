@@ -13,8 +13,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"
+        tools:ignore="ProtectedPermissions" />
+    <!-- FileProvider配置访问路径，适配7.0及其以上 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+
 
     <application
         android:name="com.kehui.www.testapp.application.MyApplication"
@@ -44,7 +49,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -57,7 +62,8 @@
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <receiver android:name="com.kehui.www.testapp.receiver.RestartAppReceiver">
+        <receiver android:name="com.kehui.www.testapp.receiver.RestartAppReceiver"
+            android:permission="restartapp">
             <intent-filter>
                 <action android:name="restartapp" />
             </intent-filter>
@@ -80,7 +86,18 @@
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.kehui.www.testapp.base.BaseActivity" />
-        <activity android:name="com.kehui.www.testapp.view.BaseActivity"></activity>
+        <activity android:name="com.kehui.www.testapp.view.BaseActivity" />
+
+        <!-- FileProvider配置访问路径，适配7.0及其以上 -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.kehui.www.testapp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

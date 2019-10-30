@@ -92,9 +92,9 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/design/24.2.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/percent/25.3.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/percent/24.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/24.2.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-compat/25.3.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-compat/25.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars" />
@@ -126,9 +126,9 @@
     <orderEntry type="jdk" jdkName="Android API 24 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Gradle: org.freemarker:freemarker:2.3.23@jar" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: com.android.support:support-annotations:25.3.1@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.greenrobot:greendao:3.0.1@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: __local_jars__:D.\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\sun.misc.BASE64Decoder.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: com.android.support:percent:24.2.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-media-compat:24.2.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.google.code.gson:gson:2.7@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:support-core-ui:24.2.1@aar" level="project" />
@@ -136,20 +136,20 @@
     <orderEntry type="library" exported="" name="Gradle: __local_jars__:D.\MyApplicationAS\T-506_Smart_Pinpointer\app\src\main\libs\hellocharts-library-1.5.8.jar:unspecified@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:appcompat-v7:24.2.1@aar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource:2.2.2@aar" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: com.android.support:support-annotations:25.3.0@jar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: com.squareup:javawriter:2.1.1@jar" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: com.android.support:percent:25.3.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: __local_jars__:D.\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\xUtils-2.6.14.jar:unspecified@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.pnikosis:materialish-progress:1.0@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.squareup.retrofit2:converter-gson:2.3.0@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.akexorcist:bluetoothspp:1.0.0@aar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: javax.inject:javax.inject:1@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.squareup.retrofit2:retrofit:2.3.0@jar" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: com.android.support:support-compat:25.3.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.squareup.okhttp3:okhttp:3.8.0@jar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.jakewharton:butterknife:8.8.1@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: net.zetetic:android-database-sqlcipher:3.5.2@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: me.grantland:autofittextview:0.2.1@aar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: com.android.support.test:exposed-instrumentation-api-publish:0.5@aar" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: com.android.support:support-compat:25.3.0@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.robinhood.spark:spark:1.1.2@aar" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.android.support:animated-vector-drawable:24.2.1@aar" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Gradle: javax.annotation:javax.annotation-api:1.2@jar" level="project" />
