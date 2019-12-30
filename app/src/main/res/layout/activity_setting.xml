@@ -224,11 +224,24 @@
                     android:visibility="gone">
 
                     <LinearLayout
+                        android:id="@+id/ll_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/iv_download"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_download_300" />
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/ll_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/base_dimen_20dp"
-                        android:layout_marginTop="@dimen/base_dimen_50dp"
+                        android:layout_marginTop="@dimen/base_dimen_150dp"
                         android:orientation="horizontal">
 
                         <TextView

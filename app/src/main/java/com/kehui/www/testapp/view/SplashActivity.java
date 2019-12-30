@@ -8,14 +8,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.kehui.www.testapp.BuildConfig;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
@@ -383,8 +386,20 @@ public class SplashActivity extends BaseActivity {
         // 设置安装的类型
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         context.startActivity(intent);
-
 //        startActivityForResult(intent, 0);
+
+        /*Intent intent = new Intent(Intent.ACTION_VIEW);
+        //android4.0以后需要添加这行代码
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider",
+                    new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "kehuipadApp.apk"));
+            intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        } else {
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        }
+        context.startActivity(intent);*/
     }
 
     /**

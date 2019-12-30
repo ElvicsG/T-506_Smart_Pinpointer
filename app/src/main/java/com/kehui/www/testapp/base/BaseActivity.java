@@ -180,6 +180,12 @@ public class BaseActivity extends AppCompatActivity {
     public int filter;
 
     /**
+     * 触摸静音功能
+     */
+    public int clickTime;
+    public boolean mute;
+
+    /**
      * 全局的handler对象用来执行UI更新
      */
     public static final int SEND_SUCCESS    = 1;
@@ -191,6 +197,8 @@ public class BaseActivity extends AppCompatActivity {
     public static final int WHAT_REFRESH    = 8;
     public static final int LINK_LOST       = 9;
     public static final int LINK_RECONNECT  = 10;
+    public static final int MUTE_STATE      = 11;
+    public static final int NO_MUTE_STATE   = 12;
     @SuppressLint("HandlerLeak")
     public Handler handle = new Handler() {
         @Override
@@ -268,6 +276,9 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 2;
         //GC20191023 滤波方式音量控制
         filter = 2;
+
+        //GC20191221 触摸静音功能
+        int clickTime = 0;
     }
 
     /**
@@ -637,6 +648,158 @@ public class BaseActivity extends AppCompatActivity {
  	    1：已响应*/
 
     /**
+     * 发送触摸静音重置控制命令   //GC20191217
+     */
+    public void sendResetCommand() {
+        //设备地址：“96”= 0x60；触摸重置控制命令：5,0
+        int[] ints = {96, 5, 0};
+        long l = getCommandCrcByte(ints);
+
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 发送自动关机取消命令   //GC20191221
+     */
+    public void sendAgeingCommand() {
+        //设备地址：“96”= 0x60；自动关机取消命令：6,0
+        int[] ints = {96, 6, 0};
+        long l = getCommandCrcByte(ints);
+
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 发送触摸静音打开命令   //GC20191221
+     */
+    public void sendTouchOnCommand() {
+        //设备地址：“96”= 0x60；触摸静音打开命令：7,0
+        int[] ints = {96, 7, 0};
+        long l = getCommandCrcByte(ints);
+
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 发送触摸静音关闭命令   //GC20191221
+     */
+    public void sendTouchOffCommand() {
+        //设备地址：“96”= 0x60；触摸静音关闭命令：8,0
+        int[] ints = {96, 8, 0};
+        long l = getCommandCrcByte(ints);
+
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
      * 发送声音初始化控制命令
      */
     public void sendVoiceInitCommand() {
@@ -801,8 +964,8 @@ public class BaseActivity extends AppCompatActivity {
                 streamLeft[j] = temp[k];
             }
             for (int i1 = 0; i1 < 59; i1++) {
-                //找数据头（0x53：声音  0x4d：磁场  0x60：T-506）
-                if (streamLeft[i1] == 83 || streamLeft[i1] == 77 || streamLeft[i1] == 96) {
+                //找数据头（0x53：声音  0x4d：磁场  0x60：T-506命令  0x54：声音静音状态） //GC20191220
+                if (streamLeft[i1] == 83 || streamLeft[i1] == 77 || streamLeft[i1] == 96 || streamLeft[i1] == 84) {
                     for (int i2 = 0, j = i1; i2 < 59; i2++, j++) {
                         if (j >= 59) {
                             receivedBean[i2] = temp[i + j - leftLen];
@@ -849,7 +1012,7 @@ public class BaseActivity extends AppCompatActivity {
         }
         //开始遍历
         for (; i < tempLength - 59; i++) {
-            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96) {
+            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96 || temp[i] == 84) { //GC20191220
                 for (int j = i, k = 0; j < (i + 59); j++, k++) {
                     //截取数据包
                     receivedBean[k] = temp[j];
@@ -992,9 +1155,19 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void doPackageBean(PackageBean packageBean) {
         int[] results = decodeData(packageBean);
-        if (packageBean.getSM() == 83) {
+        if (packageBean.getSM() == 83 || packageBean.getSM() == 84) {
             //SM: "83" = 0x53——是声音数据
             int mark = packageBean.getMark();
+            //GC20191217 换算成二进制，第2位代表仪器静音状态
+            //GC20191220if (binaryStartsWithTwo(mark)) {
+            // SM: "84" = 0x54——是声音数据
+            if (packageBean.getSM() == 84) {
+//                Log.e(TAG, "静音状态");
+                handle.sendEmptyMessage(MUTE_STATE);
+            } else {
+//                Log.e(TAG, "非静音状态");
+                handle.sendEmptyMessage(NO_MUTE_STATE);
+            }
             if (binaryStartsWithOne(mark)) {
                 //Mark最高位是1——代表仪器在这一包内触发
                 Message msg = new Message();
@@ -1180,6 +1353,12 @@ public class BaseActivity extends AppCompatActivity {
      */
     public boolean binaryStartsWithOne(int tByte) {
         String tString = Integer.toBinaryString((tByte & 0xFF) + 0x100).substring(1);
+        return tString.startsWith("1");
+    }
+
+    //GC20191217
+    public boolean binaryStartsWithTwo(int tByte) {
+        String tString = Integer.toBinaryString((tByte & 0xFF) + 0x100).substring(2);
         return tString.startsWith("1");
     }
 
@@ -1818,3 +1997,6 @@ public class BaseActivity extends AppCompatActivity {
 //GC20191022    初始化滤波方式为带通
 //GC20191023    滤波方式音量控制
 //GC20191024    发现故障提示音改进
+//GC20191217    仪器触摸静音状态接收显示;发送重置命令
+//GC20191221    命令预留
+//GT 触摸

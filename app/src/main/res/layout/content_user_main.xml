@@ -436,6 +436,7 @@
                     android:src="@drawable/ic_open_voice" />
 
                 <TextView
+                    android:id="@+id/il_silence_u"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

@@ -44,6 +44,7 @@
     <color name="green2">#1d7d0c</color>
     <color name="red">#9a3023</color>
     <color name="red2">#993123</color>
+    <color name="red3">#FF0033</color>
     <color name="redfd">#3CB7EA</color>
     <color name="redfddfd">#E37364</color>
 </resources>

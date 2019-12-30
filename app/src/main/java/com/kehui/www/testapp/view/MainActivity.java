@@ -67,6 +67,9 @@ public class MainActivity extends BaseActivity {
     /**
      * 专家界面布局
      */
+    //GC20191217
+    @BindView(R.id.il_silence)
+    TextView ilSilence;
     @BindView(R.id.ll_silence)
     LinearLayout llSilence;
     @BindView(R.id.ll_pause)
@@ -121,6 +124,9 @@ public class MainActivity extends BaseActivity {
     /**
      * 用户界面布局
      */
+    //GC20191217
+    @BindView(R.id.il_silence_u)
+    TextView ilSilenceU;
     @BindView(R.id.magnetic_field_gain_control_u)
     TempControlView magneticFieldGainControlU;
     @BindView(R.id.iv_magnetic_field_gain_u)
@@ -615,6 +621,28 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(UiHandleEvent event) {
+        //GC20191217
+        if (event.status == MUTE_STATE) {
+            //GT 触摸
+            //sendTouchOffCommand();
+            mute = true;
+            ivSilence.setImageResource(R.drawable.ic_close_voice);
+            ivSilenceU.setImageResource(R.drawable.ic_close_voice);
+            //字体图标变红
+            ilSilence.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            ilSilenceU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            ivSilence.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            ivSilenceU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        }
+        if (event.status == NO_MUTE_STATE) {
+            mute = false;
+            //字体图标变蓝
+            ilSilence.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            ilSilenceU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            ivSilence.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            ivSilenceU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            checkVoice();
+        }
         if (event.status == SEND_SUCCESS) {
             handle.postDelayed(new Runnable() {
                 @Override
@@ -1110,21 +1138,50 @@ public class MainActivity extends BaseActivity {
     }
     //点击静音
     public void clickSilence() {
-        int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        if (isSilence) {
-            if (streamVolumeNow == 0) {
-                streamVolumeNow = streamMaxVolume / 2;
+        //GC20191217 仪器静音状态下按键命令处理
+        if (mute){
+            //GC20191221
+            clickTime++;
+            Log.e("VALUE","" + clickTime);
+            if(clickTime > 3) {
+                sendTouchOffCommand();
+                clickTime = 0;
+                Log.e("VALUE","end" + clickTime);
+            } else {
+                sendResetCommand();
             }
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumeNow, AudioManager.FLAG_PLAY_SOUND);
-            ivSilence.setImageResource(R.drawable.ic_open_voice);
-            ivSilenceU.setImageResource(R.drawable.ic_open_voice);
+            mute = false;
+            //字体图标变蓝
+            ilSilence.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            ilSilenceU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            ivSilence.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            ivSilenceU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            if (isSilence) {
+                streamVolumeNow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
+                ivSilence.setImageResource(R.drawable.ic_close_voice);
+                ivSilenceU.setImageResource(R.drawable.ic_close_voice);
+            } else {
+                ivSilence.setImageResource(R.drawable.ic_open_voice);
+                ivSilenceU.setImageResource(R.drawable.ic_open_voice);
+            }
         } else {
-            streamVolumeNow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
-            ivSilence.setImageResource(R.drawable.ic_close_voice);
-            ivSilenceU.setImageResource(R.drawable.ic_close_voice);
+            int streamMaxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            if (isSilence) {
+                if (streamVolumeNow == 0) {
+                    streamVolumeNow = streamMaxVolume / 2;
+                }
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, streamVolumeNow, AudioManager.FLAG_PLAY_SOUND);
+                ivSilence.setImageResource(R.drawable.ic_open_voice);
+                ivSilenceU.setImageResource(R.drawable.ic_open_voice);
+            } else {
+                streamVolumeNow = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
+                ivSilence.setImageResource(R.drawable.ic_close_voice);
+                ivSilenceU.setImageResource(R.drawable.ic_close_voice);
+            }
+            isSilence = !isSilence;
         }
-        isSilence = !isSilence;
     }
     //点击暂停
     public void clickPause() {
@@ -1222,13 +1279,18 @@ public class MainActivity extends BaseActivity {
     }
 
     public void checkVoice() {
-        int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        if (streamVolume <= 0) {
-            isSilence = true;
-            ivSilence.setImageResource(R.drawable.ic_close_voice);
-        } else {
-            isSilence = false;
-            ivSilence.setImageResource(R.drawable.ic_open_voice);
+        //GC20191217 非仪器静音状态下才去检测音量
+        if (!mute) {
+            int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            if (streamVolume <= 0) {
+                isSilence = true;
+                ivSilence.setImageResource(R.drawable.ic_close_voice);
+                ivSilenceU.setImageResource(R.drawable.ic_close_voice);
+            } else {
+                isSilence = false;
+                ivSilence.setImageResource(R.drawable.ic_open_voice);
+                ivSilenceU.setImageResource(R.drawable.ic_open_voice);
+            }
         }
     }
 
