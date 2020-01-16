@@ -18,9 +18,11 @@ public class Constant {
     public static int magneticFieldGain = 21;
 
     /**
-     *  滤波模式    * 全通 0 * 低通 1 * 高通 2 * 带通 3
+     *  滤波模式    * 全通 0 * 低通 1 * 带通 2 * 高通 3
      */
-    public static int filterType = 0;
+    public static int filterType = 0
+
+            ;
     public static String DeviceId = "";
 
     /**

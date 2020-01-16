@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity {
     /**
      * 专家界面布局
      */
-    //GC20191217
+    //GC20191220
     @BindView(R.id.il_silence)
     TextView ilSilence;
     @BindView(R.id.ll_silence)
@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity {
     /**
      * 用户界面布局
      */
-    //GC20191217
+    //GC20191220
     @BindView(R.id.il_silence_u)
     TextView ilSilenceU;
     @BindView(R.id.magnetic_field_gain_control_u)
@@ -492,10 +492,6 @@ public class MainActivity extends BaseActivity {
             }
 
         });
-
-        //GC20191022 初始化滤波方式为带通
-        Constant.filterType = currentFilter;
-        clickDaitong();
     }
 
     /**
@@ -567,14 +563,18 @@ public class MainActivity extends BaseActivity {
         lineChartVoice.setScrubListener(new SparkView.OnScrubListener() {
             @Override
             public void onScrubbed(Object value) {
-                if ((int) value >= 50) {
+                /*if ((int) value >= 50) {
                     tvYanShi.setText((((int) value - 50) * 0.125) + "ms");
                     Log.e("VALUE","" + value); //数值从0到399
                 } else {
                     tvYanShi.setText(0 + "ms");
-                }
+                }*/
+                //GC20200103    光标响应范围更改
+                tvYanShi.setText(((int) value * 0.125) + "ms");
+                Log.i("VALUE","" + value); //数值从0到399
             }
         });
+
     }
 
     /**
@@ -621,24 +621,23 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(UiHandleEvent event) {
-        //GC20191217
         if (event.status == MUTE_STATE) {
-            //GT 触摸
-            //sendTouchOffCommand();
             mute = true;
+            //静音状态显示    //GC20191220
             ivSilence.setImageResource(R.drawable.ic_close_voice);
             ivSilenceU.setImageResource(R.drawable.ic_close_voice);
-            //字体图标变红
-            ilSilence.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
-            ilSilenceU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
             ivSilence.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
             ivSilenceU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            //字体变红
+            ilSilence.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            ilSilenceU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
         }
         if (event.status == NO_MUTE_STATE) {
             mute = false;
-            //字体图标变蓝
+            //字体恢复
             ilSilence.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
             ilSilenceU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            //静音状态恢复
             ivSilence.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
             ivSilenceU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
             checkVoice();
@@ -1138,7 +1137,7 @@ public class MainActivity extends BaseActivity {
     }
     //点击静音
     public void clickSilence() {
-        //GC20191217 仪器静音状态下按键命令处理
+        //GC20191220 触摸静音状态下静音按键处理
         if (mute){
             //GC20191221
             clickTime++;
@@ -1279,7 +1278,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void checkVoice() {
-        //GC20191217 非仪器静音状态下才去检测音量
+        //GC20191220 非触摸静音状态下才去检测音量
         if (!mute) {
             int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             if (streamVolume <= 0) {

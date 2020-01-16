@@ -269,13 +269,13 @@
                     android:background="@drawable/bg_mode">
 
                     <ImageView
-                        android:id="@+id/iv_mode"
+                        android:id="@+id/iv_mode_u"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
-                        android:src="@drawable/ic_user" />
+                        android:src="@drawable/ic_expert" />
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -284,15 +284,15 @@
                         android:src="@drawable/bg_line" />
 
                     <TextView
-                        android:id="@+id/tv_mode"
+                        android:id="@+id/tv_mode_u"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="@string/user_mode"
-                        android:layout_marginRight="5dp"
+                        android:text="@string/expert_mode"
                         android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
                         android:textColor="@color/blue8"
                         android:textSize="@dimen/base_dimen_12sp" />
                 </LinearLayout>

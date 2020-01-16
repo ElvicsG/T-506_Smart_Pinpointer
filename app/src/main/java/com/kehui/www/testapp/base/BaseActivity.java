@@ -98,7 +98,7 @@ public class BaseActivity extends AppCompatActivity {
     public InputStream inputStream;
     public int[] stream;
     public int streamLength;
-    public int streamCount;
+    public int emptyCount;
     public int[] blueStream;
     public int blueStreamLen;
     public boolean hasGotStream;
@@ -177,7 +177,7 @@ public class BaseActivity extends AppCompatActivity {
     private CustomDialog customDialog;
     public int clickTongNum;
     public int currentFilter;
-    public int filter;
+    public double filter;
 
     /**
      * 触摸静音功能
@@ -236,8 +236,6 @@ public class BaseActivity extends AppCompatActivity {
         //缓存的蓝牙数据
         stream = new int[1024000];
         streamLength = 0;
-        //缓存数据包含的输入流个数
-        streamCount = 0;
         //需要处理的蓝牙数据
         blueStream = new int[1024000];
         blueStreamLen = 0;
@@ -272,13 +270,15 @@ public class BaseActivity extends AppCompatActivity {
         seekBarType = 0;
         seekBarVoiceInt = new int[]{22, 22};
         seekBarMagneticInt = new int[]{22, 22};
-        //GC20191022 初始化滤波方式为带通
-        clickTongNum = 2;
+        //初始化滤波模式对话框打开选择全通
+        clickTongNum = 0;
+        //打开对话框不点击任意方式默认为0全通——改为2带通 //GC20191022
+        currentFilter = 2;
         //GC20191023 滤波方式音量控制
-        filter = 2;
-
+        filter = 1.5;
         //GC20191221 触摸静音功能
         int clickTime = 0;
+
     }
 
     /**
@@ -474,6 +474,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void run() {
             int len;
+            int lastLen = 127;
             //存放每个输入流的字节数组
             byte[] buffer = new byte[1024000];
             while (true) {
@@ -484,34 +485,59 @@ public class BaseActivity extends AppCompatActivity {
                             return;
                         }
                         len = inputStream.read(buffer, 0, buffer.length);
-                        //Log.e("stream", "len:" + len + "时间" + System.currentTimeMillis());     //GT20180321 每个输入流的的长度
-                        byte[] tempBuffer = new byte[len];
-                        for (int i = 0, j = streamLength; i < len; i++, j++) {
-                            if (Constant.isStartInterception) {
-                                tempBuffer[i] = buffer[i];
+                        Log.i("stream", "len: " + len + "  时间：" + System.currentTimeMillis());     //GT20180321 每个输入流的的长度
+                        //GC20200114    重新连接时——输入流先是一个长度很长的数据，然后紧跟着许多连续的长度为127的数据
+                        if (len > 700) {
+                            Log.e(TAG, "处理掉无效空数据" + " len:" + len);
+                        } else {
+                            if ((len == 127) && (lastLen == 127)) {
+                                emptyCount++;
+                            } else {
+                                emptyCount = 0;
                             }
-                            //将传过来的字节数组转变为int数组
-                            stream[j] = buffer[i] & 0xff;
-                        }
-                        //截取上传数据    //jwj20180411
-                        if (Constant.isStartInterception) {
-                            Constant.sbData.append(Utils.bytes2HexString(tempBuffer));
-                        }
-                        streamLength += len;
-                        streamCount++;
-                        //在不处理数据时缓存数个输入流    //GC20171129
-                        if (streamCount >= 5 && !doingStream) {
-                            if (hasSentInitCommand) {
-                                /*//超过590滤除
-                                if (streamLength > 590) {
-                                    streamLength = 590;
-                                }*/     //GC20190627 触发灯闪烁bug原因
-                                if (streamLength >= 0) {
-                                    System.arraycopy(stream, 0, blueStream, 0, streamLength);
+                            byte[] tempBuffer = new byte[len];
+                            for (int i = 0, j = streamLength; i < len; i++, j++) {
+                                if (Constant.isStartInterception) {
+                                    tempBuffer[i] = buffer[i];
                                 }
+                                //将传过来的字节数组转变为int数组
+                                stream[j] = buffer[i] & 0xff;
+                            }
+                            //截取上传数据    //jwj20180411
+                            if (Constant.isStartInterception) {
+                                Constant.sbData.append(Utils.bytes2HexString(tempBuffer));
+                            }
+                            streamLength += len;
+                            Log.i("streamLength", "streamLength:" + streamLength);  //GT20180321 要处理的蓝牙数据的长度
+
+                            //GC20200114    连续2次len长度127，清空
+                            if (emptyCount == 2) {
+                                //缓存的数据清零
+                                streamLength = 0;
+                                emptyCount = 1;
+                                Log.e(TAG, "处理掉无效空数据 " + " lastLen:" + lastLen + " len:" + len);
+                            }
+                            lastLen = len;
+
+                        }
+
+                        //在不处理数据时缓存数个输入流    //GC20171129
+                        //GC20200104if (streamCount >= 5 && !doingStream) {
+                        if (streamLength >= 590 && !doingStream) {
+                            if (hasSentInitCommand) {
+                                System.arraycopy(stream, 0, blueStream, 0, streamLength);
                                 blueStreamLen = streamLength;
-                                //Log.e("stream", "lenSum:" + blueStreamLen);  //GT20180321 要处理的蓝牙数据的长度
                                 doingStream = true;
+                                //GC20200104    蓝牙数据延时处理试验
+                                /*if (streamLength < 750) {
+                                    System.arraycopy(stream, 0, blueStream, 0, streamLength);
+                                    blueStreamLen = streamLength;
+                                    Log.e("stream", "lenSum:" + blueStreamLen);  //GT20180321 要处理的蓝牙数据的长度
+                                    doingStream = true;
+                                } else {
+                                    Log.e(TAG, "doingStream:" + streamLength);
+                                    Log.e(TAG, "doingStream:" + doingStream);  //GT20200104 不处理蓝牙数据
+                                }*/
 
                             } else {
                                 //缓存数据之前先发送初始化控制命令
@@ -522,11 +548,17 @@ public class BaseActivity extends AppCompatActivity {
                                         sendVoiceInitCommand();
                                     }
                                 }, 1000);
+                                //初始滤波方式——带通  //GC20191022
+                                handle.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        clickDaitong();
+                                    }
+                                }, 2000);
                                 hasSentInitCommand = true;
                             }
                             //缓存的数据清零
                             streamLength = 0;
-                            streamCount = 0;
                         }
                         //短时间没有数据才跳出进行显示
                     } while (inputStream.available() != 0);
@@ -549,7 +581,6 @@ public class BaseActivity extends AppCompatActivity {
                     stream = null;
                     stream = new int[1024000];
                     streamLength = 0;
-                    streamCount = 0;
                     blueStream = null;
                     blueStream = new int[1024000];
                     blueStreamLen = 0;
@@ -648,7 +679,7 @@ public class BaseActivity extends AppCompatActivity {
  	    1：已响应*/
 
     /**
-     * 发送触摸静音重置控制命令   //GC20191217
+     * 发送触摸静音重置控制命令   //GC20191220
      */
     public void sendResetCommand() {
         //设备地址：“96”= 0x60；触摸重置控制命令：5,0
@@ -686,7 +717,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 发送自动关机取消命令   //GC20191221
+     * 发送自动关机取消命令（用于老化）   //GC20191221
      */
     public void sendAgeingCommand() {
         //设备地址：“96”= 0x60；自动关机取消命令：6,0
@@ -1158,14 +1189,13 @@ public class BaseActivity extends AppCompatActivity {
         if (packageBean.getSM() == 83 || packageBean.getSM() == 84) {
             //SM: "83" = 0x53——是声音数据
             int mark = packageBean.getMark();
-            //GC20191217 换算成二进制，第2位代表仪器静音状态
-            //GC20191220if (binaryStartsWithTwo(mark)) {
-            // SM: "84" = 0x54——是声音数据
+            //声音状态判断    //GC20191220
             if (packageBean.getSM() == 84) {
-//                Log.e(TAG, "静音状态");
+                // SM: "84" = 0x54——是声音的静音数据
+                Log.i(TAG, "静音状态");
                 handle.sendEmptyMessage(MUTE_STATE);
             } else {
-//                Log.e(TAG, "非静音状态");
+                Log.i(TAG, "非静音状态");
                 handle.sendEmptyMessage(NO_MUTE_STATE);
             }
             if (binaryStartsWithOne(mark)) {
@@ -1249,7 +1279,9 @@ public class BaseActivity extends AppCompatActivity {
                         }
                     }
                     //得到绘制的声音数组voiceDraw   //GC20180428 声音波形加上触发前50个点的数据
-                    System.arraycopy(tempVoice, 50, voiceDraw, 0, 400);
+//                    System.arraycopy(tempVoice, 50, voiceDraw, 0, 400);
+                    //GC20200103 国内不看触发时刻之前的数据
+                    System.arraycopy(tempVoice, 100, voiceDraw, 0, 400);
                     //用于声音自动识别定位的数组
                     for (int i = 0; i < 800; i++) {
                         //用于计算特征值的声音数据  //GC20180412
@@ -1349,16 +1381,10 @@ public class BaseActivity extends AppCompatActivity {
 
     /**
      * @param tByte 需要判断的字节数组
-     * @return  判断二进制的最高位是否是1   //G?
+     * @return  判断二进制的最高位是否是1
      */
     public boolean binaryStartsWithOne(int tByte) {
         String tString = Integer.toBinaryString((tByte & 0xFF) + 0x100).substring(1);
-        return tString.startsWith("1");
-    }
-
-    //GC20191217
-    public boolean binaryStartsWithTwo(int tByte) {
-        String tString = Integer.toBinaryString((tByte & 0xFF) + 0x100).substring(2);
         return tString.startsWith("1");
     }
 
@@ -1378,7 +1404,8 @@ public class BaseActivity extends AppCompatActivity {
         byte[] bytes = new byte[results.length * 2];
         for (int i = 0; i < results.length; i++) {
             //GC20191023 滤波方式音量控制
-            short sh = (short) ((results[i] - 2048) * 16 * filter);
+//            short sh = (short) ((results[i] - 2048) * 16 * filter);
+            short sh = (short) ((results[i] - 2048) * 16);
             byte[] bytes1 = shortToByte(sh);
             //Log.e("FILE", "byte.length:  " + bytes1.length);
             bytes[i * 2] = bytes1[0];
@@ -1664,6 +1691,8 @@ public class BaseActivity extends AppCompatActivity {
     protected void showFilterDialog(final LinearLayout llView) {
         customDialog = new CustomDialog(BaseActivity.this);
         customDialog.show();
+        //GT20191022
+        Log.e("testFilterType", "clickTongNum: " + clickTongNum);
         switch (clickTongNum) {
             case 0:
                 customDialog.clearFilter1();
@@ -1716,6 +1745,8 @@ public class BaseActivity extends AppCompatActivity {
         customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //GT20191022
+                Log.e("testFilterType", "currentFilter: " + currentFilter);
                 switch (currentFilter) {
                     case 0:
                         Constant.filterType = currentFilter;
@@ -1725,12 +1756,12 @@ public class BaseActivity extends AppCompatActivity {
                         break;
                     case 1:
                         Constant.filterType = currentFilter;
-                        filter = 2;
+                        filter = 1.5;
                         clickDitong();
                         break;
                     case 2:
                         Constant.filterType = currentFilter;
-                        filter = 2;
+                        filter = 1.5;
                         clickDaitong();
                         break;
                     case 3:
@@ -1803,8 +1834,8 @@ public class BaseActivity extends AppCompatActivity {
     public void clickDaitong() {
         clickTongNum = 2;
         int[] ints = {96, 2, 0};
-
         long l = getCommandCrcByte(ints);
+
         String s = Long.toBinaryString((int) l);
         StringBuilder ss = new StringBuilder();
         if (s.length() <= 32) {
@@ -1995,8 +2026,11 @@ public class BaseActivity extends AppCompatActivity {
 //GC20191011    设置探头位置
 //GC2.01.011————多平台平板适配
 //GC20191022    初始化滤波方式为带通
-//GC20191023    滤波方式音量控制
+//GC20191023    滤波方式音量控制    取消
 //GC20191024    发现故障提示音改进
-//GC20191217    仪器触摸静音状态接收显示;发送重置命令
+//GC20191220    触摸静音状态判断和显示
 //GC20191221    命令预留
 //GT 触摸
+//GC20200103    国内习惯适配（声音波形触发时刻前去掉、用户专家界面模式按钮更改）
+//GC20200104    蓝牙数据延时处理试验
+//GC20200114    重连操作延时原因——设备与APP重新连接时有一部分无用的空数据，需要处理掉
