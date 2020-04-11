@@ -176,5 +176,6 @@
     <string name="shengyin_value_min">0</string>
     <string name="current">当前：</string>
     <string name="last">上次：</string>
+    <string name="message_notice_trigger">等待仪器触发</string>
 
 </resources>

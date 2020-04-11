@@ -25,6 +25,7 @@
     <dimen name="base_dimen_50dp">25dp</dimen>
     <dimen name="base_dimen_55dp">27.5dp</dimen>
     <dimen name="base_dimen_65dp">32.5dp</dimen>
+    <dimen name="base_dimen_80dp">40dp</dimen>
     <dimen name="base_dimen_100dp">50dp</dimen>
     <dimen name="base_dimen_120dp">60dp</dimen>
     <dimen name="base_dimen_130dp">65dp</dimen>

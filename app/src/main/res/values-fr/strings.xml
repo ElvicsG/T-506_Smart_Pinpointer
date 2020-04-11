@@ -173,5 +173,6 @@
     <string name="Please_re_adjust_the_gain">Please re-adjust the gain</string>
     <string name="current">"Current: "</string>
     <string name="last">"Last: "</string>
+    <string name="message_notice_trigger">Wait for trigger</string>
 
 </resources>

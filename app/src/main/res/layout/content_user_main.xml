@@ -127,7 +127,7 @@
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="472px"
+                        android:layout_height="wrap_content"
                         android:background="@drawable/bg_user_main_acoutstio_magnetic_delay2"
                         android:gravity="center"
                         android:orientation="vertical">
@@ -152,13 +152,12 @@
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="0dp"
-                            android:layout_weight="1">
+                            android:layout_height="wrap_content">
 
                             <RelativeLayout
                                 android:id="@+id/rl_wave_u"
-                                android:layout_width="@dimen/base_dimen_130dp"
-                                android:layout_height="@dimen/base_dimen_135dp"
+                                android:layout_width="@dimen/base_dimen_100dp"
+                                android:layout_height="@dimen/base_dimen_100dp"
                                 android:layout_gravity="center"
                                 android:orientation="horizontal">
 
@@ -175,7 +174,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_alignTop="@+id/ccv_first_u"
                                     android:layout_centerHorizontal="true"
-                                    android:layout_marginTop="0dp"
+                                    android:layout_marginTop="3dp"
                                     android:visibility="visible" />
                             </RelativeLayout>
 
@@ -207,7 +206,8 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
 
                             <TextView
                                 android:id="@+id/tv_last_delay_u"
@@ -283,7 +283,8 @@
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
+                                android:layout_gravity="top"
+                                android:layout_margin="@dimen/base_dimen_20dp"
                                 android:layout_weight="1"
                                 android:src="@drawable/bg_user_main_left" />
 
@@ -296,7 +297,8 @@
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
+                                android:layout_gravity="top"
+                                android:layout_margin="@dimen/base_dimen_20dp"
                                 android:layout_weight="1"
                                 android:src="@drawable/bg_user_main_right" />
                         </LinearLayout>
@@ -308,20 +310,22 @@
 
                             <ImageView
                                 android:id="@+id/iv_position_left"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
+                                android:layout_width="@dimen/base_dimen_15dp"
+                                android:layout_height="@dimen/base_dimen_80dp"
                                 android:layout_weight="1"
-                                android:src="@drawable/ic_user_main_notice_point"
+                                android:layout_gravity="bottom"
+                                android:paddingBottom="@dimen/base_dimen_20dp"
+                                android:src="@drawable/ic_user_main_notice_point2"
                                 android:visibility="invisible" />
 
                             <ImageView
                                 android:id="@+id/iv_position_right"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
+                                android:layout_width="@dimen/base_dimen_15dp"
+                                android:layout_height="@dimen/base_dimen_80dp"
                                 android:layout_weight="1"
-                                android:src="@drawable/ic_user_main_notice_point"
+                                android:layout_gravity="bottom"
+                                android:paddingBottom="@dimen/base_dimen_20dp"
+                                android:src="@drawable/ic_user_main_notice_point2"
                                 android:visibility="visible" />
                         </LinearLayout>
 
