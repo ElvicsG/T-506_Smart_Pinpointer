@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -162,6 +163,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.rl_wave_u)
     RelativeLayout rlWaveU;
     @BindView(R.id.tv_scan_u)
+    //GC20200410
     TextView tvScanU;
     @BindView(R.id.ccv_first_u)
     CustomCircleView ccvFirstU;
@@ -212,6 +214,8 @@ public class MainActivity extends BaseActivity {
         setChartListener();
         //读取提示音 //GC20190422
         soundSystem = new SoundUtils(this);
+        //开始倒计时   //GC20200410
+        timer.start();
     }
 
     /**
@@ -221,9 +225,10 @@ public class MainActivity extends BaseActivity {
         //专家界面
         seekBarMagnetic.setMax(100);
         seekBarVoice.setMax(100);
-        seekBarMagnetic.setProgress(70);
+        //GC20200312    缺省值改为100
+        seekBarMagnetic.setProgress(100);
         seekBarVoice.setProgress(70);
-        tvMagneticValue.setText(70 + "%");
+        tvMagneticValue.setText(100 + "%");
         tvVoiceValue.setText(70 + "%");
         checkVoice();
 
@@ -256,7 +261,7 @@ public class MainActivity extends BaseActivity {
         ivScanU.setVisibility(View.GONE);
         //画动画2
         //颜色改动之前——灰色"#555555"  "黄色#e1de04"
-        ccvFirstU.updateView("#00ffde", 8, 19);
+        ccvFirstU.updateView("#00ffde", 8, 145);
         //GC20190724
         ccvFirstU.setVisibility(View.VISIBLE);
         tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
@@ -271,7 +276,8 @@ public class MainActivity extends BaseActivity {
         magneticFieldGainControlU.setValueColor("#d0210e");
         magneticFieldGainControlU.setCurrentValueColor("#a03225");
         magneticFieldGainControlU.setTitle(getString(R.string.gain));
-        magneticFieldGainControlU.setTemp(0, 100, 70);
+        //GC20200312    缺省值改为100
+        magneticFieldGainControlU.setTemp(0, 100, 100);
         magneticFieldGainControlU.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
             @Override
             public void change(int temp) {
@@ -691,10 +697,17 @@ public class MainActivity extends BaseActivity {
         }
 
         if (event.status == LIGHT_UP) {
+            //取消倒计时，显示正在测试  //GC20200410
+            timer.cancel();
+            tvScanU.setText(getString(R.string.message_notice_5));
+
             ivSynchronizeStatus.setImageResource(R.drawable.light_red);
             //提示框词条和左右位置闪烁一次效果  //GC20190307
             tvNotice.setText("");
-            tvPosition.setText("");
+            if(isDraw) {
+                //暂停效果添加    //GC20200409
+                tvPosition.setText("");
+            }
             tvNoticeU.setText("");
             //GC20190724
             if (isDrawCircle) {
@@ -704,6 +717,8 @@ public class MainActivity extends BaseActivity {
         }
         if (event.status == TRIGGERED) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
+            //重新开始倒计时   //GC20200410
+            timer.start();
         }
         if (event.status == WHAT_REFRESH) {
             if (isDraw) {
@@ -734,6 +749,27 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
+    /**
+     * 倒计时60s处理    //GC20200410
+     */
+    private CountDownTimer timer = new CountDownTimer(60000, 1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            //用户界面
+            tvScanU.setVisibility(View.VISIBLE);
+            tvScanU.setText(getString(R.string.message_notice_trigger));
+            tvNoticeU.setText(getString(R.string.message_notice_trigger));
+            //专家界面
+            tvNotice.setText(getString(R.string.message_notice_trigger));
+        }
+
+    };
 
     /**
      * 用户界面磁场或声音的进度条处理    //GC20181113

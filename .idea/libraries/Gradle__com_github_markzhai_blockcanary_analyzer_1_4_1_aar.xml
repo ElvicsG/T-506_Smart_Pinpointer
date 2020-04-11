@@ -5,6 +5,8 @@
       <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.markzhai/blockcanary-analyzer/1.4.1/res" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.markzhai/blockcanary-analyzer/1.4.1/443b137c20623524bfff4f3fc69a72e882909a19/blockcanary-analyzer-1.4.1-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

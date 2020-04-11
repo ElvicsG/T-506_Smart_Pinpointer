@@ -141,6 +141,7 @@ public class BaseActivity extends AppCompatActivity {
      * 声音智能识别
      */
     public int maxVoice;
+    public int maxVoicePlay;
     public int maxMagnetic;
     private int[] tempVoice;
     private int[] svmData;
@@ -287,8 +288,8 @@ public class BaseActivity extends AppCompatActivity {
     public void setAudioTrack() {
         //内部的音频缓冲区的大小 输出结果1392
         int minBufferSize = AudioTrack.getMinBufferSize(8000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        //音频设置——管理策略、采样频率、通道、数据位宽、bufferSizeInBytes、播放方式  //GC20171129  bufferSizeInBytes大小修改
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);  //GC20200309
+        //音频设置——指定流的类型、音频数据的采样频率、输出声道、音频数据块、bufferSizeInBytes、模式类型  //GC20171129  bufferSizeInBytes大小修改
         mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,  8000,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
                 minBufferSize / 6, AudioTrack.MODE_STREAM);
@@ -1241,16 +1242,23 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             playSound(results);
+            Log.e("FILE", "maxVoicePlay:  " + maxVoicePlay );
 
         } else if (packageBean.getSM() == 77) {
             //SM: "77" = 0x4d——是磁场数据
             if (packageBean.getMark() >= 128) {
                 //探头相对电缆位置的判断   Mark: "128"= 10000000 代表位7是1 //GC20171205
-                handle.sendEmptyMessage(POSITION_RIGHT);
+                if (isDraw) {
+                    //暂停效果添加    //GC20200409
+                    handle.sendEmptyMessage(POSITION_RIGHT);
+                }
                 //令位7=0
                 packageBean.setMark(packageBean.getMark() - 128);
             } else {
-                handle.sendEmptyMessage(POSITION_LEFT);
+                if (isDraw) {
+                    //暂停效果添加    //GC20200409
+                    handle.sendEmptyMessage(POSITION_LEFT);
+                }
             }
             //按顺序拼接将磁场数据（从0到3，共4包，1包有100个点数据）
             for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
@@ -1398,18 +1406,34 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * @param results   声音数据
+     * @param results   声音数据转化和播放    //GC20200309
      */
     public void playSound(int[] results) {
+        int max = 0;
         byte[] bytes = new byte[results.length * 2];
         for (int i = 0; i < results.length; i++) {
             //GC20191023 滤波方式音量控制
 //            short sh = (short) ((results[i] - 2048) * 16 * filter);
             short sh = (short) ((results[i] - 2048) * 16);
+
+            //GC20200402
+            int sh1 = Math.abs(sh);
+            if (sh1 > max) {
+                max = sh1;
+                //找寻声音信号幅值最大点用于用户界面画进度条高度 //GC20181113
+                maxVoicePlay = max;
+            }
+
             byte[] bytes1 = shortToByte(sh);
-            //Log.e("FILE", "byte.length:  " + bytes1.length);
+//            Log.e("FILE", "byte.length:  " + bytes1.length);
             bytes[i * 2] = bytes1[0];
             bytes[i * 2 + 1] = bytes1[1];
+          /*  int sh = (int) ((results[i] - 2048) * 16 * 256);
+            byte[] bytes1 = intToByte(sh);
+            bytes[i * 4] = bytes1[0];
+            bytes[i * 4 + 1] = bytes1[1];
+            bytes[i * 4 + 2] = bytes1[2];
+            bytes[i * 4 + 3] = bytes1[3];*/
         }
         if (!isExit) {
             mAudioTrack.write(bytes, 0, bytes.length);
@@ -1428,7 +1452,20 @@ public class BaseActivity extends AppCompatActivity {
             temp = temp >> 8;
         }
         return b;
+    }
 
+    /**
+     * int转byte   //GC20200309
+     */
+    public static byte[] intToByte(int number) {
+        int temp = number;
+        byte[] b = new byte[4];
+        for (int i = 0; i < b.length; i++) {
+            b[i] = Integer.valueOf(temp & 0xff).byteValue();
+            // 向右移8位
+            temp = temp >> 8;
+        }
+        return b;
     }
 
     /**
@@ -1658,6 +1695,8 @@ public class BaseActivity extends AppCompatActivity {
         if (n > 0) {
             position = n - 50;
             timeDelay = (position - 50) * 0.125;
+            //GC20200313    自动算法光标定位国内习惯改进修正BUG
+            position = position - 50;
             Log.e("test", position + "点数");
             Log.e("test",timeDelay + "ms");
         }
@@ -1996,7 +2035,7 @@ public class BaseActivity extends AppCompatActivity {
 
 /*更改记录*/
 //GC20170609    修改增益显示方式（百分比或实际值）
-//GC20171129    声音播放延时处理
+//GC20171129    声音播放延时处理①
 //GC20171205    添加探头相对电缆位置的左右判断的功能
 //GC20180412    截取800个点的声音数据并计算其特征值
 //GC20180428    画声音波形的位置改变，提前50个点
@@ -2032,5 +2071,14 @@ public class BaseActivity extends AppCompatActivity {
 //GC20191221    命令预留
 //GT 触摸
 //GC20200103    国内习惯适配（声音波形触发时刻前去掉、用户专家界面模式按钮更改）
-//GC20200104    蓝牙数据延时处理试验
-//GC20200114    重连操作延时原因——设备与APP重新连接时有一部分无用的空数据，需要处理掉
+//GC20200313    自动算法光标定位国内习惯改进修正BUG
+
+//GC20200104    蓝牙数据延时处理试验②
+//GC20200114    重连操作延时原因——设备与APP重新连接时有一部分无用的空数据，需要处理掉 ③最终处理
+
+//GT20200306    色调更改调试
+//GC20200309    声音数据转化和播放       //GC20200402
+//GC20200312    缺省值改为100
+//GC20200409    暂停效果添加              //用户界面探头显示效果改进
+//GC20200410    用户模式1分钟无触发信号调整
+

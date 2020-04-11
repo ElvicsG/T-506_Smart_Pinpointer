@@ -20,9 +20,7 @@ public class Constant {
     /**
      *  滤波模式    * 全通 0 * 低通 1 * 带通 2 * 高通 3
      */
-    public static int filterType = 0
-
-            ;
+    public static int filterType = 0;
     public static String DeviceId = "";
 
     /**

@@ -383,11 +383,11 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
         //光标初始位置定义  //GC20190216
         if(scrubEnabled) {
             //只在声音布局中画紫色实光标
-            //GC20200103setScrubLine2(50);
+            //GC20200103 setScrubLine2(50);
         }
         if(!startMove && scrubEnabled) {
             //红色虚光标初始位置
-            //GC20200103setScrubLine3(70);
+            //GC20200103 setScrubLine3(70);·
             setScrubLine3(20);
         }
         //绘制灰色箭头图像
@@ -863,7 +863,7 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
             }
         }
         //红色虚光标触摸有效范围    //GC20190216
-        //GC20200103if(x >= 211.86 & x <= 1460) {
+        //GC20200103 if(x >= 211.86 & x <= 1460) {
         if(x >= 35 & x <= 1460) {
             setScrubLine(x);
         }
