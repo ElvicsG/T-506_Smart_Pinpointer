@@ -15,7 +15,7 @@
     <string name="The_line_has_been_disconnected_please_re_connect">The line has been disconnected,please re-connect!</string>
     <string name="Connection_failed_unable_to_get_Socket">Connection failed, unable to get Socket!</string>
     <string name="connect">Connection to</string>
-    <string name="success">succcessful!</string>
+    <string name="success">successful!</string>
     <string name="Connection_failed">Connection failed!</string>
     <string name="Device_address">Device address</string>
     <string name="Automatic_connection_please_wait">Automatic connection, please wait …</string>
@@ -137,7 +137,7 @@
     <string name="please_find_device">Please find a device!</string>
     <string name="min_delay">Minimum delay</string>
     <string name="pinpointer_position">Pinpointer Position</string>
-    <string name="connecting_waite">Connecting, please wait…</string>
+    <string name="connecting_wait">Connecting, please wait…</string>
     <string name="please_choose">Please select</string>
     <string name="fault_type_1">Low impedance</string>
     <string name="fault_type_2">High impedance</string>
@@ -160,7 +160,7 @@
     <string name="follow_sys">Auto</string>
     <string name="demo_notice">Eingegebenen Demo-Modus!</string>
     <string name="triggered">Triggered</string>
-    <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrumnet!</string>
+    <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrument!</string>
     <string name="cichang_value_max">32</string>
     <string name="cichang_value_min">0</string>
     <string name="gpsNotifyMsg">当前应用需要打开定位功能。</string>

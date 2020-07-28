@@ -35,8 +35,8 @@ public class SoundUtils {
         THUNDER = pool.load(context, R.raw.countdown23, 1);
         SCREAM = pool.load(context, R.raw.countdown22, 1);
         HORN = pool.load(context, R.raw.countdown21, 1);
-        //GC20191024
-        SONAR = pool.load(context, R.raw.countdown3, 1);
+        //GC20200417 改为“叮叮”    //GC20191024 countdown3 “叮叮叮”
+        SONAR = pool.load(context, R.raw.countdown2, 1);
     }
 
 

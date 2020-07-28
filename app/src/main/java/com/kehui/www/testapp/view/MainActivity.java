@@ -57,6 +57,9 @@ import butterknife.OnClick;
  */
 public class MainActivity extends BaseActivity {
 
+
+    private static final String TAG = "MainActivity";
+
     /**
      * 浮动层   //GC20190215 界面无缝切换
      */
@@ -206,6 +209,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        Log.e(TAG, "进入!");
         instance = this;
         initView();
         setSeekBar();
@@ -214,8 +218,10 @@ public class MainActivity extends BaseActivity {
         setChartListener();
         //读取提示音 //GC20190422
         soundSystem = new SoundUtils(this);
-        //开始倒计时   //GC20200410
-        timer.start();
+        //开始倒计时   //GC20200728
+        if (Constant.BluetoothState) {
+            timer.start();
+        }
     }
 
     /**
@@ -741,11 +747,15 @@ public class MainActivity extends BaseActivity {
             Utils.showToast(this, getResources().getString(R.string.Link_Lost_Reconnect));
             tvNotice.setText(getResources().getString(R.string.Link_Lost_Reconnect));
             tvNoticeU.setText(getResources().getString(R.string.Link_Lost_Reconnect));
+            //取消倒计时  //GC20200728
+            timer.cancel();
         }
         //GC20190613
-        if (event.status == LINK_RECONNECT) {
+        if (event.status == LINK_CONNECT) {
             tvNotice.setText(getString(R.string.message_notice_5));
             tvNoticeU.setText(getString(R.string.message_notice_5));
+            //重新开始倒计时   //GC20200728
+            timer.start();
         }
 
     }
@@ -1003,7 +1013,7 @@ public class MainActivity extends BaseActivity {
                 public void run() {
                     soundSystem.play(soundSystem.SONAR);
                 }
-            }, 2000);
+            }, 3000);   //GC20200417    间隔拉长
 
             //是故障，判断“已发现故障”
             tvNotice.setText(getString(R.string.message_notice_7));
@@ -1223,12 +1233,20 @@ public class MainActivity extends BaseActivity {
         //mMediaPlayer.stop();
         isDraw = !isDraw;
         if (isDraw) {
-            ivPlay.setImageResource(R.drawable.ic_stop);
-            tvPlay.setText(getString(R.string.pause));
-        } else {
+            //播放状态
             ivPlay.setImageResource(R.drawable.ic_play);
+            tvPlay.setText(getString(R.string.pause));
+            ivPlay.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+            tvPlay.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.blue3));
+        } else {
+            //暂停状态
+            ivPlay.setImageResource(R.drawable.ic_stop);
             tvPlay.setText(getString(R.string.play));
+            //播放暂停效果改进  //GC20200519
+            ivPlay.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            tvPlay.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
         }
+
     }
     //点击滤波
     private void clickFilter() {

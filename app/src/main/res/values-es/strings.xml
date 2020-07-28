@@ -146,7 +146,7 @@
     <string name="please_find_device">Please find a device!</string>
     <string name="min_delay">Minimum delay</string>
     <string name="pinpointer_position">Pinpointer Position</string>
-    <string name="connecting_waite">Connecting, please wait…</string>
+    <string name="connecting_wait">Connecting, please wait…</string>
     <string name="please_choose">Seleccionar</string>
     <string name="fault_type_1">Low impedance</string>
     <string name="fault_type_2">High impedance</string>
@@ -169,7 +169,7 @@
     <string name="follow_sys">Auto</string>
     <string name="demo_notice">Eingegebenen Demo-Modus!</string>
     <string name="triggered">Activado</string>
-    <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrumnet!</string>
+    <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrument!</string>
     <string name="Please_re_adjust_the_gain">Please re-adjust the gain</string>
     <string name="current">"Current: "</string>
     <string name="last">"Last: "</string>

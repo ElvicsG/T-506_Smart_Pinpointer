@@ -39,8 +39,7 @@
     <string name="The_sending_data_failed_and_was_being_resent">发送数据失败，正在重新发送</string>
     <string name="Sound_field_delay">声磁延时：</string>
     <string name="Sound_field_delay2">声磁延时</string>
-    <string name="Can_not_get_input_stream_via_Bluetooth_socket">不能通过蓝牙socket获得输入流,请重新打开应用进行连接
-    </string>
+    <string name="Can_not_get_input_stream_via_Bluetooth_socket">不能通过蓝牙socket获得输入流,请重新打开应用进行连接</string>
     <string name="You_have_no_memory_data_can_not_compare">你还没有记忆数据，无法比较</string>
     <string name="Bluetooth_is_not_connected">未连接蓝牙</string>
     <string name="Send_content_is_empty">发送内容为空</string>
@@ -141,7 +140,7 @@
     <string name="please_find_device">请查找设备!</string>
     <string name="min_delay">最小延迟</string>
     <string name="pinpointer_position">探头位置</string>
-    <string name="connecting_waite">正在连接,请稍后…</string>
+    <string name="connecting_wait">正在连接,请稍后…</string>
     <string name="please_choose">请选择</string>
     <string name="fault_type_1">低阻</string>
     <string name="fault_type_2">高阻</string>

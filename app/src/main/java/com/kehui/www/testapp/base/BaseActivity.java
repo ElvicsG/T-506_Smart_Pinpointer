@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -197,7 +198,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final int TRIGGERED       = 7;
     public static final int WHAT_REFRESH    = 8;
     public static final int LINK_LOST       = 9;
-    public static final int LINK_RECONNECT  = 10;
+    public static final int LINK_CONNECT    = 10;
     public static final int MUTE_STATE      = 11;
     public static final int NO_MUTE_STATE   = 12;
     @SuppressLint("HandlerLeak")
@@ -213,6 +214,9 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //GC20200519
+//        hideBottomUIMenu();
+
         initData();
         setAudioTrack();
         getFeaturexData();
@@ -228,7 +232,25 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 初始化
+     * 隐藏虚拟按键，并且全屏
+     */
+    protected void hideBottomUIMenu() {
+        //隐藏虚拟按键，并且全屏
+        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
+            // lower api
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            //for new api versions.
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+    }
+
+    /**
+     * 数组初始化
      */
     private void initData() {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
@@ -273,10 +295,8 @@ public class BaseActivity extends AppCompatActivity {
         seekBarMagneticInt = new int[]{22, 22};
         //初始化滤波模式对话框打开选择全通
         clickTongNum = 0;
-        //打开对话框不点击任意方式默认为0全通——改为2带通 //GC20191022
-        currentFilter = 2;
-        //GC20191023 滤波方式音量控制
-        filter = 1.5;
+        /*//打开对话框不点击任意方式默认为0全通——改为2带通 //GC20191022
+        currentFilter = 2;*/    //GC20200417
         //GC20191221 触摸静音功能
         int clickTime = 0;
 
@@ -288,7 +308,7 @@ public class BaseActivity extends AppCompatActivity {
     public void setAudioTrack() {
         //内部的音频缓冲区的大小 输出结果1392
         int minBufferSize = AudioTrack.getMinBufferSize(8000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);  //GC20200309
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);  //GT20200309
         //音频设置——指定流的类型、音频数据的采样频率、输出声道、音频数据块、bufferSizeInBytes、模式类型  //GC20171129  bufferSizeInBytes大小修改
         mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,  8000,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
@@ -438,8 +458,7 @@ public class BaseActivity extends AppCompatActivity {
                 inputStream = bluetoothSocket.getInputStream();
             }
         } catch (IOException e) {
-            Toast.makeText(this, getResources().getString(R.string
-                    .Can_not_get_input_stream_via_Bluetooth_socket), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.Can_not_get_input_stream_via_Bluetooth_socket), Toast.LENGTH_SHORT).show();
             handle.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -486,10 +505,10 @@ public class BaseActivity extends AppCompatActivity {
                             return;
                         }
                         len = inputStream.read(buffer, 0, buffer.length);
-                        Log.i("stream", "len: " + len + "  时间：" + System.currentTimeMillis());     //GT20180321 每个输入流的的长度
+//                        Log.e("stream", "len: " + len + "  时间：" + System.currentTimeMillis());     //GT20180321 每个输入流的的长度
                         //GC20200114    重新连接时——输入流先是一个长度很长的数据，然后紧跟着许多连续的长度为127的数据
                         if (len > 700) {
-                            Log.e(TAG, "处理掉无效空数据" + " len:" + len);
+                            Log.e(TAG, "处理掉无效空数据>700" + " len:" + len);
                         } else {
                             if ((len == 127) && (lastLen == 127)) {
                                 emptyCount++;
@@ -509,10 +528,10 @@ public class BaseActivity extends AppCompatActivity {
                                 Constant.sbData.append(Utils.bytes2HexString(tempBuffer));
                             }
                             streamLength += len;
-                            Log.i("streamLength", "streamLength:" + streamLength);  //GT20180321 要处理的蓝牙数据的长度
+//                            Log.e("streamLength", "streamLength:" + streamLength);  //GT20180321 要处理的蓝牙数据的长度
 
-                            //GC20200114    连续2次len长度127，清空
-                            if (emptyCount == 2) {
+                            //GC20200114    连续3次len长度127，清空
+                            if (emptyCount == 3) {
                                 //缓存的数据清零
                                 streamLength = 0;
                                 emptyCount = 1;
@@ -533,7 +552,7 @@ public class BaseActivity extends AppCompatActivity {
                                 /*if (streamLength < 750) {
                                     System.arraycopy(stream, 0, blueStream, 0, streamLength);
                                     blueStreamLen = streamLength;
-                                    Log.e("stream", "lenSum:" + blueStreamLen);  //GT20180321 要处理的蓝牙数据的长度
+                                    Log.e("stream", "lenSum:" + blueStreamLen);  //GT20200104 要处理的蓝牙数据的长度
                                     doingStream = true;
                                 } else {
                                     Log.e(TAG, "doingStream:" + streamLength);
@@ -549,13 +568,13 @@ public class BaseActivity extends AppCompatActivity {
                                         sendVoiceInitCommand();
                                     }
                                 }, 1000);
-                                //初始滤波方式——带通  //GC20191022
+                                /*//初始滤波方式——带通  //GC20191022
                                 handle.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
                                         clickDaitong();
                                     }
-                                }, 2000);
+                                }, 2000);*/     //GC20200417
                                 hasSentInitCommand = true;
                             }
                             //缓存的数据清零
@@ -631,14 +650,14 @@ public class BaseActivity extends AppCompatActivity {
                 reconnectSocket.connect();
                 needReconnect = true;
                 EventBus.getDefault().post(new RestartGetStreamEvent(bluetoothDevice.getName()));
-                Log.e(TAG, "尝试重新连接成功");
+                Log.e(TAG, "尝试连接成功");
             }
 
         } catch (IOException e) {
             try {
                 reconnectSocket.close();
                 reconnectSocket = null;
-                Log.e(TAG, "尝试重新连接走到异常");
+                Log.e(TAG, "尝试连接走到异常");
                 Thread.sleep(10000);
             } catch (Exception ignored) {
             }
@@ -646,13 +665,13 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * @param event 开启重新读取蓝牙数据线程的事件
+     * @param event 开启读取蓝牙数据线程的事件
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(RestartGetStreamEvent event) {
         //添加硬件重新连接后的提示框提示语    //GC20190613
         Message message = new Message();
-        message.what = LINK_RECONNECT;
+        message.what = LINK_CONNECT;
         handle.sendMessage(message);
 
         Toast.makeText(this, getResources().getString(R.string.connect) + " " + event.device + " " + getResources().getString(R.string.success), Toast.LENGTH_SHORT).show();
@@ -1242,7 +1261,7 @@ public class BaseActivity extends AppCompatActivity {
             }
 
             playSound(results);
-            Log.e("FILE", "maxVoicePlay:  " + maxVoicePlay );
+//            Log.e("FILE", "maxVoicePlay:  " + maxVoicePlay ); //GT20200402 查看播放的音量数据
 
         } else if (packageBean.getSM() == 77) {
             //SM: "77" = 0x4d——是磁场数据
@@ -1406,21 +1425,18 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * @param results   声音数据转化和播放    //GC20200309
+     * @param results   声音数据转化和播放    //GT20200309
      */
     public void playSound(int[] results) {
         int max = 0;
         byte[] bytes = new byte[results.length * 2];
         for (int i = 0; i < results.length; i++) {
-            //GC20191023 滤波方式音量控制
-//            short sh = (short) ((results[i] - 2048) * 16 * filter);
             short sh = (short) ((results[i] - 2048) * 16);
 
-            //GC20200402
+            //GT20200402
             int sh1 = Math.abs(sh);
             if (sh1 > max) {
                 max = sh1;
-                //找寻声音信号幅值最大点用于用户界面画进度条高度 //GC20181113
                 maxVoicePlay = max;
             }
 
@@ -1455,7 +1471,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * int转byte   //GC20200309
+     * int转byte   //GT20200309
      */
     public static byte[] intToByte(int number) {
         int temp = number;
@@ -1526,6 +1542,7 @@ public class BaseActivity extends AppCompatActivity {
         for (int i = 0; i < 751; i++) {
             sum += mED[i];
         }
+
         meanValue = sum / 751;
         for (int i = 0; i < 751; i++) {
             if (mED[i] > meanValue) {
@@ -1594,7 +1611,7 @@ public class BaseActivity extends AppCompatActivity {
             //连续两次判断为故障声开始进行相关
             if(svmPredictCount > 0){
                 //相关判断
-                related();
+                correlationCalculation();
                 if(p > 0.9){
                     //相关之后再光标定位、计算延时值
                     autoLocate();
@@ -1620,7 +1637,7 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * 计算相关系数       //GC20181119
      */
-    private void related() {
+    private void correlationCalculation() {
         //分母1
         double sum1 = 0;
         for (int i = 0; i < 800; i++) {
@@ -1650,8 +1667,8 @@ public class BaseActivity extends AppCompatActivity {
         }
         //相关系数
         p = sum / (sta1 * sta2);
-        /*String related = String.valueOf(p);
-        Log.e("related", related);*/
+        /*String correlationCalculation = String.valueOf(p);
+        Log.e("correlationCalculation", correlationCalculation);*/
     }
 
     /**
@@ -1730,7 +1747,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void showFilterDialog(final LinearLayout llView) {
         customDialog = new CustomDialog(BaseActivity.this);
         customDialog.show();
-        //GT20191022
+        //GC20191022
         Log.e("testFilterType", "clickTongNum: " + clickTongNum);
         switch (clickTongNum) {
             case 0:
@@ -1784,28 +1801,23 @@ public class BaseActivity extends AppCompatActivity {
         customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //GT20191022
+                //GC20191022
                 Log.e("testFilterType", "currentFilter: " + currentFilter);
                 switch (currentFilter) {
                     case 0:
                         Constant.filterType = currentFilter;
-                        //GC20191023 滤波方式音量控制
-                        filter = 1;
                         clickQuantong();
                         break;
                     case 1:
                         Constant.filterType = currentFilter;
-                        filter = 1.5;
                         clickDitong();
                         break;
                     case 2:
                         Constant.filterType = currentFilter;
-                        filter = 1.5;
                         clickDaitong();
                         break;
                     case 3:
                         Constant.filterType = currentFilter;
-                        filter = 1;
                         clickGaotong();
                         break;
                     default:
@@ -2032,13 +2044,16 @@ public class BaseActivity extends AppCompatActivity {
 //        String str = formatter.format(curDate);
 //        Log.e("TAG4playSound", str);    //GT20171129
 //GT20180321 蓝牙输入流解读
+//GT20200104 延时处理试验
+//GT20200309 声音数据转化和播放
+//GT20200402 查看播放的音量数据
 
 /*更改记录*/
 //GC20170609    修改增益显示方式（百分比或实际值）
 //GC20171129    声音播放延时处理①
 //GC20171205    添加探头相对电缆位置的左右判断的功能
 //GC20180412    截取800个点的声音数据并计算其特征值
-//GC20180428    画声音波形的位置改变，提前50个点
+//GC20180428    画声音波形的位置改变，提前50个点————后恢复//GC20200103
 //GC20180504    训练声音特征生成model   //G?是否不用线程
 //GC20180707    声音特征值归一化计算修改
 //GC20181113    增益进度条高度显示优化
@@ -2062,23 +2077,22 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190720    延时值显示逻辑bug修改
 //GC20190724    去掉圆圈动画，与词条跳动效果一致
 //GC2.01.010————多平台平板适配
-//GC20191011    设置探头位置
+//GC20191011    设置用户界面探头的左右位置
 //GC2.01.011————多平台平板适配
-//GC20191022    初始化滤波方式为带通
-//GC20191023    滤波方式音量控制    取消
-//GC20191024    发现故障提示音改进
+//GC20191022    初始化滤波方式为带通————后恢复//GC20200417
+//GC20191024    发现故障提示音改进 “叮叮叮”————后改为“叮叮”//GC20200417
 //GC20191220    触摸静音状态判断和显示
 //GC20191221    命令预留
-//GT 触摸
+
+//GC2.02.012————各种使用反馈优化
 //GC20200103    国内习惯适配（声音波形触发时刻前去掉、用户专家界面模式按钮更改）
 //GC20200313    自动算法光标定位国内习惯改进修正BUG
-
 //GC20200104    蓝牙数据延时处理试验②
 //GC20200114    重连操作延时原因——设备与APP重新连接时有一部分无用的空数据，需要处理掉 ③最终处理
+//GC20200312    磁场增益缺省值改为100
+//GC20200409    暂停时“左右”显示不更新              //用户界面UI探头显示效果改进
+//GC20200410    1分钟无触发信号界面提示调整      //GC20200728 后续优化
+//GC20200417    提示音改为“叮叮”，提示间隔拉长 /恢复默认显示全通
 
-//GT20200306    色调更改调试
-//GC20200309    声音数据转化和播放       //GC20200402
-//GC20200312    缺省值改为100
-//GC20200409    暂停效果添加              //用户界面探头显示效果改进
-//GC20200410    用户模式1分钟无触发信号调整
+//GC20200519    播放暂停效果改进 / （如有虚拟按键，屏蔽）尝试
 

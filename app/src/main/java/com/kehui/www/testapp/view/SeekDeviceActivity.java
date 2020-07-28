@@ -81,15 +81,13 @@ public class SeekDeviceActivity extends BaseActivity {
     private void init() {
         pairedDevicesArrayAdapter = new ArrayAdapter<>(this, R.layout.device_name2);
         if (bluetoothAdapter == null) {
-            Toast.makeText(this, getResources().getString(R.string.does_not_find_device), Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(this, getResources().getString(R.string.does_not_find_device), Toast.LENGTH_LONG).show();
             finish();
             return;
         }
         //如果蓝牙服务不可用则提示
         if (!bluetoothAdapter.isEnabled()) {
-            Toast.makeText(this, getResources().getString(R.string.open_bluetooth_ing),
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.open_bluetooth_ing), Toast.LENGTH_SHORT).show();
 
             new Thread() {
                 @Override
@@ -198,8 +196,7 @@ public class SeekDeviceActivity extends BaseActivity {
                         showMain();
                     } catch (IOException e) {
                         try {
-                            Toast.makeText(this, getResources().getString(R.string.Connection_failed) + getResources().getString(R.string
-                                    .demo_notice), Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getResources().getString(R.string.Connection_failed) + getResources().getString(R.string.demo_notice), Toast.LENGTH_LONG).show();
                             showMain();
                             bluetoothSocket.close();
                             bluetoothSocket = null;
@@ -210,14 +207,14 @@ public class SeekDeviceActivity extends BaseActivity {
                     }
                 }
                 break;
-            case 100:   //G?
+            case 100:
+                //G?
                 disconnect();
                 try {
                     MyApplication.getInstances().getBluetoothSocket().close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             default:
                 break;
         }

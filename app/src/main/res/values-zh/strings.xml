@@ -140,7 +140,7 @@
     <string name="please_find_device">请查找设备!</string>
     <string name="min_delay">最小延迟</string>
     <string name="pinpointer_position">探头位置</string>
-    <string name="connecting_waite">正在连接,请稍后…</string>
+    <string name="connecting_wait">正在连接,请稍后…</string>
     <string name="please_choose">请选择</string>
     <string name="fault_type_1">低阻</string>
     <string name="fault_type_2">高阻</string>

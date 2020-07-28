@@ -21,15 +21,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.github.markzhai\blockcanary-android\1.4.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="240276267043767bad10752646d525517511a91b">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.github.markzhai-blockcanary-android-1.4.1_5aafb6aad0492df5b97edfc61bc92797a13c618f.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\sun.misc.BASE64Decoder.jar"
         jumboMode="false"
         optimize="true"
@@ -39,30 +30,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\me.grantland\autofittextview\0.2.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="972ca945f0cf5ff0765ab94fa8e1a90661ea197a">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\me.grantland-autofittextview-0.2.1_32f7ae6676e8dc2a082cccd97c4b0e7414d15fd1.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\net.zetetic\android-database-sqlcipher\3.5.2\jars\classes.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
         sha1="e7ecee496793b4020ffe5052331a7efb075f5a73">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\net.zetetic-android-database-sqlcipher-3.5.2_8ca8083aa76a88783f1526687b8861fc58d8c1d2.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.7\751f548c85fa49f330cecbb1875893f971b33c4e\gson-2.7.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\gson-2.7_4e39c32842aa16683abdfbd903ad58ea4c75fefc.jar" />
     </item>
     <item
         is-multidex="false"
@@ -84,24 +57,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.2.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-24.2.1_4c95a11679a551b6e8581033ea7451bc72e2a8d2.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.13.0\a9283170b7305c8d92d25aff02a6ab7e45d06cbe\okio-1.13.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okio-1.13.0_e664676edcc4f11306774880b5f09c0a8705593a.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
@@ -117,42 +72,6 @@
         revision="24.0.3"
         sha1="ef03fdf4961ef0714ff37ab7480f46c4a437ba5c">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-generator-3.0.0_7bf96dc8f04e79c7686661a7e8c1e907e3bc1d6f.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.pnikosis\materialish-progress\1.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="57487745ce450899f9f250d5ae5c092a682cd041">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.pnikosis-materialish-progress-1.0_719c08185796bf2c99a1f2e553ada54bc35d1830.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\libs\internal_impl-24.2.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="867dad63c33388ff8c7644b236579355036d075f">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\internal_impl-24.2.1_9be86acc4eadf0e2e85e33add3ad65fcf5ee918f.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.robinhood.spark\spark\1.1.2\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="88998b1d461a43d0d81167d8da7cc6ce3cf12af9">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.robinhood.spark-spark-1.1.2_beb0f732a12549c3c30f9521113dea2d15e9dff9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-scalars\2.0.0-beta4\f8685e25bc7f076913e2b51996cbc19ef7eb05df\converter-scalars-2.0.0-beta4.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="f8685e25bc7f076913e2b51996cbc19ef7eb05df">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\converter-scalars-2.0.0-beta4_e7dd3ef75ac96d202d9542fa283b437534a8e63d.jar" />
     </item>
     <item
         is-multidex="false"
@@ -183,15 +102,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.jakewharton\butterknife\8.8.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="6a2bcb61342d09fe9acf55c9daf63961c8866cc0">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.jakewharton-butterknife-8.8.1_cfa166508cd1d9d5cd0083e5f7f77473fa1fb7c3.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\org.greenrobot\eventbus\3.1.1\5cd91fd014f5b72292f959748c20a2cefefae77d\eventbus-3.1.1.jar"
         jumboMode="false"
         optimize="true"
@@ -210,57 +120,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\Android\android-sdk-windows\extras\android\m2repository\com\android\support\support-annotations\25.3.0\support-annotations-25.3.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="dd84903d2e1af25a6081ef9038ad863cb14ca3a0">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\support-annotations-25.3.0_31ac6064fdbabd84a974b9667d0d1281e63ae811.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\xUtils-2.6.14.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
         sha1="f10c51f3e0732fdeefe6e104279a58e275879b6c">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\xUtils-2.6.14_eb0210fc0952e93f3dea1bd6ea2cfcf9c1d67a61.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.fang\dashview\v1.0.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="fc638e6588c545cf28cb9647c3277eac68ed9aad">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.fang-dashview-v1.0.0_9d868e5d3cae1d148f5d5257d27b6665fc3613d6.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\internal_impl-24.2.1_0e54f8f985710c3b66688cf4d1d5cb160857f30e.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-24.2.1_43034c6a59e53a500363c706fea26ff4930b2f77.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\libsvm.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="114ad9ff1965fb141eb8e7aa2eca05878641f43c">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\libsvm_97ff6cd4362456e008850e4b6149101cbc926c14.jar" />
     </item>
     <item
         is-multidex="false"
@@ -282,24 +147,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-media-compat-24.2.1_2fd13344ea0c6576e8158d3fdf61fee1a169ce8f.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\cn.pedant.sweetalert\library\1.3\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="0c3529d9491be892952749d252ae1defa9b1f937">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\cn.pedant.sweetalert-library-1.3_ccbfead14db6d7c15fedc171d1c1da108c0e87e8.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\percent\24.2.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
@@ -309,39 +156,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-compat\25.3.0\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="93c10d68ab5ea070f15782ae6d3a28d1f1d8f45e">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-compat-25.3.0_6b51528f7d25ca7fd53f2bc7974ebe43129e941a.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\me.drakeet.materialdialog\library\1.3.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
         sha1="6e57fe155cea810fb2ba5fe9ffabcb197ecf81d1">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\me.drakeet.materialdialog-library-1.3.1_d87dacd515711c2e868398ea2303f00cebe7717d.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-core-ui-24.2.1_4345646e59559c03faaddda12f0a6ec15d8e5484.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao\3.0.1\20ec484d992d38d7775a22e43ac40d2d551bb886\greendao-3.0.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="20ec484d992d38d7775a22e43ac40d2d551bb886">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-3.0.1_1dab198f3fefae48f9a667dfe1ba5c19de34e604.jar" />
     </item>
     <item
         is-multidex="false"
@@ -387,6 +207,186 @@
         revision="24.0.3"
         sha1="5a11f020cce2d11eb71ba916700600e18c4547e7">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okhttp-3.8.0_2befdecaaa6c4935ab8b078cda9f8fe8d8555757.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.github.markzhai\blockcanary-android\1.4.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="240276267043767bad10752646d525517511a91b">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.github.markzhai-blockcanary-android-1.4.1_5aafb6aad0492df5b97edfc61bc92797a13c618f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\me.grantland\autofittextview\0.2.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="972ca945f0cf5ff0765ab94fa8e1a90661ea197a">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\me.grantland-autofittextview-0.2.1_32f7ae6676e8dc2a082cccd97c4b0e7414d15fd1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.7\751f548c85fa49f330cecbb1875893f971b33c4e\gson-2.7.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\gson-2.7_4e39c32842aa16683abdfbd903ad58ea4c75fefc.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.2.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-24.2.1_4c95a11679a551b6e8581033ea7451bc72e2a8d2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.13.0\a9283170b7305c8d92d25aff02a6ab7e45d06cbe\okio-1.13.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okio-1.13.0_e664676edcc4f11306774880b5f09c0a8705593a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.pnikosis\materialish-progress\1.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="57487745ce450899f9f250d5ae5c092a682cd041">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.pnikosis-materialish-progress-1.0_719c08185796bf2c99a1f2e553ada54bc35d1830.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="867dad63c33388ff8c7644b236579355036d075f">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\internal_impl-24.2.1_9be86acc4eadf0e2e85e33add3ad65fcf5ee918f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.robinhood.spark\spark\1.1.2\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="88998b1d461a43d0d81167d8da7cc6ce3cf12af9">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.robinhood.spark-spark-1.1.2_beb0f732a12549c3c30f9521113dea2d15e9dff9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-scalars\2.0.0-beta4\f8685e25bc7f076913e2b51996cbc19ef7eb05df\converter-scalars-2.0.0-beta4.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="f8685e25bc7f076913e2b51996cbc19ef7eb05df">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\converter-scalars-2.0.0-beta4_e7dd3ef75ac96d202d9542fa283b437534a8e63d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.jakewharton\butterknife\8.8.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="6a2bcb61342d09fe9acf55c9daf63961c8866cc0">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.jakewharton-butterknife-8.8.1_cfa166508cd1d9d5cd0083e5f7f77473fa1fb7c3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\android-sdk-windows\extras\android\m2repository\com\android\support\support-annotations\25.3.0\support-annotations-25.3.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="dd84903d2e1af25a6081ef9038ad863cb14ca3a0">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\support-annotations-25.3.0_31ac6064fdbabd84a974b9667d0d1281e63ae811.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.fang\dashview\v1.0.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="fc638e6588c545cf28cb9647c3277eac68ed9aad">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.fang-dashview-v1.0.0_9d868e5d3cae1d148f5d5257d27b6665fc3613d6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\internal_impl-24.2.1_0e54f8f985710c3b66688cf4d1d5cb160857f30e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-24.2.1_43034c6a59e53a500363c706fea26ff4930b2f77.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\libsvm.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="114ad9ff1965fb141eb8e7aa2eca05878641f43c">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\libsvm_97ff6cd4362456e008850e4b6149101cbc926c14.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-media-compat-24.2.1_2fd13344ea0c6576e8158d3fdf61fee1a169ce8f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\cn.pedant.sweetalert\library\1.3\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="0c3529d9491be892952749d252ae1defa9b1f937">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\cn.pedant.sweetalert-library-1.3_ccbfead14db6d7c15fedc171d1c1da108c0e87e8.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-compat\25.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="93c10d68ab5ea070f15782ae6d3a28d1f1d8f45e">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-compat-25.3.0_6b51528f7d25ca7fd53f2bc7974ebe43129e941a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-support-core-ui-24.2.1_4345646e59559c03faaddda12f0a6ec15d8e5484.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\34238\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao\3.0.1\20ec484d992d38d7775a22e43ac40d2d551bb886\greendao-3.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="20ec484d992d38d7775a22e43ac40d2d551bb886">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-3.0.1_1dab198f3fefae48f9a667dfe1ba5c19de34e604.jar" />
     </item>
     <item
         is-multidex="false"

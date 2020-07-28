@@ -8,17 +8,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.kehui.www.testapp.BuildConfig;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
@@ -138,7 +135,7 @@ public class SplashActivity extends BaseActivity {
      * @param view  布局点击事件
      */
     public void clickSplash(View view) {
-        Utils.showToast(SplashActivity.this, getString(R.string.connecting_waite));
+        Utils.showToast(SplashActivity.this, getString(R.string.connecting_wait));
         Intent intent = new Intent(this, SeekDeviceActivity.class);
         startActivity(intent);
         finish();
