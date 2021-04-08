@@ -231,10 +231,10 @@ public class MainActivity extends BaseActivity {
         //专家界面
         seekBarMagnetic.setMax(100);
         seekBarVoice.setMax(100);
-        //GC20200312    缺省值改为100
-        seekBarMagnetic.setProgress(100);
+        //GC20200312    缺省值改为100    //GC202103 后续修改99
+        seekBarMagnetic.setProgress(99);
         seekBarVoice.setProgress(70);
-        tvMagneticValue.setText(100 + "%");
+        tvMagneticValue.setText(99 + "%");
         tvVoiceValue.setText(70 + "%");
         checkVoice();
 
@@ -282,8 +282,8 @@ public class MainActivity extends BaseActivity {
         magneticFieldGainControlU.setValueColor("#d0210e");
         magneticFieldGainControlU.setCurrentValueColor("#a03225");
         magneticFieldGainControlU.setTitle(getString(R.string.gain));
-        //GC20200312    缺省值改为100
-        magneticFieldGainControlU.setTemp(0, 100, 100);
+        //GC20200312    缺省值改为100    //GC202103 后续修改99  好像这里没效果？
+        magneticFieldGainControlU.setTemp(0, 100, 99);
         magneticFieldGainControlU.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
             @Override
             public void change(int temp) {
@@ -385,6 +385,44 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+    }
+
+    /**
+     * //GC202103   磁场初始命令值99
+     */
+    private void initCommand() {
+        int[] ints = {96, 0, 128 + b2s(99)};
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        //GC20190407 蓝牙重连功能优化
+        Constant.CurrentMagParam = request;
+        sendCommand(request);
     }
 
     /**

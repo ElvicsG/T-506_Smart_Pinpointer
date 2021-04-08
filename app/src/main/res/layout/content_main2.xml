@@ -314,7 +314,8 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_expert_notice"
-            android:gravity="center">
+            android:gravity="center"
+            app:layout_heightPercent="13%">
 
             <TextView
                 android:id="@+id/tv_notice"

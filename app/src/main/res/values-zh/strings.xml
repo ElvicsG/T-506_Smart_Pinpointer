@@ -177,5 +177,6 @@
     <string name="current">当前：</string>
     <string name="last">上次：</string>
     <string name="message_notice_trigger">等待仪器触发</string>
+    <string name="Suspected_fault">疑似故障</string>
 
 </resources>
