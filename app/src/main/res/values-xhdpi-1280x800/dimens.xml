@@ -1,0 +1,28 @@
+<?xml version ="1.0" encoding="utf-8"?>
+<resources>
+	<!--自定义适配平板的参数-->
+	<dimen name="base_dimen_12sp">15sp</dimen>
+	<dimen name="base_dimen_13sp">16.25sp</dimen>
+	<dimen name="base_dimen_14sp">17.5sp</dimen>
+	<dimen name="base_dimen_15sp">18.75sp</dimen>
+	<dimen name="base_dimen_16sp">20sp</dimen>
+	<dimen name="base_dimen_18sp">18sp</dimen>
+	<dimen name="base_dimen_34sp">34sp</dimen>
+
+	<dimen name="base_dimen_5dp">6.25dp</dimen>
+	<dimen name="base_dimen_10dp">12.5dp</dimen>
+	<dimen name="base_dimen_15dp">18.75dp</dimen>
+	<dimen name="base_dimen_20dp">31dp</dimen>
+	<dimen name="base_dimen_25dp">31.25dp</dimen>
+	<dimen name="base_dimen_40dp">50dp</dimen>
+    <dimen name="base_dimen_50dp">62.5dp</dimen>
+    <dimen name="base_dimen_55dp">68.75dp</dimen>
+    <dimen name="base_dimen_65dp">81.25dp</dimen>
+    <dimen name="base_dimen_100dp">125dp</dimen>
+    <dimen name="base_dimen_120dp">150dp</dimen>
+    <dimen name="base_dimen_130dp">162.5dp</dimen>
+    <dimen name="base_dimen_135dp">168.75dp</dimen>
+    <dimen name="base_dimen_150dp">200dp</dimen>
+    <dimen name="base_dimen_200dp">262.5dp</dimen>
+
+</resources>
