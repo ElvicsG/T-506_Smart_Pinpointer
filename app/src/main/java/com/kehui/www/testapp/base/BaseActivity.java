@@ -33,6 +33,7 @@ import com.kehui.www.testapp.event.SendCommandFinishEvent;
 import com.kehui.www.testapp.event.RestartGetStreamEvent;
 import com.kehui.www.testapp.event.UiHandleEvent;
 import com.kehui.www.testapp.ui.CustomDialog;
+import com.kehui.www.testapp.ui.CustomDeviceListDialog;
 import com.kehui.www.testapp.util.SoundUtils;
 import com.kehui.www.testapp.util.Utils;
 
@@ -61,7 +62,6 @@ import libsvm.svm_problem;
 public class BaseActivity extends AppCompatActivity {
 
     private static final String TAG = "BaseActivity";
-
     /**
      * 声音播放部分
      */
@@ -71,28 +71,26 @@ public class BaseActivity extends AppCompatActivity {
     public int streamVolumeNow;
     public boolean isSilence;
     public boolean isExit;
-
     /**
      * 蓝牙相关部分
      */
     private BluetoothSocket bluetoothSocket;
     private BluetoothSocket reconnectSocket = null;
-
     /**
      * 获得本设备的蓝牙适配器实例      返回值：如果设备具备蓝牙功能，返回BluetoothAdapter 实例；否则，返回null对象
      */
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private final static String MY_UUID = "00001101-0000-1000-8000-00805F9B34FB";
     private boolean needReconnect;
-
     /**
-     * 发送蓝牙数据
+     * 下发蓝牙数据（控制命令或MAC地址）
      */
     public byte[] sendCommand;
     public long[] crcTable;
     public boolean hasSentInitCommand;
     public boolean hasSentCommand;
-
+    public byte[] address;
+    public int[] sendAddress = new int[3];
     /**
      * 接收蓝牙数据
      */
@@ -107,18 +105,14 @@ public class BaseActivity extends AppCompatActivity {
     public int[] streamLeft;
     public int leftLen;
     public boolean hasLeft;
-
     /**
      * 解码packageBean需要的解析常量数组
      */
     public int[] indexTable = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
-    public int[] stepSizeTable = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31,
-            34, 37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190,
-            209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963,
-            1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660,
-            4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635,
-            13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
-
+    public int[] stepSizeTable = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60, 66, 73, 80,
+            88, 97, 107, 118, 130, 143, 157, 173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963,
+            1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484, 7132,
+            7845, 8630, 9493, 10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
     /**
      * 是否开始获取声音包的标志
      */
@@ -130,14 +124,12 @@ public class BaseActivity extends AppCompatActivity {
     public int[] magneticArray;
     public int[] magneticDraw;
     public boolean isDraw;
-
     /**
      * 声音特征训练
      */
     private double[] readFeature = new double[2000];
     private boolean svmTrainThread;
     private svm_model model;
-
     /**
      * 声音智能识别
      */
@@ -157,7 +149,6 @@ public class BaseActivity extends AppCompatActivity {
     private double timeDelay;
     private int position;
     public boolean isDrawCircle;
-
     /**
      * sparkView布局部分
      */
@@ -165,28 +156,28 @@ public class BaseActivity extends AppCompatActivity {
     public MyChartAdapterBase myChartAdapterMagnetic;
     public boolean isClickMem;
     public boolean isCom;
-
     /**
-     * 声音和磁场增益控制—— 默认（0）磁场（1）声音（2）
+     * 声音和磁场增益控制
      */
     public int seekBarType;
     public int[] seekBarVoiceInt;
     public int[] seekBarMagneticInt;
-
     /**
-     * 自定义滤波方式的对话框   *低通1 *带通2 *高通3 *全通0
+     * 自定义滤波方式的对话框
      */
     private CustomDialog customDialog;
     public int clickTongNum;
     public int currentFilter;
     public double filter;
-
+    /**
+     * 自定义滤波方式的对话框
+     */
+    private CustomDeviceListDialog customDeviceListDialog;
     /**
      * 触摸静音功能
      */
     public int clickTime;
     public boolean mute;
-
     /**
      * 全局的handler对象用来执行UI更新
      */
@@ -201,6 +192,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final int LINK_CONNECT    = 10;
     public static final int MUTE_STATE      = 11;
     public static final int NO_MUTE_STATE   = 12;
+
     @SuppressLint("HandlerLeak")
     public Handler handle = new Handler() {
         @Override
@@ -214,47 +206,26 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //GC20200519
-//        hideBottomUIMenu();
-
+        //GC20200519 hideBottomUIMenu();
         initData();
         setAudioTrack();
-        getFeaturexData();
+        getFeatureData();
         //启动训练声音特征的线程
         svmTrain.start();
         getCrcTable();
-        //获取蓝牙数据
+        //获取蓝牙数据流
         startGetStream();
-        //处理蓝牙数据
+        //启动处理蓝牙数据流的线程
         doStream.start();
         //注册使用EventBus
         EventBus.getDefault().register(this);
     }
 
     /**
-     * 隐藏虚拟按键，并且全屏
-     */
-    protected void hideBottomUIMenu() {
-        //隐藏虚拟按键，并且全屏
-        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
-            // lower api
-            View v = this.getWindow().getDecorView();
-            v.setSystemUiVisibility(View.GONE);
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            //for new api versions.
-            View decorView = getWindow().getDecorView();
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
-        }
-    }
-
-    /**
-     * 数组初始化
+     * 所需数据初始化
      */
     private void initData() {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-
         sendCommand = new byte[7];
         //缓存的蓝牙数据
         stream = new int[1024000];
@@ -273,7 +244,6 @@ public class BaseActivity extends AppCompatActivity {
         magneticDraw = new int[400];
         compareDraw = new int[400];
         isDraw = true;
-
         tempVoice = new int[900];
         svmData = new int[800];
         autoLocate = new int[800];
@@ -288,15 +258,12 @@ public class BaseActivity extends AppCompatActivity {
         p = 0;
         //连续相关的次数
         isRelatedCount = 0;
-
         //初始化seekBar控制情况
         seekBarType = 0;
         seekBarVoiceInt = new int[]{22, 22};
         seekBarMagneticInt = new int[]{22, 22};
-        //初始化滤波模式对话框打开选择全通
+        //滤波模式默认为全通
         clickTongNum = 0;
-        /*//打开对话框不点击任意方式默认为0全通——改为2带通 //GC20191022
-        currentFilter = 2;*/    //GC20200417
         //GC20191221 触摸静音功能
         int clickTime = 0;
 
@@ -306,13 +273,13 @@ public class BaseActivity extends AppCompatActivity {
      * 设置音频播放工具
      */
     public void setAudioTrack() {
-        //内部的音频缓冲区的大小 输出结果1392
+        //内部的音频缓冲区的大小
         int minBufferSize = AudioTrack.getMinBufferSize(8000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);  //GT20200309
-        //音频设置——指定流的类型、音频数据的采样频率、输出声道、音频数据块、bufferSizeInBytes、模式类型  //GC20171129  bufferSizeInBytes大小修改
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        //音频设置——指定流的类型、音频数据的采样频率、输出声道、音频数据块、bufferSizeInBytes、模式类型
         mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,  8000,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                minBufferSize / 6, AudioTrack.MODE_STREAM);
+                minBufferSize, AudioTrack.MODE_STREAM);
         // 播放模式有MODE_STATIC和MODE_STREAM两种分类：
         // STREAM方式表示由用户通过write方式把数据一次一次得写到audioTrack中，
         // 这种方式的缺点就是JAVA层和Native层不断地交换数据，效率损失较大；
@@ -323,9 +290,9 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 从assets文件夹中获取声音特征的数据 //GC20180504 注意读取文本文件的编码格式为ANSI
+     * 从assets文件夹中获取声音特征数据     //GC20180504 注意读取文本文件的编码格式为ANSI
      */
-    private void getFeaturexData() {
+    private void getFeatureData() {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "feature.txt");
         BufferedInputStream bis = new BufferedInputStream(mResourceAsStream);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -426,7 +393,6 @@ public class BaseActivity extends AppCompatActivity {
         InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "crctable.txt");
         BufferedInputStream bis = new BufferedInputStream(mResourceAsStream);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         int c;
         try {
             //读取bis流中的下一个字节
@@ -448,7 +414,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 获取蓝牙数据
+     * 获取蓝牙数据流
      */
     private void startGetStream() {
         try {
@@ -480,7 +446,7 @@ public class BaseActivity extends AppCompatActivity {
             }
             //当前连接状态为连接
             Constant.BluetoothState = true;
-            //启动获取蓝牙数据的线程
+            //启动缓存获取蓝牙数据的线程
             new Thread(getStream).start();
             hasGotStream = true;
         }
@@ -488,7 +454,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 获取蓝牙数据的线程
+     * 缓存获取蓝牙数据流的线程
      */
     Runnable getStream = new Runnable() {
         @Override
@@ -529,7 +495,6 @@ public class BaseActivity extends AppCompatActivity {
                             }
                             streamLength += len;
 //                            Log.e("streamLength", "streamLength:" + streamLength);  //GT20180321 要处理的蓝牙数据的长度
-
                             //GC20200114    连续3次len长度127，清空
                             if (emptyCount == 3) {
                                 //缓存的数据清零
@@ -540,24 +505,13 @@ public class BaseActivity extends AppCompatActivity {
                             lastLen = len;
 
                         }
-
-                        //在不处理数据时缓存数个输入流    //GC20171129
-                        //GC20200104if (streamCount >= 5 && !doingStream) {
+                        //在不处理数据时缓存数个输入流
+                        //GC20200104 if (streamCount >= 5 && !doingStream) {
                         if (streamLength >= 590 && !doingStream) {
                             if (hasSentInitCommand) {
                                 System.arraycopy(stream, 0, blueStream, 0, streamLength);
                                 blueStreamLen = streamLength;
                                 doingStream = true;
-                                //GC20200104    蓝牙数据延时处理试验
-                                /*if (streamLength < 750) {
-                                    System.arraycopy(stream, 0, blueStream, 0, streamLength);
-                                    blueStreamLen = streamLength;
-                                    Log.e("stream", "lenSum:" + blueStreamLen);  //GT20200104 要处理的蓝牙数据的长度
-                                    doingStream = true;
-                                } else {
-                                    Log.e(TAG, "doingStream:" + streamLength);
-                                    Log.e(TAG, "doingStream:" + doingStream);  //GT20200104 不处理蓝牙数据
-                                }*/
 
                             } else {
                                 //缓存数据之前先发送初始化控制命令
@@ -568,13 +522,6 @@ public class BaseActivity extends AppCompatActivity {
                                         sendVoiceInitCommand();
                                     }
                                 }, 1000);
-                                /*//初始滤波方式——带通  //GC20191022
-                                handle.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        clickDaitong();
-                                    }
-                                }, 2000);*/     //GC20200417
                                 hasSentInitCommand = true;
                             }
                             //缓存的数据清零
@@ -590,7 +537,6 @@ public class BaseActivity extends AppCompatActivity {
                         e1.printStackTrace();
                     }
                     inputStream = null;
-
                     //提示框连接断开提示 //GC20190407 蓝牙重连功能优化
                     Message message = new Message();
                     message.what = LINK_LOST;
@@ -626,13 +572,13 @@ public class BaseActivity extends AppCompatActivity {
     };
 
     /**
-     * 尝试重新连接蓝牙 //GC20190407
+     * 丢失连接（硬件断开）后，尝试重新连接 //GC20190407
      */
     public void reconnect() {
         //读取设置数据
         SharedPreferences shareData = getSharedPreferences("Add", 0);
         String address = shareData.getString(String.valueOf(1), null);
-        //获取远程蓝牙设备
+        //通过MAC地址获取蓝牙设备
         BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
         //用服务号得到socket
         try {
@@ -665,321 +611,17 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * @param event 开启读取蓝牙数据线程的事件
+     * @param event 蓝牙重新连接成功后的事件
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(RestartGetStreamEvent event) {
-        //添加硬件重新连接后的提示框提示语    //GC20190613
+        //提示框提示语更新    //GC20190613
         Message message = new Message();
         message.what = LINK_CONNECT;
         handle.sendMessage(message);
-
         Toast.makeText(this, getResources().getString(R.string.connect) + " " + event.device + " " + getResources().getString(R.string.success), Toast.LENGTH_SHORT).show();
         hasGotStream = false;
         startGetStream();
-    }
-
-    /*蓝牙控制命令——客户端发送：共7个字节
-    Device：设备地址，T-506为0x60  十进制96
-    Function：功能码，实现声音、磁场增益的调整和声音通带的选择
-        0：声音/磁场增益调整
-        1：声音通道选择低通
-        2：声音通道选择带通
-        3：声音通道选择高通
-        4：声音通道选择全通
-    Control：控制声音和磁场的增益  （字节转换为位）（增益共有32阶：0~31）
-        位7：声音/磁场的选择
-            0：声音
-            1：磁场
-        位6~0：调整后的阶数
-    Crc：占4个字节*/
-    /*蓝牙控制命令——设备端响应：共7个字节
-    第3个字节Respond：响应值，命令是否响应
-        0：未响应
- 	    1：已响应*/
-
-    /**
-     * 发送触摸静音重置控制命令   //GC20191220
-     */
-    public void sendResetCommand() {
-        //设备地址：“96”= 0x60；触摸重置控制命令：5,0
-        int[] ints = {96, 5, 0};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        sendCommand(request);
-    }
-
-    /**
-     * 发送自动关机取消命令（用于老化）   //GC20191221
-     */
-    public void sendAgeingCommand() {
-        //设备地址：“96”= 0x60；自动关机取消命令：6,0
-        int[] ints = {96, 6, 0};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        sendCommand(request);
-    }
-
-    /**
-     * 发送触摸静音打开命令   //GC20191221
-     */
-    public void sendTouchOnCommand() {
-        //设备地址：“96”= 0x60；触摸静音打开命令：7,0
-        int[] ints = {96, 7, 0};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        sendCommand(request);
-    }
-
-    /**
-     * 发送触摸静音关闭命令   //GC20191221
-     */
-    public void sendTouchOffCommand() {
-        //设备地址：“96”= 0x60；触摸静音关闭命令：8,0
-        int[] ints = {96, 8, 0};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        sendCommand(request);
-    }
-
-    /**
-     * 发送声音初始化控制命令
-     */
-    public void sendVoiceInitCommand() {
-        //设备地址：“96”= 0x60；声音/磁场增益调整：0；控制增益：声音0、阶数22
-        int[] ints = {96, 0, 22};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        sendCommand(request);
-    }
-
-    /**
-     * 发送磁场初始化控制命令
-     */
-    public void sendMagneticInitCommand() {
-        //设备地址：96”= 0x60；声音/磁场增益调整：0；控制增益：声音“128”= 二进制1000 0000、阶数22。
-        int[] ints = {96, 0, 128 + 22};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        sendCommand(request);
-    }
-
-    /**
-     * @param bytes 发送的控制命令
-     * @return  发送控制命令的CRC码
-     */
-    public long getCommandCrcByte(int[] bytes) {
-        return getCrc(bytes);
-    }
-
-    /**
-     * @param ints  数据内容
-     * @return  得到crc码
-     */
-    public long getCrc(int[] ints) {
-        handle.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-            }
-        }, 2000);
-        long nReg = Long.valueOf("4294967295");
-        long integer = Long.valueOf("4294967295");
-        for (int i = 0; i < ints.length; i++) {
-            nReg = nReg ^ ints[i];
-            for (int j = 0; j < 4; j++) {
-                long a = nReg >> 24;
-                long b = a & 255;
-                long nTemp = crcTable[(int) b];
-                nReg = (nReg << 8) & integer;
-                nReg = nReg ^ nTemp;
-            }
-        }
-        return nReg;
-    }
-
-    /**
-     * @param command   设备控制命令
-     */
-    public void sendCommand(byte[] command) {
-        if (!hasSentCommand) {
-            System.arraycopy(command, 0, sendCommand, 0, command.length);
-            if (bluetoothSocket == null) {
-                Toast.makeText(this, getResources().getString(R.string.Bluetooth_is_not_connected), Toast.LENGTH_SHORT).show();
-            }
-            try {
-                //蓝牙输出流
-                OutputStream os = bluetoothSocket.getOutputStream();
-                os.write(command);
-                EventBus.getDefault().post(new SendCommandFinishEvent());
-                hasSentCommand = true;
-            } catch (IOException e) {
-                //Toast.makeText(this, "发送失败" + e.toString(), Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            //Toast.makeText(MainActivity.this, "还没有收到来自设备端的回复", Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**
@@ -997,6 +639,40 @@ public class BaseActivity extends AppCompatActivity {
         }
     });
 
+    /*APP接收的蓝牙数据流——
+    ①数据包结构：一包59个字节
+    (1)	S/M：声音、磁场数据的选择
+            0x53：声音
+            0x54：声音静音状态
+            0x4d：磁场
+    (2)	Mark：数据的标记位
+    当数据为声音数据时:
+        位7：是否在此包数据触发
+            0：没有触发
+            1：触发
+        位6~0：触发时的数据点所在位置（0~99）
+    当数据为磁场数据时：
+        位7：判断探头在电缆哪一侧
+		    0：左
+		    1：右
+        位1~0：为磁场数据的顺序
+            00
+            01
+            10
+            11
+    (3)	Index：解码数据index
+    (4)	Predsample：解码数据（由两个字节组成，第4个字节为高8位，第5个字节为低8位）
+    (5)	Date：声音编码数据
+    (6)	Crc：循环冗余校验码（由末尾4个字节组成）
+
+    ②控制命令——设备端响应：一组7个字节
+    Device：设备地址，T-506为0x60  十进制96
+    Function：对应功能码
+    Respond：响应值，命令是否响应
+        0：未响应
+ 	    1：已响应
+ 	Crc：占4个字节*/
+
     /**
      * @param temp 需要处理的蓝牙数据    //G?
      * @param tempLength   数据长度
@@ -1007,7 +683,6 @@ public class BaseActivity extends AppCompatActivity {
         int dataNum = 0;
         int[] receivedBean = new int[59];
         int[] receivedCommand = new int[7];
-
         //处理过后有剩余数据
         if (hasLeft) {
             for (int j = leftLen, k = 0; j < 59; j++, k++) {
@@ -1015,18 +690,17 @@ public class BaseActivity extends AppCompatActivity {
                 streamLeft[j] = temp[k];
             }
             for (int i1 = 0; i1 < 59; i1++) {
-                //找数据头（0x53：声音  0x4d：磁场  0x60：T-506命令  0x54：声音静音状态） //GC20191220
+                //找数据头（0x53：声音  0x4d：磁场  0x60：DEVICE  0x54：声音静音状态） //GC20191220
                 if (streamLeft[i1] == 83 || streamLeft[i1] == 77 || streamLeft[i1] == 96 || streamLeft[i1] == 84) {
                     for (int i2 = 0, j = i1; i2 < 59; i2++, j++) {
                         if (j >= 59) {
                             receivedBean[i2] = temp[i + j - leftLen];
                         } else {
-                            //截取数据包
                             receivedBean[i2] = streamLeft[j];
                         }
                         boolean isCrc = doTempCrc(receivedBean);
+                        //判断是数据包数据
                         if (isCrc) {
-                            //判断为数据包数据
                             doTempBean(receivedBean);
                             i1 += 58;
                         } else {
@@ -1039,8 +713,8 @@ public class BaseActivity extends AppCompatActivity {
                                     }
                                 }
                                 boolean isCrc2 = doTempCrc2(receivedCommand);
+                                //判断是控制命令的反馈
                                 if (isCrc2) {
-                                    //判断为控制命令
                                     hasSentCommand = false;
                                     i1 += 6;
                                     if (receivedCommand[2] != 1) {
@@ -1048,10 +722,12 @@ public class BaseActivity extends AppCompatActivity {
                                         handle.sendEmptyMessage(SEND_ERROR);
                                         EventBus.getDefault().post(new SendCommandNotRespondEvent());
                                         seekBarType = 0;
-                                    } else if (receivedCommand[1] == sendCommand[1]) {
-                                        //接収的命令内容与要发送的命令内容一致
-                                        seekBarType = 0;
-                                        handle.sendEmptyMessage(SEND_SUCCESS);
+                                    } else{
+//                                        if (receivedCommand[1] == sendCommand[1]) {   //GC20210707    命令发送错误BUG改进试验
+                                            //接収的命令内容与要发送的命令内容一致
+                                            seekBarType = 0;
+                                            handle.sendEmptyMessage(SEND_SUCCESS);
+//                                        }
                                     }
                                 }
                             }
@@ -1061,39 +737,42 @@ public class BaseActivity extends AppCompatActivity {
             }
             hasLeft = false;
         }
-        //开始遍历
+        //开始遍历处理
         for (; i < tempLength - 59; i++) {
-            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96 || temp[i] == 84) { //GC20191220
+            //找数据头（0x53：声音  0x4d：磁场  0x60：DEVICE  0x54：声音静音状态） //GC20191220
+            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96 || temp[i] == 84) {
+                //截取数据包长度的数据
                 for (int j = i, k = 0; j < (i + 59); j++, k++) {
-                    //截取数据包
                     receivedBean[k] = temp[j];
                 }
                 boolean isCrc = doTempCrc(receivedBean);
+                //判断是数据包数据
                 if (isCrc) {
-                    //判断为数据包数据
                     doTempBean(receivedBean);
                     i += 58;
                 } else {
                     if (temp[i] == 96) {
+                        //截取控制命令长度的数据
                         for (int j = i, k = 0; j < (i + 7); j++, k++) {
-                            //截取控制命令
                             receivedCommand[k] = temp[j];
                         }
                         boolean isCrc2 = doTempCrc2(receivedCommand);
+                        //判断是控制命令的反馈
                         if (isCrc2) {
-                            //判断为控制命令
                             hasSentCommand = false;
+                            i += 6;
+                            //第三个字节Respond：0，命令未响应;1，命令已响应
                             if (receivedCommand[2] != 1) {
-                                //Respond：响应值，命令未响应
                                 handle.sendEmptyMessage(SEND_ERROR);
                                 EventBus.getDefault().post(new SendCommandNotRespondEvent());
                                 seekBarType = 0;
-                            } else if (receivedCommand[1] == sendCommand[1]) {
-                                //接収的命令内容与要发送的命令内容一致
-                                seekBarType = 0;
-                                handle.sendEmptyMessage(SEND_SUCCESS);
+                            } else {
+//                                if (receivedCommand[1] == sendCommand[1]) {   //GC20210707    命令发送错误BUG改进试验
+                                    //接収的命令内容与要发送的命令内容一致
+                                    seekBarType = 0;
+                                    handle.sendEmptyMessage(SEND_SUCCESS);
+//                                }
                             }
-                            i += 6;
                         }
                     }
                 }
@@ -1158,34 +837,10 @@ public class BaseActivity extends AppCompatActivity {
         long ll = (long) (ints2[0] * Math.pow(2, 24) + ints2[1] * Math.pow(2, 16) + ints2[2] *
                 Math.pow(2, 8) + ints2[3]);
         return l == ll;
-
     }
 
-    /*数据包结构：
-    (1)	S/M：声音、磁场数据的选择
-            0x53：声音
-            0x4d：磁场
-    (2)	Mark：数据的标记位
-    当数据为声音数据时:
-        位7：是否在此包数据触发
-            0：没有触发
-            1：触发
-        位6~0：触发时的数据点所在位置（0~99）
-    当数据为磁场数据时：
-        位7：判断探头在电缆哪一侧
-		    0：左
-		    1：右
-        位1~0：为磁场数据的顺序
-            00
-            01
-            10
-            11
-    (3)	Index：解码数据index
-    (4)	Predsample：解码数据（由两个字节组成，第4个字节为高8位，第5个字节为低8位）
-    (5)	Date：声音编码数据
-    (6)	Crc：循环冗余校验码（由4个字节组成）*/
     /**
-     * @param tempBean  对59个数据进行bean对象的处理
+     * @param tempBean  对59个字节数据进行bean对象的处理
      */
     private void doTempBean(int[] tempBean) {
         PackageBean packageBean = new PackageBean();
@@ -1206,24 +861,22 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void doPackageBean(PackageBean packageBean) {
         int[] results = decodeData(packageBean);
+        //1、是声音数据——SM: "83" = 0x53（正常状态）；"84" = 0x54（静音状态）
         if (packageBean.getSM() == 83 || packageBean.getSM() == 84) {
-            //SM: "83" = 0x53——是声音数据
             int mark = packageBean.getMark();
-            //声音状态判断    //GC20191220
+            //判断声音状态并显示    //GC20191220
             if (packageBean.getSM() == 84) {
-                // SM: "84" = 0x54——是声音的静音数据
                 Log.i(TAG, "静音状态");
                 handle.sendEmptyMessage(MUTE_STATE);
             } else {
-                Log.i(TAG, "非静音状态");
                 handle.sendEmptyMessage(NO_MUTE_STATE);
             }
+            //截取需要绘制的声音数据
             if (binaryStartsWithOne(mark)) {
-                //Mark最高位是1——代表仪器在这一包内触发
+                //Mark最高位是1——代表仪器在这一包声音数据内触发
                 Message msg = new Message();
                 msg.what = LIGHT_UP;
                 handle.sendMessage(msg);
-                //开始截取声音包
                 isVoicePack = true;
                 //Mark后7位，找到触发时刻声音数据点所在的位置
                 triggeredPosition = getMarkLastSeven(mark);
@@ -1259,23 +912,21 @@ public class BaseActivity extends AppCompatActivity {
                     }
                 }
             }
-
             playSound(results);
 //            Log.e("FILE", "maxVoicePlay:  " + maxVoicePlay ); //GT20200402 查看播放的音量数据
-
-        } else if (packageBean.getSM() == 77) {
-            //SM: "77" = 0x4d——是磁场数据
+        }
+        //2、是磁场数据——SM: "77" = 0x4d
+        else if (packageBean.getSM() == 77) {
             if (packageBean.getMark() >= 128) {
                 //探头相对电缆位置的判断   Mark: "128"= 10000000 代表位7是1 //GC20171205
                 if (isDraw) {
-                    //暂停效果添加    //GC20200409
+                    //非“暂停”状态下才刷新位置显示    //GC20200409
                     handle.sendEmptyMessage(POSITION_RIGHT);
                 }
                 //令位7=0
                 packageBean.setMark(packageBean.getMark() - 128);
             } else {
                 if (isDraw) {
-                    //暂停效果添加    //GC20200409
                     handle.sendEmptyMessage(POSITION_LEFT);
                 }
             }
@@ -1293,7 +944,7 @@ public class BaseActivity extends AppCompatActivity {
                     //得到绘制的磁场数组magneticDraw
                     for (int i = 0; i < 400; i++) {
                         magneticDraw[i] = magneticArray[i];
-                        //找寻磁场信号幅值最大点用于用户界面画进度条高度   //GC20181113
+                        //找到磁场信号幅值最大值maxMagnetic用于用户界面画进度条高度   //GC20181113
                         magneticArray[i] = magneticArray[i] - 2048;
                         if (magneticArray[i] > 2047) {
                             magneticArray[i] = 2047;
@@ -1305,9 +956,7 @@ public class BaseActivity extends AppCompatActivity {
                             maxMagnetic = magneticArray[i];
                         }
                     }
-                    //得到绘制的声音数组voiceDraw   //GC20180428 声音波形加上触发前50个点的数据
-//                    System.arraycopy(tempVoice, 50, voiceDraw, 0, 400);
-                    //GC20200103 国内不看触发时刻之前的数据
+                    //截取需要绘制的声音数组voiceDraw      //GC20180428 加上触发前50个点的数据   //GC20200103 改回触发时刻
                     System.arraycopy(tempVoice, 100, voiceDraw, 0, 400);
                     //用于声音自动识别定位的数组
                     for (int i = 0; i < 800; i++) {
@@ -1317,7 +966,7 @@ public class BaseActivity extends AppCompatActivity {
                         autoLocate[i] = tempVoice[i];
                     }
                     //获取声音特征
-                    obtainFeaturex();
+                    obtainFeature();
                     //根据声音特征预测
                     if (svmTrainThread) {
                         voiceSvmPredict(feature);
@@ -1432,14 +1081,12 @@ public class BaseActivity extends AppCompatActivity {
         byte[] bytes = new byte[results.length * 2];
         for (int i = 0; i < results.length; i++) {
             short sh = (short) ((results[i] - 2048) * 16);
-
             //GT20200402
             int sh1 = Math.abs(sh);
             if (sh1 > max) {
                 max = sh1;
                 maxVoicePlay = max;
             }
-
             byte[] bytes1 = shortToByte(sh);
 //            Log.e("FILE", "byte.length:  " + bytes1.length);
             bytes[i * 2] = bytes1[0];
@@ -1487,7 +1134,7 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * 获取当前声音数据的特征值    //GC20180412
      */
-    private void obtainFeaturex() {
+    private void obtainFeature() {
         //声音数据归一化
         int max = 0;
         for (int i = 0; i < 800; i++) {
@@ -1500,7 +1147,7 @@ public class BaseActivity extends AppCompatActivity {
             svmData[i] = Math.abs(svmData[i]);
             if (svmData[i] > max) {
                 max = svmData[i];
-                //找寻声音信号幅值最大点用于用户界面画进度条高度 //GC20181113
+                //找找到声音信号幅值最大值maxVoice用于用户界面画进度条高度 //GC20181113
                 maxVoice = max;
             }
         }
@@ -1720,13 +1367,563 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //点击记忆按钮执行的方法
+    /*APP发送的蓝牙数据流
+    ①控制命令——APP发送：共7个字节
+    Device：设备地址，T-506为0x60  十进制96；
+    Function：功能码，实现声音、磁场增益的调整和声音通带的选择
+        0：声音/磁场增益调整
+        1：声音通道选择低通
+        2：声音通道选择带通
+        3：声音通道选择高通
+        4：声音通道选择全通
+        5：触摸静音重置命令
+        6：自动关机取消命令
+        7：触摸静音打开命令
+        8：触摸静音关闭命令
+        9：音频蓝牙重置命令
+    Control：控制声音和磁场的增益  （字节转换为位）（增益共有32阶：0~31）
+        位7：声音/磁场的选择
+            0：声音
+            1：磁场
+        位6~0：调整后的阶数
+    Crc：占4个字节
+
+    ②后续增加下发耳机MAC address——Device数据头0x61,Function和Control用来传数据*/
+
+    /**
+     * 1、下发低通控制命令     数字滤波100Hz-400Hz
+     * 格式：①设备地址：96；②低通声音通道：1；③：无
+     */
+    public void clickDitong() {
+        clickTongNum = 1;
+        int[] ints = {96, 1, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        //GC2.01.006 蓝牙重连功能优化
+        Constant.CurrentFilterParam = request;
+        sendCommand(request);
+
+    }
+
+    /**
+     * 2、下发带通控制命令     数字滤波150Hz-600Hz
+     */
+    public void clickDaitong() {
+        clickTongNum = 2;
+        int[] ints = {96, 2, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        //GC2.01.006 蓝牙重连功能优化
+        Constant.CurrentFilterParam = request;
+        sendCommand(request);
+
+    }
+
+    /**
+     * 3、下发高通控制命令     数字滤波200Hz-1500Hz    （硬件改参数，实际效果200Hz-800Hz）
+     */
+    public void clickGaotong() {
+        clickTongNum = 3;
+        int[] ints = {96, 3, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        //GC2.01.006 蓝牙重连功能优化
+        Constant.CurrentFilterParam = request;
+        sendCommand(request);
+
+    }
+
+    /**
+     * 4、下发全通控制命令     数字滤波不处理曾经是100Hz-1500Hz  （硬件改参数，实际效果10Hz-800Hz）
+     */
+    public void clickQuantong() {
+        clickTongNum = 0;
+        int[] ints = {96, 4, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        //GC2.01.006 蓝牙重连功能优化
+        Constant.CurrentFilterParam = request;
+        sendCommand(request);
+
+    }
+
+    /**
+     * 5、下发触摸静音重置控制命令   //GC20191220
+     */
+    public void sendResetCommand() {
+        //设备地址：“96”= 0x60；触摸重置控制命令：5,0
+        int[] ints = {96, 5, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 6、下发自动关机取消命令（用于老化）   //GC20191221
+     */
+    public void sendAgingCommand() {
+        //设备地址：“96”= 0x60；自动关机取消命令：6,0
+        int[] ints = {96, 6, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 7、下发触摸静音打开命令   //GC20191221
+     */
+    public void sendTouchOnCommand() {
+        //设备地址：“96”= 0x60；触摸静音打开命令：7,0
+        int[] ints = {96, 7, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 8、下发触摸静音关闭命令   //GC20191221
+     */
+    public void sendTouchOffCommand() {
+        //设备地址：“96”= 0x60；触摸静音关闭命令：8,0
+        int[] ints = {96, 8, 0};
+        long l = getCommandCrcByte(ints);
+
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 9、下发音频蓝牙重置控制命令    //GC20210630
+     */
+    public void sendReconnectCommand() {
+        int[] ints = {96, 9, 0};
+
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+
+    }
+
+    /**
+     * 0、下发声音增益初始化命令
+     */
+    public void sendVoiceInitCommand() {
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：声音0、阶数22
+        int[] ints = {96, 0, 22};
+        //计算CRC校验码
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+        //下发命令
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 0、下发磁场初始化控制命令
+     */
+    public void sendMagneticInitCommand() {
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000、阶数22—— //GC202171 99%（阶数31）
+        int[] ints = {96, 0, 128 + 31};
+        //计算CRC校验码
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+        //下发命令
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * @param bytes 发送的控制命令
+     * @return  发送控制命令的CRC码
+     */
+    public long getCommandCrcByte(int[] bytes) {
+        return getCrc(bytes);
+    }
+
+    /**
+     * @param ints  数据内容
+     * @return  得到crc码
+     */
+    public long getCrc(int[] ints) {
+        handle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 2000);
+        long nReg = Long.valueOf("4294967295");
+        long integer = Long.valueOf("4294967295");
+        for (int i = 0; i < ints.length; i++) {
+            nReg = nReg ^ ints[i];
+            for (int j = 0; j < 4; j++) {
+                long a = nReg >> 24;
+                long b = a & 255;
+                long nTemp = crcTable[(int) b];
+                nReg = (nReg << 8) & integer;
+                nReg = nReg ^ nTemp;
+            }
+        }
+        return nReg;
+    }
+
+    /**
+     * @param command   设备控制命令
+     */
+    public void sendCommand(byte[] command) {
+        if (!hasSentCommand) {
+            System.arraycopy(command, 0, sendCommand, 0, command.length);
+            if (bluetoothSocket == null) {
+                Toast.makeText(this, getResources().getString(R.string.Bluetooth_is_not_connected), Toast.LENGTH_SHORT).show();
+            }
+            try {
+                //蓝牙输出流
+                OutputStream os = bluetoothSocket.getOutputStream();
+                os.write(command);
+                EventBus.getDefault().post(new SendCommandFinishEvent());
+                hasSentCommand = true;
+            } catch (IOException e) {
+                //Toast.makeText(this, "发送失败" + e.toString(), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            //Toast.makeText(MainActivity.this, "还没有收到来自设备端的回复", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 下发MAC地址控制命令    //GC20210701
+     */
+    public void sendMAC(int[] ints) {
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+
+    }
+
+    /**
+     * 点击记忆按钮执行的方法
+     */
     public void clickMemory() {
         isClickMem = true;
         System.arraycopy(voiceDraw, 0, compareDraw, 0, 400);
     }
 
-    //点击比较按钮执行的方法
+    /**
+     * 点击比较按钮执行的方法
+     */
     public void clickCompare() {
         if (isClickMem) {
             isCom = !isCom;
@@ -1741,14 +1938,12 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 滤波方式选择， *低通1 *带通2 *高通3 *全通0
+     * 点击滤波按钮     方式选择 clickTongNum：低通=1；带通=2；高通=3；全通=0
      * @param llView    滤波对话框
      */
     protected void showFilterDialog(final LinearLayout llView) {
         customDialog = new CustomDialog(BaseActivity.this);
         customDialog.show();
-        //GC20191022
-        Log.e("testFilterType", "clickTongNum: " + clickTongNum);
         switch (clickTongNum) {
             case 0:
                 customDialog.clearFilter1();
@@ -1801,8 +1996,6 @@ public class BaseActivity extends AppCompatActivity {
         customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //GC20191022
-                Log.e("testFilterType", "currentFilter: " + currentFilter);
                 switch (currentFilter) {
                     case 0:
                         Constant.filterType = currentFilter;
@@ -1843,160 +2036,41 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    //发送低通控制命令
-    public void clickDitong() {
-        clickTongNum = 1;
-        int[] ints = {96, 1, 0};    //GN （控制命令前三个字节的十进制数值）  设备地址：96；低通滤波功能：1；控制增益：无
+    /**
+     * 点击耳机按钮
+     * @param llView    耳机查找对话框     //GC20210712
+     */
+    protected void showHeadphonesDialog(final LinearLayout llView) {
+        customDeviceListDialog = new CustomDeviceListDialog(BaseActivity.this);
+        customDeviceListDialog.show();
 
-        long l = getCommandCrcByte(ints);
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
+        customDeviceListDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                customDeviceListDialog.dismiss();
+
             }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendCommand(request);
+        });
+        customDeviceListDialog.setRightButton(getString(R.string.cancel), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                llView.setClickable(true);
+                customDeviceListDialog.dismiss();
+            }
+        });
+        customDeviceListDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                llView.setClickable(true);
+            }
+        });
 
     }
 
-    //发送带通控制命令
-    public void clickDaitong() {
-        clickTongNum = 2;
-        int[] ints = {96, 2, 0};
-        long l = getCommandCrcByte(ints);
-
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendCommand(request);
-
-    }
-
-    //发送高通控制命令
-    public void clickGaotong() {
-        clickTongNum = 3;
-        int[] ints = {96, 3, 0};
-
-        long l = getCommandCrcByte(ints);
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        Constant.CurrentFilterParam = request;  //GC2.01.006 蓝牙重连功能优化
-        sendCommand(request);
-
-    }
-
-    //发送全通控制命令
-    public void clickQuantong() {
-        clickTongNum = 0;
-        int[] ints = {96, 4, 0};
-
-        long l = getCommandCrcByte(ints);
-        String s = Long.toBinaryString((int) l);
-        StringBuilder ss = new StringBuilder();
-        if (s.length() <= 32) {
-            for (int i = 0; i < (32 - s.length()); i++) {
-                ss.append("0");
-            }
-            s = ss.toString() + s;
-        } else {
-            s = s.substring(s.length() - 32);
-        }
-        String substring1 = s.substring(0, 8);
-        String substring2 = s.substring(8, 16);
-        String substring3 = s.substring(16, 24);
-        String substring4 = s.substring(24, 32);
-        Integer integer1 = Integer.valueOf(substring1, 2);
-        Integer integer2 = Integer.valueOf(substring2, 2);
-        Integer integer3 = Integer.valueOf(substring3, 2);
-        Integer integer4 = Integer.valueOf(substring4, 2);
-
-        byte[] request = new byte[7];
-        request[0] = (byte) ints[0];
-        request[1] = (byte) ints[1];
-        request[2] = (byte) ints[2];
-        request[3] = (byte) integer1.intValue();
-        request[4] = (byte) integer2.intValue();
-        request[5] = (byte) integer3.intValue();
-        request[6] = (byte) integer4.intValue();
-        //GC2.01.006 蓝牙重连功能优化
-        Constant.CurrentFilterParam = request;
-        sendCommand(request);
-
-    }
-
-    //增益数值和百分比的转化 100转32
+    /**
+     * 增益阶数和百分比的转化 100转32
+     */
     public int b2s(int b) {
         int s;
         float v = (float) b / 100.0f;
@@ -2005,13 +2079,33 @@ public class BaseActivity extends AppCompatActivity {
         return s;
     }
 
-    //32转100
+    /**
+     * 32转100
+     */
     public int s2b(int s) {
         int b;
         float v = (float) s / 32.0f;
         float v1 = v * 100;
         b = (int) v1;
         return b;
+    }
+
+    /**
+     * 隐藏虚拟按键，并且全屏  //GC20200519
+     */
+    protected void hideBottomUIMenu() {
+        //隐藏虚拟按键，并且全屏
+        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
+            // lower api
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            //for new api versions.
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
     }
 
     @Override
@@ -2040,18 +2134,18 @@ public class BaseActivity extends AppCompatActivity {
 
 /*调试记录*/
 //        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss:SSS");
-//        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+//        Date curDate = new Date(System.currentTimeMillis());  //获取当前时间
 //        String str = formatter.format(curDate);
-//        Log.e("TAG4playSound", str);    //GT20171129
+//        Log.e("TAG4playSound", str);
 //GT20180321 蓝牙输入流解读
-//GT20200104 延时处理试验
 //GT20200309 声音数据转化和播放
 //GT20200402 查看播放的音量数据
+//G?    增益下发
+//GT20210705    延时操作运用
 
 /*更改记录*/
-//GC20170609    修改增益显示方式（百分比或实际值）
-//GC20171129    声音播放延时处理①
-//GC20171205    添加探头相对电缆位置的左右判断的功能
+//GC20170609    增益显示方式（百分比或实际阶数）
+//GC20171205    添加探头相对电缆位置的左右方向判断显示
 //GC20180412    截取800个点的声音数据并计算其特征值
 //GC20180428    画声音波形的位置改变，提前50个点————后恢复//GC20200103
 //GC20180504    训练声音特征生成model   //G?是否不用线程
@@ -2068,10 +2162,9 @@ public class BaseActivity extends AppCompatActivity {
 //GC20190407    硬件关闭重连功能添加和优化
 //GC2.01.007————添加故障提示音和重连提示
 //GC20190422    "发现故障"提示音添加
-//GC20190613    添加硬件重新连接后的提示框提示语
+//GC20190613    蓝牙重新连接后，提示框提示语更新
 //GC2.01.008————用户界面布局修改，稳定无bug版本
 //GC20190625    用户界面发现故障UI提示更改 （动画改为根据延时值改变大小的圆圈）
-//GC20190627    触发灯闪烁bug原因
 //GC2.01.009————用户界面布局修改，故障判断逻辑优化
 //GC20190717    用户界面布局修改（去掉最小延时值、改变当前、上次延时值显示位置等）
 //GC20190720    延时值显示逻辑bug修改
@@ -2079,20 +2172,21 @@ public class BaseActivity extends AppCompatActivity {
 //GC2.01.010————多平台平板适配
 //GC20191011    设置用户界面探头的左右位置
 //GC2.01.011————多平台平板适配
-//GC20191022    初始化滤波方式为带通————后恢复//GC20200417
-//GC20191024    发现故障提示音改进 “叮叮叮”————后改为“叮叮”//GC20200417
 //GC20191220    触摸静音状态判断和显示
 //GC20191221    命令预留
-
 //GC2.02.012————各种使用反馈优化
 //GC20200103    国内习惯适配（声音波形触发时刻前去掉、用户专家界面模式按钮更改）
 //GC20200313    自动算法光标定位国内习惯改进修正BUG
-//GC20200104    蓝牙数据延时处理试验②
 //GC20200114    重连操作延时原因——设备与APP重新连接时有一部分无用的空数据，需要处理掉 ③最终处理
-//GC20200312    磁场增益缺省值改为100        //GC202103 后续修改99
-//GC20200409    暂停时“左右”显示不更新              //用户界面UI探头显示效果改进
+//GC20200312    磁场增益缺省值改为99%（阶数31，增益阶数0-32）       //GC202171  初始化增益阶数控制命令下发
+//GC20200409    “暂停”状态时“左右”位置不刷新
 //GC20200410    1分钟无触发信号界面提示调整      //GC20200728 后续优化
-//GC20200417    提示音改为“叮叮”，提示间隔拉长 /恢复默认显示全通
-
+//GC20200417    提示音改为“叮叮”，提示间隔拉长
 //GC20200519    播放暂停效果改进 / （如有虚拟按键，屏蔽）尝试
 
+//GC2.02.013————蓝牙耳机，浅色主题，初始化控制命令BUG
+//GC20210630    下发音频蓝牙重置控制命令
+//GC20210701    下发MAC地址控制命令
+//GC20210703    浅色主题
+//GC20210706    下发耳机MAC地址
+//GC20210707    命令发送错误BUG改进试验

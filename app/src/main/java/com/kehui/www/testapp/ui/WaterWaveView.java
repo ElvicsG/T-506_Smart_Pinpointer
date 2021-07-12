@@ -54,7 +54,9 @@ public class WaterWaveView extends View {
 	}
 
 	private void init() {
-		setWaveInfo(30f, 2f, 2f, 15f, Color.argb(255,242,232,124));
+//		setWaveInfo(30f, 2f, 2f, 15f, Color.argb(255,242,232,124));
+		//GC20210703
+		setWaveInfo(30f, 2f, 2f, 15f, Color.argb(255,17,91,156));
 	}
 
 	@Override

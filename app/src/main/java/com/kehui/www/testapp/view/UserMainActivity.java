@@ -151,7 +151,7 @@ public class UserMainActivity extends BaseActivity {
         magneticFieldGainControl.setValueColor("#d0210e");
         magneticFieldGainControl.setCurrentValueColor("#a03225");
         magneticFieldGainControl.setTitle(getString(R.string.gain));
-        magneticFieldGainControl.setTemp(0, 100, 70);   //GC20181102 magneticFieldGainControl.setTemp(0, 100, 63);
+        magneticFieldGainControl.setTemp(0, 100, 70);
         magneticFieldGainControl.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
             @Override
             public void change(int temp) {
@@ -199,7 +199,7 @@ public class UserMainActivity extends BaseActivity {
         voiceGainControl.setValueColor("#00ec03");  //最大最小值颜色
         voiceGainControl.setCurrentValueColor("#026b02");   //当前设置值颜色
         voiceGainControl.setTitle(getString(R.string.gain));
-        voiceGainControl.setTemp(0, 100, 70);   //GC20181102 voiceGainControl.setTemp(0, 100, 45);
+        voiceGainControl.setTemp(0, 100, 70);
         voiceGainControl.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
             @Override
             public void change(int temp) {
@@ -306,15 +306,14 @@ public class UserMainActivity extends BaseActivity {
             ivPosition.setLayoutParams(params);
         }
         if (event.status == WHAT_REFRESH) {
-            //GC20181113 上下语句顺序调整，否则影响进度条回落功能
             handleGainView(maxVoice, ivVoiceGain, 1);
             handleGainView(maxMagnetic, ivMagneticFieldGain, 0);
         }
 
     }
-    //GN 控制增益进度条
+    //控制增益进度条
     private void handleGainView(int maxValue, ImageView imageView, final int type) {
-        double a = maxValue / 2048.00;  //GC20181113 最大值重新计算
+        double a = maxValue / 2048.00;
         int b = (int) (a * 100);
         if (b >= 0 && b < 10) {
             currentPosition = 0;
@@ -339,10 +338,10 @@ public class UserMainActivity extends BaseActivity {
         } else if (b >= 100) {
             currentPosition = 10;
         }
-        //GC20181113 判断结构修改
+
         if (type == 0) {
             changeMagneticFieldGainView(imageView, currentPosition);
-            maxMagnetic = 0;     //GC20181113 刷新之后归零
+            maxMagnetic = 0;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -357,7 +356,7 @@ public class UserMainActivity extends BaseActivity {
             }).start();
         } else if (type == 1) {
             changeVoiceGainView(ivVoiceGain, currentPosition);
-            maxVoice = 0;    //GC20181113 刷新之后归零
+            maxVoice = 0;
             //GC20181121 添加声音回落
             new Thread(new Runnable() {
                 @Override
@@ -791,8 +790,6 @@ public class UserMainActivity extends BaseActivity {
 }
 
 /*更改记录*/
-//GC20181102 增益初始值修改
-//GC20181113 增益进度条显示bug修改
 //GC20181115 改进发现过声音故障时，再次未发现故障时的声磁延时动画效果
 //GC20181117 系统音量监听
 //GC20181119 增加相关后提示效果逻辑判断重写

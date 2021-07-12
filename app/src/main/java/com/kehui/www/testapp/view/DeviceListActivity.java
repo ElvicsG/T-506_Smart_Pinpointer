@@ -63,7 +63,6 @@ public class DeviceListActivity extends BaseActivity {
      * 返回时数据标签
      */
     public static String EXTRA_DEVICE_ADDRESS = "MAC地址";
-
     /**
      * 成员域
      */

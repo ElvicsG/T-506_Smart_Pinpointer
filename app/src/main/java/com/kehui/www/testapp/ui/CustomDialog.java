@@ -16,23 +16,13 @@ import com.kehui.www.testapp.R;
 
 /**
  * 自定义对话框
- * @author jwj  /   zhuwentao
- * @date 2018/04/16     /   2016-08-19.
+ * @author jwj / zhuwentao
+ * @date 2018/04/16 / 2016-08-19
  */
 public class CustomDialog extends Dialog {
-
     /**
-     * 提示
+     * 滤波模式选项部分
      */
-    private TextView hintTv;
-
-    /**
-     * 左边和右边的按钮
-     */
-    private Button doubleLeftBtn;
-    private Button doubleRightBtn;
-    private final WindowManager wm;
-
     private LinearLayout llFilter;
     public RadioGroup rgFilter1;
     public RadioGroup rgFilter2;
@@ -40,6 +30,16 @@ public class CustomDialog extends Dialog {
     public RadioButton rbDaiTong;
     public RadioButton rbGaoTong;
     public RadioButton rbQuanTong;
+    /**
+     * 提示语部分
+     */
+    private TextView hintTv;
+    /**
+     * 确认、取消按钮部分
+     */
+    private Button doubleLeftBtn;
+    private Button doubleRightBtn;
+    private final WindowManager wm;
 
     public CustomDialog(Context context) {
         super(context, R.style.CustomDialogStyle);
@@ -50,9 +50,6 @@ public class CustomDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_layout);
-        hintTv = (TextView) findViewById(R.id.tv_notice_text);
-        doubleLeftBtn = (Button) findViewById(R.id.btn_confirm);
-        doubleRightBtn = (Button) findViewById(R.id.btn_cancel);
         llFilter = (LinearLayout) findViewById(R.id.ll_filter);
         rgFilter1 = (RadioGroup) findViewById(R.id.rg_filter1);
         rgFilter2 = (RadioGroup) findViewById(R.id.rg_filter2);
@@ -60,6 +57,9 @@ public class CustomDialog extends Dialog {
         rbDaiTong = (RadioButton) findViewById(R.id.rb_dai);
         rbGaoTong = (RadioButton) findViewById(R.id.rb_gao);
         rbQuanTong = (RadioButton) findViewById(R.id.rb_quan);
+        hintTv = (TextView) findViewById(R.id.tv_notice_text);
+        doubleLeftBtn = (Button) findViewById(R.id.btn_confirm);
+        doubleRightBtn = (Button) findViewById(R.id.btn_cancel);
 
         Window win = getWindow();
         assert win != null;
@@ -71,26 +71,10 @@ public class CustomDialog extends Dialog {
     }
 
     /**
-     * 设置右键文字和点击事件
-     *
-     * @param rightStr      文字
-     * @param clickListener 点击事件
+     * 设置滤波部分显示
      */
-    public void setRightButton(String rightStr, View.OnClickListener clickListener) {
-        doubleRightBtn.setOnClickListener(clickListener);
-        doubleRightBtn.setText(rightStr);
-    }
-
-    public void setRightGone() {
-        doubleRightBtn.setVisibility(View.GONE);
-    }
-
     public void setFilterVisible() {
         llFilter.setVisibility(View.VISIBLE);
-    }
-
-    public void setTextGone() {
-        hintTv.setVisibility(View.GONE);
     }
 
     public void setRadioGroup(RadioGroup.OnCheckedChangeListener checkedChangeListener) {
@@ -105,20 +89,14 @@ public class CustomDialog extends Dialog {
     }
 
     /**
-     * 设置左键文字和点击事件
-     *
-     * @param leftStr       文字
-     * @param clickListener 点击事件
+     * 设置提示语部分消失
      */
-    public void setLeftButton(String leftStr, View.OnClickListener clickListener) {
-        doubleLeftBtn.setOnClickListener(clickListener);
-        doubleLeftBtn.setText(leftStr);
+    public void setTextGone() {
+        hintTv.setVisibility(View.GONE);
     }
 
     /**
-     * 设置提示内容
-     *
-     * @param str 内容
+     * @param str 提示部分的文字内容
      */
     public void setHintText(String str) {
         hintTv.setText(str);
@@ -126,14 +104,29 @@ public class CustomDialog extends Dialog {
     }
 
     /**
-     * 给两个按钮 设置文字
+     * 设置右边按键文字和点击事件
      *
-     * @param leftStr  左按钮文字
-     * @param rightStr 右按钮文字
+     * @param rightStr      文字
+     * @param clickListener 点击事件
      */
-    public void setBtnText(String leftStr, String rightStr) {
-        doubleLeftBtn.setText(leftStr);
+    public void setRightButton(String rightStr, View.OnClickListener clickListener) {
+        doubleRightBtn.setOnClickListener(clickListener);
         doubleRightBtn.setText(rightStr);
+    }
+
+    public void setRightGone() {
+        doubleRightBtn.setVisibility(View.GONE);
+    }
+
+    /**
+     * 设置左边按键文字和点击事件
+     *
+     * @param leftStr       文字
+     * @param clickListener 点击事件
+     */
+    public void setLeftButton(String leftStr, View.OnClickListener clickListener) {
+        doubleLeftBtn.setOnClickListener(clickListener);
+        doubleLeftBtn.setText(leftStr);
     }
 
 }

@@ -92,9 +92,9 @@
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/mute"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                    <!-- GC20210703 blue3-->
                 <ImageView
                     android:id="@+id/iv_silence"
                     android:layout_width="wrap_content"
@@ -119,9 +119,9 @@
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/pause"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                <!-- GC20210703 blue3-->
                 <ImageView
                     android:id="@+id/iv_play"
                     android:layout_width="wrap_content"
@@ -145,9 +145,9 @@
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/memory"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                <!-- GC20210703 blue3-->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -170,9 +170,9 @@
                     android:text="@string/compare"
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                <!-- GC20210703 blue3-->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -196,9 +196,9 @@
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
                     android:text="@string/filter"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                <!-- GC20210703 blue3-->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -221,9 +221,9 @@
                     android:text="@string/assist"
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                <!-- GC20210703 blue3-->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -246,13 +246,39 @@
                     android:text="@string/setting"
                     android:maxWidth="@dimen/base_dimen_55dp"
                     android:minWidth="@dimen/base_dimen_55dp"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
-
+                <!-- GC20210703 blue3-->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_setting" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_headphones"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/ic_btn_expert"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="10dp"
+                    android:gravity="center"
+                    android:maxWidth="@dimen/base_dimen_55dp"
+                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:text="@string/headphones"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/base_dimen_13sp" />
+                <!-- GC20210703 blue3-->
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_headphones_66" />
             </LinearLayout>
 
             <LinearLayout
@@ -323,10 +349,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/message_notice_5"
-                android:textColor="@color/blue9"
+                android:textColor="@color/white"
                 android:textSize="@dimen/base_dimen_18sp" />
         </LinearLayout>
-
+        <!-- GC20210703 blue9-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -403,8 +429,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/base_dimen_10dp"
-                app:spark_lineColor="@color/blue3" />
-
+                app:spark_lineColor="@color/blue2" />
+            <!-- GC20210703 blue2-->
             <TextView
                 android:id="@+id/tv_position"
                 android:layout_width="wrap_content"
@@ -412,12 +438,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="25dp"
                 android:text=""
-                android:textColor="@color/blue3"
+                android:textColor="@color/yellow2"
                 android:textSize="@dimen/base_dimen_16sp"
                 tools:text="@string/left"
                 tools:ignore="RelativeOverlap" />
         </RelativeLayout>
-
+        <!-- GC20210703 blue3-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -494,9 +520,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/base_dimen_10dp"
-                app:spark_lineColor="@color/blue3"
+                app:spark_lineColor="@color/blue2"
                 app:spark_scrubEnabled="true" />
-
+            <!-- GC20210703 blue2-->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -508,15 +534,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/Sound_field_delay"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/yellow2"
                     android:textSize="@dimen/base_dimen_16sp" />
-
+                <!-- GC20210703 blue3-->
                 <TextView
                     android:id="@+id/tv_yan_shi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2.5ms"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/yellow2"
                     android:textSize="@dimen/base_dimen_16sp"/>
             </LinearLayout>
         </RelativeLayout>

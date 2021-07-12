@@ -110,7 +110,7 @@
                     android:layout_marginBottom="@dimen/base_dimen_5dp"
                     android:gravity="center"
                     android:text="@string/message_notice_5"
-                    android:textColor="@color/blue"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_18sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -128,7 +128,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_user_main_acoutstio_magnetic_delay2"
+                        android:background="@drawable/bg_user_main_acoutstio_magnetic_delay"
                         android:gravity="center"
                         android:orientation="vertical">
 
@@ -147,7 +147,8 @@
                                 android:text=""
                                 android:textColor="@color/blue3"
                                 android:textSize="@dimen/base_dimen_14sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:visibility="gone" />
                         </LinearLayout>
 
                         <RelativeLayout
@@ -190,7 +191,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/message_notice_5"
-                                    android:textColor="@color/yellow5"
+                                    android:textColor="@color/blue2"
                                     android:textStyle="bold"
                                     android:textSize="@dimen/base_dimen_14sp" />
 
@@ -221,7 +222,7 @@
                                 android:textColor="@color/yellow3"
                                 android:textSize="@dimen/base_dimen_13sp"
                                 android:textStyle="bold"
-                                tools:visibility="invisible"/>
+                                tools:visibility="gone"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -306,6 +307,8 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
                             android:background="@drawable/bg_user_main_positon">
 
                             <ImageView
@@ -444,9 +447,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="4dp"
                     android:text="@string/mute"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -464,12 +467,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
                     android:drawablePadding="5dp"
                     android:drawableTop="@drawable/ic_filter"
                     android:gravity="center"
                     android:text="@string/filter"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/base_dimen_14sp" />
+            </com.kehui.www.testapp.ui.PercentLinearLayout>
+
+            <com.kehui.www.testapp.ui.PercentLinearLayout
+                android:id="@+id/ll_headphones_u"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/btn_user_main_bg_2"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="5dp"
+                    android:drawableTop="@drawable/ic_headphones_66"
+                    android:gravity="center"
+                    android:text="@string/headphones"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -487,12 +511,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
                     android:drawablePadding="5dp"
                     android:drawableTop="@drawable/ic_assist"
                     android:gravity="center"
                     android:text="@string/assist"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
@@ -510,12 +533,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
                     android:drawablePadding="5dp"
                     android:drawableTop="@drawable/ic_setting"
                     android:gravity="center"
                     android:text="@string/setting"
-                    android:textColor="@color/blue3"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_14sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 

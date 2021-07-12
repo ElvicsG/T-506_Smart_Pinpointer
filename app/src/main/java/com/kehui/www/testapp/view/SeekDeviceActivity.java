@@ -171,7 +171,7 @@ public class SeekDeviceActivity extends BaseActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     // MAC地址，由DeviceListActivity设置返回    //GC20190726 获取蓝牙设备的硬件地址(MAC地址)
                     String address = Objects.requireNonNull(data.getExtras()).getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    //获取远程蓝牙设备
+                    //通过MAC地址获取蓝牙设备
                     BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
                     // 用服务号得到socket // SPP服务UUID号
                     try {

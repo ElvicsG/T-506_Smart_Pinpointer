@@ -30,8 +30,8 @@
     <string name="ok">OK</string>
     <string name="confirm">Confirm</string>
     <string name="find_device">Find the device</string>
-    <string name="left">left</string>
-    <string name="right">right</string>
+    <string name="left">Left</string>
+    <string name="right">Right</string>
     <string name="note">prompt</string>
     <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
     <string name="Exit_application">exit</string>
@@ -132,7 +132,7 @@
     <string name="no_report_data">No unreported data！</string>
     <string name="uploading_waiting">Uploading, please wait</string>
     <string name="paired_device">Paired device</string>
-    <string name="no_paired_device">Unpaired device</string>
+    <string name="not_paired_device">Unpaired device</string>
     <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
     <string name="please_find_device">Please find a device!</string>
     <string name="min_delay">Minimum delay</string>
@@ -175,5 +175,8 @@
     <string name="last">"Last: "</string>
     <string name="message_notice_trigger">Wait for trigger</string>
     <string name="Suspected_fault">Suspected fault</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="headphones">Headphones</string>
+    <string name="choose_headphones">Choose Headphones</string>
 
 </resources>

@@ -292,7 +292,7 @@ public class InitiateAssistanceActivity extends BaseActivity {
                 tvDataCollectionProgress.setText(counter + "%");
 
             }else if (msg.what == 2) {
-                //硬件关闭重连功能添加    //GC20190407
+                //硬件关闭重连功能添加    //GC20190407        //GT20210705 延时操作
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
