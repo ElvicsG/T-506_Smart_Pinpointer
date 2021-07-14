@@ -136,7 +136,7 @@
     <string name="no_report_data">无未上报数据！</string>
     <string name="uploading_waiting">上传中,请稍后</string>
     <string name="paired_device">已配对设备</string>
-    <string name="not_paired_device">未配对设备</string>
+    <string name="new_device">未配对设备</string>
     <string name="no_paired_device_find_device">未有配对设备,请查找设备!</string>
     <string name="please_find_device">请查找设备!</string>
     <string name="min_delay">最小延迟</string>
@@ -180,5 +180,8 @@
     <string name="Suspected_fault">疑似故障</string>
     <string name="headphones">耳机</string>
     <string name="choose_headphones">选择蓝牙耳机</string>
+    <string name="waiting_link">连接中，请保持耳机处于可被查找状态…</string>
+    <string name="headphones_connected">蓝牙耳机已连接！</string>
+    <string name="headphones_disconnected">蓝牙耳机已断开！</string>
 
 </resources>

@@ -5,12 +5,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +39,7 @@ import com.kehui.www.testapp.ui.CustomDialog;
 import com.kehui.www.testapp.ui.CustomDeviceListDialog;
 import com.kehui.www.testapp.util.SoundUtils;
 import com.kehui.www.testapp.util.Utils;
+import com.kehui.www.testapp.view.DeviceListActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -192,6 +196,8 @@ public class BaseActivity extends AppCompatActivity {
     public static final int LINK_CONNECT    = 10;
     public static final int MUTE_STATE      = 11;
     public static final int NO_MUTE_STATE   = 12;
+    public static final int HEADPHONES_CONNECT      = 13;
+    public static final int HEADPHONES_DISCONNECT   = 14;
 
     @SuppressLint("HandlerLeak")
     public Handler handle = new Handler() {
@@ -717,17 +723,22 @@ public class BaseActivity extends AppCompatActivity {
                                 if (isCrc2) {
                                     hasSentCommand = false;
                                     i1 += 6;
-                                    if (receivedCommand[2] != 1) {
+                                    //第三个字节Respond：0，命令未响应;1，命令已响应      //蓝牙耳机状态反馈：2连接；3断开  //GC20210714
+                                    if (receivedCommand[2] == 0) {
                                         //Respond：响应值为0，命令未响应
                                         handle.sendEmptyMessage(SEND_ERROR);
                                         EventBus.getDefault().post(new SendCommandNotRespondEvent());
                                         seekBarType = 0;
-                                    } else{
+                                    } else if (receivedCommand[2] == 1) {
 //                                        if (receivedCommand[1] == sendCommand[1]) {   //GC20210707    命令发送错误BUG改进试验
                                             //接収的命令内容与要发送的命令内容一致
                                             seekBarType = 0;
                                             handle.sendEmptyMessage(SEND_SUCCESS);
 //                                        }
+                                    } else if (receivedCommand[2] == 2) {
+                                        handle.sendEmptyMessage(HEADPHONES_CONNECT);
+                                    } else if (receivedCommand[2] == 3) {
+                                        handle.sendEmptyMessage(HEADPHONES_DISCONNECT);
                                     }
                                 }
                             }
@@ -761,17 +772,21 @@ public class BaseActivity extends AppCompatActivity {
                         if (isCrc2) {
                             hasSentCommand = false;
                             i += 6;
-                            //第三个字节Respond：0，命令未响应;1，命令已响应
-                            if (receivedCommand[2] != 1) {
+                            //第三个字节Respond：0，命令未响应;1，命令已响应      //蓝牙耳机状态反馈：2连接；3断开  //GC20210714
+                            if (receivedCommand[2] == 0) {
                                 handle.sendEmptyMessage(SEND_ERROR);
                                 EventBus.getDefault().post(new SendCommandNotRespondEvent());
                                 seekBarType = 0;
-                            } else {
+                            } else if (receivedCommand[2] == 1) {
 //                                if (receivedCommand[1] == sendCommand[1]) {   //GC20210707    命令发送错误BUG改进试验
                                     //接収的命令内容与要发送的命令内容一致
                                     seekBarType = 0;
                                     handle.sendEmptyMessage(SEND_SUCCESS);
 //                                }
+                            }else if (receivedCommand[2] == 2) {
+                                handle.sendEmptyMessage(HEADPHONES_CONNECT);
+                            } else if (receivedCommand[2] == 3) {
+                                handle.sendEmptyMessage(HEADPHONES_DISCONNECT);
                             }
                         }
                     }
@@ -1944,6 +1959,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void showFilterDialog(final LinearLayout llView) {
         customDialog = new CustomDialog(BaseActivity.this);
         customDialog.show();
+        //对话框初始化
         switch (clickTongNum) {
             case 0:
                 customDialog.clearFilter1();
@@ -1966,6 +1982,7 @@ public class BaseActivity extends AppCompatActivity {
         }
         customDialog.setFilterVisible();
         customDialog.setTextGone();
+        //监听滤波选项变化
         customDialog.setRadioGroup(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -1992,7 +2009,7 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
         });
-
+        //点击按键执行的事件
         customDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -2023,8 +2040,8 @@ public class BaseActivity extends AppCompatActivity {
         customDialog.setRightButton(getString(R.string.cancel), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                llView.setClickable(true);
                 customDialog.dismiss();
+
             }
         });
         customDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2044,29 +2061,88 @@ public class BaseActivity extends AppCompatActivity {
         customDeviceListDialog = new CustomDeviceListDialog(BaseActivity.this);
         customDeviceListDialog.show();
 
-        customDeviceListDialog.setLeftButton(getString(R.string.confirm), new View.OnClickListener() {
+        //注册接收查找到设备action接收器
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        this.registerReceiver(customDeviceListDialog.broadcastReceiver, filter);
+        //注册查找结束action接收器
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        this.registerReceiver(customDeviceListDialog.broadcastReceiver, filter);
+
+        customDeviceListDialog.setLeftButton(getString(R.string.find_device), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                customDeviceListDialog.dismiss();
+                customDeviceListDialog.doDiscovery();
 
             }
         });
         customDeviceListDialog.setRightButton(getString(R.string.cancel), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                llView.setClickable(true);
                 customDeviceListDialog.dismiss();
             }
         });
         customDeviceListDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
+                //关闭服务查找
+                if (bluetoothAdapter != null) {
+                    bluetoothAdapter.cancelDiscovery();
+                }
+                if (customDeviceListDialog.getAddress) {
+                    //将得到MAC地址发送给主板进行耳机连接   //GC20210714
+                    sendAddress(customDeviceListDialog.headphonesAddress);
+                    customDeviceListDialog.getAddress = false;
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.waiting_link), Toast.LENGTH_SHORT).show();
+                }
                 llView.setClickable(true);
             }
         });
 
     }
+
+    /**
+     * 下发耳机MAC地址    //GC20210706
+     */
+    public void sendAddress(String neededAddress) {
+//        String neededAddress = "5CC6E918D15A";    读取的地址字符串“20:21:03:02:18:51”
+        address = neededAddress.getBytes();
+        //使用定时器将需要的MAC地址间隔开发送     发送MAC地址命令开头：0x61
+        sendAddress[0] = 97;
+        sendTimer.start();
+    }
+
+    /**
+     * 倒计时处理    //GC20210706     //GT20210705
+     */
+    int count = 0;
+    int i = 1;
+    private CountDownTimer sendTimer = new CountDownTimer(1000, 1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            for (; i < 3; i++) {
+                sendAddress[i] = address[count];
+                count++;
+            }
+            if (i == 3) {
+                i = 1;
+                //字符串里面的“：”符号不要
+                count++;
+                sendMAC(sendAddress);
+                sendTimer.start();
+            }
+            //地址字符串转为的BYTE长度为17，计数至18停止取消计数
+            if (count == 18) {
+                count = 0;
+                sendTimer.cancel();
+            }
+        }
+
+    };
 
     /**
      * 增益阶数和百分比的转化 100转32
@@ -2190,3 +2266,4 @@ public class BaseActivity extends AppCompatActivity {
 //GC20210703    浅色主题
 //GC20210706    下发耳机MAC地址
 //GC20210707    命令发送错误BUG改进试验
+//GC20210714    利用对话框查找需要的蓝牙耳机MAC地址，然后下发给主板操作  /  蓝牙耳机状态反馈

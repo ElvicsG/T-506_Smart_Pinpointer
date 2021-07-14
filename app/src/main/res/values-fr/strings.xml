@@ -141,7 +141,7 @@
     <string name="no_report_data">No unreported data！</string>
     <string name="uploading_waiting">Uploading, please wait</string>
     <string name="paired_device">Paired device</string>
-    <string name="not_paired_device">Unpaired device</string>
+    <string name="new_device">Unpaired device</string>
     <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
     <string name="please_find_device">Please find a device!</string>
     <string name="min_delay">Minimum delay</string>
@@ -178,5 +178,8 @@
     <string name="reconnect">Reconnect</string>
     <string name="headphones">Headphones</string>
     <string name="choose_headphones">Choose Headphones</string>
+    <string name="waiting_link">In connection, please keep the headset in searchable state</string>
+    <string name="headphones_connected">蓝牙耳机已连接！</string>
+    <string name="headphones_disconnected">蓝牙耳机已断开！</string>
 
 </resources>

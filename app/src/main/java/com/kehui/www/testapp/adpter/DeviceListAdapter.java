@@ -25,7 +25,6 @@ public class DeviceListAdapter extends BaseAdapter {
     private ArrayList<String> deviceList;
     private int type;
 
-
     public DeviceListAdapter(Context context, ArrayList<String> deviceList, int type) {
         this.context = context;
         this.deviceList = deviceList;

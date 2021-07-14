@@ -50,6 +50,7 @@ public class CustomDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_layout);
+
         llFilter = (LinearLayout) findViewById(R.id.ll_filter);
         rgFilter1 = (RadioGroup) findViewById(R.id.rg_filter1);
         rgFilter2 = (RadioGroup) findViewById(R.id.rg_filter2);

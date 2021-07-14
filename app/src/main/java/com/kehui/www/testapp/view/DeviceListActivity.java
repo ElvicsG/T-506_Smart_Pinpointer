@@ -42,22 +42,22 @@ public class DeviceListActivity extends BaseActivity {
 
     @BindView(R.id.tv_app_name)
     TextView tvAppName;
-    @BindView(R.id.paired_devices)
-    ListView pairedDevices;
+    @BindView(R.id.ll_list)
+    LinearLayout llList;
     @BindView(R.id.title_new_devices)
     TextView titleNewDevices;
     @BindView(R.id.new_devices)
     ListView newDevices;
+    @BindView(R.id.paired_devices)
+    ListView pairedDevices;
+    @BindView(R.id.ll_no_device)
+    LinearLayout llNoDevice;
+    @BindView(R.id.tv_no_device)
+    TextView tvNoDevice;
     @BindView(R.id.button_scan)
     Button buttonScan;
     @BindView(R.id.button_cancel)
     Button buttonCancel;
-    @BindView(R.id.tv_no_device)
-    TextView tvNoDevice;
-    @BindView(R.id.ll_list)
-    LinearLayout llList;
-    @BindView(R.id.ll_no_device)
-    LinearLayout llNoDevice;
 
     /**
      * 返回时数据标签
@@ -67,7 +67,9 @@ public class DeviceListActivity extends BaseActivity {
      * 成员域
      */
     private BluetoothAdapter bluetoothAdapter;
+    private DeviceListAdapter pairedDevicesArrayAdapter;
     private DeviceListAdapter newDevicesArrayAdapter;
+    private ArrayList<String> deviceList;
     private ArrayList<String> deviceList2;
 
     @Override
@@ -77,33 +79,33 @@ public class DeviceListActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_device_list);
         ButterKnife.bind(this);
-        initView();
 
+        initView();
         Log.e(TAG, "进入!");
         // 设定默认返回值为取消
         setResult(Activity.RESULT_CANCELED);
-        // 设定扫描按键响应
+        //设定查找设备按键响应
         Button scanButton = (Button) findViewById(R.id.button_scan);
-
         scanButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 doDiscovery();
-                v.setVisibility(View.GONE);
+//                v.setVisibility(View.GONE);
             }
         });
 
-        ArrayList<String> deviceList = new ArrayList<>();
+        deviceList = new ArrayList<>();
         deviceList2 = new ArrayList<>();
-        // 初使化设备存储数组
-        DeviceListAdapter pairedDevicesArrayAdapter = new DeviceListAdapter(DeviceListActivity.this, deviceList, 1);
+        //初始化设备存储数组
+        pairedDevicesArrayAdapter = new DeviceListAdapter(DeviceListActivity.this, deviceList, 1);
         newDevicesArrayAdapter = new DeviceListAdapter(DeviceListActivity.this, deviceList2, 0);
-        // 设置已配队设备列表
+        //设置已配对设备列表
         pairedDevices.setAdapter(pairedDevicesArrayAdapter);
         pairedDevices.setOnItemClickListener(deviceClickListener);
-        // 设置新查找设备列表
+        //设置未配对设备列表
         newDevices.setAdapter(newDevicesArrayAdapter);
         newDevices.setOnItemClickListener(deviceClickListener);
+
         // 注册接收查找到设备action接收器
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         this.registerReceiver(broadcastReceiver, filter);
@@ -113,13 +115,13 @@ public class DeviceListActivity extends BaseActivity {
 
         //获得本设备的蓝牙适配器实例
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        // 得到已配对蓝牙设备列表  //获取与本机蓝牙所有绑定的远程蓝牙信息
+        //得到已配对蓝牙设备列表信息
         final Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        // 读取设置数据
+        //读取已经选择过的设备名称和MAC地址
         SharedPreferences shareData = getSharedPreferences("Add", 0);
         String stringName = shareData.getString(String.valueOf(0), null);
         String stringAdd = shareData.getString(String.valueOf(1), null);
-        // 添加已配对设备到列表并显示
+        //添加已配对设备到列表
         if (pairedDevices.size() > 0) {
             llNoDevice.setVisibility(View.GONE);
             llList.setVisibility(View.VISIBLE);
@@ -127,8 +129,8 @@ public class DeviceListActivity extends BaseActivity {
             for (BluetoothDevice device : pairedDevices) {
                 deviceList.add(device.getName() + "\n" + device.getAddress());
                 pairedDevicesArrayAdapter.notifyDataSetChanged();
+                //判断，如果有已经选择过的设备,自动连接
                 if (stringName != null && stringAdd != null) {
-                    //如果是,自动连接
                     if (device.getName().equals(stringName) && device.getAddress().equals(stringAdd)) {
                         Toast.makeText(this, getResources().getString(R.string.Automatic_connection_please_wait), Toast.LENGTH_SHORT).show();
                         returnData(device.getAddress());
@@ -171,7 +173,7 @@ public class DeviceListActivity extends BaseActivity {
         setTitle(getResources().getString(R.string.Find_the_device));
         // 显示其它设备（未配对设备）列表
         findViewById(R.id.title_new_devices).setVisibility(View.VISIBLE);
-        // 关闭再进行的服务查找
+        // 关闭在进行的服务查找
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
         }
@@ -180,15 +182,15 @@ public class DeviceListActivity extends BaseActivity {
     }
 
     /**
-     * 选择设备响应函数
+     * 点击列表选择设备时的响应函数
      */
     private OnItemClickListener deviceClickListener = new OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
-            // 准备连接设备，关闭服务查找
+            //准备连接设备，关闭服务查找
             bluetoothAdapter.cancelDiscovery();
+            //得到MAC地址
             DeviceListAdapter.ViewHolder holder = (DeviceListAdapter.ViewHolder) v.getTag();
-            // 得到mac地址  //GC20190726 获取蓝牙设备的硬件地址(MAC地址)
             String info = holder.tvDeviceName.getText().toString();
             String address = info.substring(info.length() - 17);
             returnData(address);
@@ -241,11 +243,11 @@ public class DeviceListActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // 关闭服务查找
+        //关闭服务查找
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
         }
-        // 注销action接收器
+        //注销action接收器
         this.unregisterReceiver(broadcastReceiver);
     }
 

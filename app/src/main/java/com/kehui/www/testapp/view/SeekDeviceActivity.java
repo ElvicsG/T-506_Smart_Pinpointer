@@ -169,7 +169,7 @@ public class SeekDeviceActivity extends BaseActivity {
             case REQUEST_CONNECT_DEVICE:
                 //响应返回结果——连接成功
                 if (resultCode == Activity.RESULT_OK) {
-                    // MAC地址，由DeviceListActivity设置返回    //GC20190726 获取蓝牙设备的硬件地址(MAC地址)
+                    //MAC地址，由DeviceListActivity设置返回
                     String address = Objects.requireNonNull(data.getExtras()).getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
                     //通过MAC地址获取蓝牙设备
                     BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);

@@ -184,6 +184,14 @@ public class MainActivity extends BaseActivity {
      */
     @BindView(R.id.ll_headphones)
     LinearLayout llHeadphones;
+    @BindView(R.id.tv_headphones)
+    TextView tvHeadphones;
+    @BindView(R.id.iv_headphones)
+    ImageView ivHeadphones;
+    @BindView(R.id.tv_headphones_u)
+    TextView tvHeadphonesU;
+    @BindView(R.id.iv_headphones_u)
+    ImageView ivHeadphonesU;
 
     /**
      * 专家界面参数
@@ -228,6 +236,10 @@ public class MainActivity extends BaseActivity {
      * 初始化界面视图
      */
     private void initView() {
+        ivHeadphones.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        tvHeadphones.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        ivHeadphonesU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        tvHeadphonesU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
         //专家界面
         seekBarMagnetic.setMax(100);
         seekBarVoice.setMax(100);
@@ -736,6 +748,21 @@ public class MainActivity extends BaseActivity {
             tvNoticeU.setText(getString(R.string.message_notice_5));
             //重新开始倒计时   //GC20200728
             timer.start();
+        }
+        //蓝牙耳机这状态反馈 //GC20210714
+        if (event.status == HEADPHONES_CONNECT) {
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.headphones_connected), Toast.LENGTH_SHORT).show();
+            ivHeadphones.clearColorFilter();
+            tvHeadphones.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.white));
+            ivHeadphonesU.clearColorFilter();
+            tvHeadphonesU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.white));
+        }
+        if (event.status == HEADPHONES_DISCONNECT) {
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.headphones_disconnected), Toast.LENGTH_SHORT).show();
+            ivHeadphones.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            tvHeadphones.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            ivHeadphonesU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            tvHeadphonesU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
         }
 
     }
@@ -1345,47 +1372,6 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
-
-    /**
-     * 下发耳机MAC地址    //GC20210706
-     */
-    public void sendAddress() {
-        String neededAddress = "5CC6E918D15A";
-        address = neededAddress.getBytes();
-        //将需要的MAC地址分开发送     发送MAC地址命令开头：0x61
-        sendAddress[0] = 97;
-        sendTimer.start();
-    }
-
-    /**
-     * 倒计时处理    //GC20210706     //GT20210705
-     */
-    int count = 0;
-    int i = 1;
-    private CountDownTimer sendTimer = new CountDownTimer(1000, 1000) {
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-
-        @Override
-        public void onFinish() {
-            for (; i < 3; i++) {
-                sendAddress[i] = address[count];
-                count++;
-            }
-            if (i == 3) {
-                i = 1;
-                sendMAC(sendAddress);
-                sendTimer.start();
-            }
-            if (count == 12) {
-                count = 0;
-                sendTimer.cancel();
-            }
-        }
-
-    };
 
     @Override
     protected void onStop() {
