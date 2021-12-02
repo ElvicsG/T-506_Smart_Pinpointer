@@ -7,6 +7,7 @@
     android:background="@drawable/bg_user_main2"
     android:orientation="vertical">
 
+    <!--10%标题-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -23,9 +24,10 @@
     <com.kehui.www.testapp.ui.PercentLinearLayout
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        app:layout_heightPercent="70%"
         android:orientation="horizontal">
 
+        <!--24%声音栏-->
         <com.kehui.www.testapp.ui.PercentLinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -75,7 +77,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.2"
                     android:gravity="center">
 
                     <ImageView
@@ -87,14 +89,16 @@
             </com.kehui.www.testapp.ui.PercentLinearLayout>
         </com.kehui.www.testapp.ui.PercentLinearLayout>
 
+        <!--52%状态栏-->
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:gravity="center">
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            app:layout_widthPercent="52%">
 
+            <!--提示框-->
             <com.kehui.www.testapp.ui.PercentLinearLayout
                 android:id="@+id/ll_notice_u"
                 android:layout_width="match_parent"
@@ -114,9 +118,12 @@
                     android:textSize="@dimen/base_dimen_18sp" />
             </com.kehui.www.testapp.ui.PercentLinearLayout>
 
+            <!--指示框-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_dimen_1dp"
+                android:layout_marginEnd="@dimen/base_dimen_1dp"
                 android:layout_below="@id/ll_notice_u"
                 android:gravity="center">
 
@@ -127,7 +134,7 @@
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:background="@drawable/bg_user_main_acoutstio_magnetic_delay"
                         android:gravity="center"
                         android:orientation="vertical">
@@ -160,7 +167,7 @@
                                 android:layout_width="@dimen/base_dimen_100dp"
                                 android:layout_height="@dimen/base_dimen_100dp"
                                 android:layout_gravity="center"
-                                android:orientation="horizontal">
+                                android:orientation="vertical">
 
                                 <com.kehui.www.testapp.ui.CustomCircleView
                                     android:id="@+id/ccv_first_u"
@@ -271,76 +278,31 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_user_main_positon">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_user_main_positon">
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="top"
-                                android:layout_margin="@dimen/base_dimen_20dp"
-                                android:layout_weight="1"
-                                android:src="@drawable/bg_user_main_left" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:src="@drawable/bg_user_main_pole2" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="top"
-                                android:layout_margin="@dimen/base_dimen_20dp"
-                                android:layout_weight="1"
-                                android:src="@drawable/bg_user_main_right" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentTop="true"
-                            android:background="@drawable/bg_user_main_positon">
-
-                            <ImageView
-                                android:id="@+id/iv_position_left"
-                                android:layout_width="@dimen/base_dimen_15dp"
-                                android:layout_height="@dimen/base_dimen_80dp"
-                                android:layout_weight="1"
-                                android:layout_gravity="bottom"
-                                android:paddingBottom="@dimen/base_dimen_20dp"
-                                android:src="@drawable/ic_user_main_notice_point2"
-                                android:visibility="invisible" />
-
-                            <ImageView
-                                android:id="@+id/iv_position_right"
-                                android:layout_width="@dimen/base_dimen_15dp"
-                                android:layout_height="@dimen/base_dimen_80dp"
-                                android:layout_weight="1"
-                                android:layout_gravity="bottom"
-                                android:paddingBottom="@dimen/base_dimen_20dp"
-                                android:src="@drawable/ic_user_main_notice_point2"
-                                android:visibility="visible" />
-                        </LinearLayout>
+                        android:background="@drawable/bg_user_main_position">
 
                         <ImageView
-                            android:id="@+id/iv_position_u"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginStart="50dp"
-                            android:src="@drawable/ic_user_main_notice_point"
+                            android:id="@+id/iv_position_left"
+                            android:layout_width="@dimen/base_dimen_15dp"
+                            android:layout_height="@dimen/base_dimen_80dp"
+                            android:layout_weight="1"
+                            android:layout_gravity="bottom"
+                            android:paddingBottom="@dimen/base_dimen_20dp"
+                            android:src="@drawable/ic_user_main_notice_point2"
                             android:visibility="invisible" />
-                    </RelativeLayout>
+
+                        <ImageView
+                            android:id="@+id/iv_position_right"
+                            android:layout_width="@dimen/base_dimen_15dp"
+                            android:layout_height="@dimen/base_dimen_80dp"
+                            android:layout_weight="1"
+                            android:layout_gravity="bottom"
+                            android:paddingBottom="@dimen/base_dimen_20dp"
+                            android:src="@drawable/ic_user_main_notice_point2"
+                            android:visibility="visible" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -354,6 +316,7 @@
             </LinearLayout>
         </RelativeLayout>
 
+        <!--24%磁场栏-->
         <com.kehui.www.testapp.ui.PercentLinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -402,7 +365,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.2"
                     android:gravity="center">
 
                     <ImageView
@@ -416,10 +379,11 @@
 
     </com.kehui.www.testapp.ui.PercentLinearLayout>
 
+    <!--20%底部按钮-->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_heightPercent="22%">
+        app:layout_heightPercent="20%">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -483,7 +447,8 @@
                 android:layout_marginStart="5dp"
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="visible">
 
                 <ImageView
                     android:id="@+id/iv_headphones_u"

@@ -84,10 +84,6 @@ public class MainActivity extends BaseActivity {
     LinearLayout llAssist;
     @BindView(R.id.ll_settings)
     LinearLayout llSettings;
-    @BindView(R.id.iv_mode)
-    ImageView ivMode;
-    @BindView(R.id.tv_mode)
-    TextView tvMode;
     @BindView(R.id.ll_mode)
     LinearLayout llMode;
     @BindView(R.id.ll_right)
@@ -122,6 +118,10 @@ public class MainActivity extends BaseActivity {
     TextView tvYanShi;
     @BindView(R.id.tv_position)
     TextView tvPosition;
+    @BindView(R.id.iv_mode_u)
+    ImageView ivModeU;
+    @BindView(R.id.tv_mode_u)
+    TextView tvModeU;
     /**
      * 用户界面布局
      */
@@ -137,8 +137,6 @@ public class MainActivity extends BaseActivity {
     ImageView ivVoiceGainU;
     @BindView(R.id.tv_notice_u)
     TextView tvNoticeU;
-    @BindView(R.id.iv_position_u)
-    ImageView ivPositionU;
     @BindView(R.id.iv_position_right)
     ImageView ivPositionRight;
     @BindView(R.id.iv_position_left)
@@ -151,10 +149,6 @@ public class MainActivity extends BaseActivity {
     PercentLinearLayout llAssistU;
     @BindView(R.id.ll_settings_u)
     PercentLinearLayout llSettingsU;
-    @BindView(R.id.iv_mode_u)
-    ImageView ivModeU;
-    @BindView(R.id.tv_mode_u)
-    TextView tvModeU;
     @BindView(R.id.ll_mode_u)
     LinearLayout llModeU;
     @BindView(R.id.iv_silence_u)
@@ -177,6 +171,10 @@ public class MainActivity extends BaseActivity {
     TextView tvMinDelayValueU;
     @BindView(R.id.ll_min_delay_u)
     LinearLayout llMinDelayU;
+    @BindView(R.id.iv_mode)
+    ImageView ivMode;
+    @BindView(R.id.tv_mode)
+    TextView tvMode;
 
     public static MainActivity instance;
     /**
@@ -243,10 +241,10 @@ public class MainActivity extends BaseActivity {
         //专家界面
         seekBarMagnetic.setMax(100);
         seekBarVoice.setMax(100);
-        //GC20200312    专家界面磁场增益缺省值改为99%（阶数31，增益阶数0-32）
-        seekBarMagnetic.setProgress(99);
+        //GC20200312    专家界面磁场增益缺省值改为99%（阶数31，增益阶数0-32） //GC20210730    93%（阶数29）
+        seekBarMagnetic.setProgress(93);
         seekBarVoice.setProgress(70);
-        tvMagneticValue.setText(99 + "%");
+        tvMagneticValue.setText(93 + "%");
         tvVoiceValue.setText(70 + "%");
         checkVoice();
 
@@ -279,8 +277,8 @@ public class MainActivity extends BaseActivity {
         magneticFieldGainControlU.setValueColor("#d0210e");
         magneticFieldGainControlU.setCurrentValueColor("#a03225");
         magneticFieldGainControlU.setTitle(getString(R.string.gain));
-        //GC20200312    用户界面磁场增益缺省值改为99%（阶数31，增益阶数0-32）
-        magneticFieldGainControlU.setTemp(0, 100, 99);
+        //GC20200312    用户界面磁场增益缺省值改为99%（阶数31，增益阶数0-32） //GC20210730    93%（阶数29）
+        magneticFieldGainControlU.setTemp(0, 100, 93);
         magneticFieldGainControlU.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
             @Override
             public void change(int temp) {
@@ -1295,6 +1293,18 @@ public class MainActivity extends BaseActivity {
      * 点击模式切换时，控制布局的隐藏和显示。
      */
     public void clickMode() {
+
+        //GC20210830    暂停时点击“切换界面”按钮取消暂停，恢复至播放状态
+        if (!isDraw) {
+            isDraw = !isDraw;
+            //播放状态
+            ivPlay.setImageResource(R.drawable.ic_play);
+            tvPlay.setText(getString(R.string.pause));
+            //GC20210703    浅色主题    //blue3
+            ivPlay.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.white));
+            tvPlay.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.white));
+        }
+
         llUserUI.setVisibility(View.VISIBLE);
         llUserUI.setEnabled(true);
         llVoiceU.setEnabled(true);

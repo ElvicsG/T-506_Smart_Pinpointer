@@ -57,8 +57,6 @@ public class UserMainActivity extends BaseActivity {
     ImageView ivVoiceGain;
     @BindView(R.id.tv_notice_u)
     TextView tvNotice;
-    @BindView(R.id.iv_position_u)
-    ImageView ivPosition;
     @BindView(R.id.ll_voice_u)
     PercentLinearLayout llVoice;
     @BindView(R.id.ll_filter_u)
@@ -142,7 +140,7 @@ public class UserMainActivity extends BaseActivity {
         v.setFillWaveSourceShapeRadius(10);
         rlWave.addView(v);
         //设置探头位置
-        layoutParams = new ViewGroup.MarginLayoutParams(ivPosition.getLayoutParams());
+        //layoutParams = new ViewGroup.MarginLayoutParams(ivPosition.getLayoutParams());
         //设置增益显示
 //        magneticFieldGainControl.setAngleRate(0.2);
         magneticFieldGainControl.setArcColor("#a03225");
@@ -298,12 +296,10 @@ public class UserMainActivity extends BaseActivity {
         if (event.status == POSITION_RIGHT) {
             layoutParams.setMargins(Utils.dp2px(UserMainActivity.this, 100), Utils.dp2px(UserMainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
-            ivPosition.setLayoutParams(params);
         }
         if (event.status == POSITION_LEFT) {
             layoutParams.setMargins(Utils.dp2px(UserMainActivity.this, 40), Utils.dp2px(UserMainActivity.this, 50), 0, 0);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(layoutParams);
-            ivPosition.setLayoutParams(params);
         }
         if (event.status == WHAT_REFRESH) {
             handleGainView(maxVoice, ivVoiceGain, 1);

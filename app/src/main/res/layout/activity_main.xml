@@ -30,10 +30,7 @@
     <LinearLayout android:id="@+id/userUI" android:visibility="invisible"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content">
-
         <include layout="@layout/content_user_main" />
     </LinearLayout>
-
-
 
 </android.support.design.widget.CoordinatorLayout>

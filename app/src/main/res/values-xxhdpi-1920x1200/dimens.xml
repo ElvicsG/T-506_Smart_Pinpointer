@@ -9,6 +9,7 @@
 	<dimen name="base_dimen_18sp">18sp</dimen>
 	<dimen name="base_dimen_34sp">34sp</dimen>
 
+	<dimen name="base_dimen_1dp">0dp</dimen>
 	<dimen name="base_dimen_5dp">5dp</dimen>
 	<dimen name="base_dimen_10dp">10dp</dimen>
 	<dimen name="base_dimen_15dp">15dp</dimen>

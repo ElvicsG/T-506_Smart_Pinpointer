@@ -1802,8 +1802,8 @@ public class BaseActivity extends AppCompatActivity {
      * 0、下发磁场初始化控制命令
      */
     public void sendMagneticInitCommand() {
-        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000、阶数22—— //GC202171 99%（阶数31）
-        int[] ints = {96, 0, 128 + 31};
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000、阶数22（70）—— //GC202171 阶数31.68（99%）——//GC20210730   阶数29.76（93%）
+        int[] ints = {96, 0, 128 + 29};
         //计算CRC校验码
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
@@ -2264,6 +2264,10 @@ public class BaseActivity extends AppCompatActivity {
 //GC20210630    下发音频蓝牙重置控制命令
 //GC20210701    下发MAC地址控制命令
 //GC20210703    浅色主题
+
 //GC20210706    下发耳机MAC地址
 //GC20210707    命令发送错误BUG改进试验
 //GC20210714    利用对话框查找需要的蓝牙耳机MAC地址，然后下发给主板操作  /  蓝牙耳机状态反馈
+
+//GC20210830    暂停时点击“切换界面”按钮取消暂停，恢复至播放状态
+//GC20210730    93%（阶数29）
