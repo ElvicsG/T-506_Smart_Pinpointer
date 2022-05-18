@@ -174,7 +174,7 @@ public class BaseActivity extends AppCompatActivity {
     public int currentFilter;
     public double filter;
     /**
-     * 自定义滤波方式的对话框
+     * 自定义扫描蓝牙设备的对话框
      */
     private CustomDeviceListDialog customDeviceListDialog;
     /**
@@ -198,6 +198,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final int NO_MUTE_STATE   = 12;
     public static final int HEADPHONES_CONNECT      = 13;
     public static final int HEADPHONES_DISCONNECT   = 14;
+    public static final int HEADPHONES_DISCONNECT_STATE   = 15;
 
     @SuppressLint("HandlerLeak")
     public Handler handle = new Handler() {
@@ -743,8 +744,7 @@ public class BaseActivity extends AppCompatActivity {
                                 }
                             }
                         }
-                    }
-                }
+                    }}
             }
             hasLeft = false;
         }
@@ -874,6 +874,9 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * 解码packageBean并对其进行相应的操作
      */
+    public boolean isRight = false;
+    public boolean isSingle = false;
+    public int state = 1;
     public void doPackageBean(PackageBean packageBean) {
         int[] results = decodeData(packageBean);
         //1、是声音数据——SM: "83" = 0x53（正常状态）；"84" = 0x54（静音状态）
@@ -889,9 +892,9 @@ public class BaseActivity extends AppCompatActivity {
             //截取需要绘制的声音数据
             if (binaryStartsWithOne(mark)) {
                 //Mark最高位是1——代表仪器在这一包声音数据内触发
-                Message msg = new Message();
-                msg.what = LIGHT_UP;
-                handle.sendMessage(msg);
+//                Message msg = new Message();
+//                msg.what = LIGHT_UP;  //GC20220510
+//                handle.sendMessage(msg);
                 isVoicePack = true;
                 //Mark后7位，找到触发时刻声音数据点所在的位置
                 triggeredPosition = getMarkLastSeven(mark);
@@ -932,29 +935,48 @@ public class BaseActivity extends AppCompatActivity {
         }
         //2、是磁场数据——SM: "77" = 0x4d
         else if (packageBean.getSM() == 77) {
-            if (packageBean.getMark() >= 128) {
-                //探头相对电缆位置的判断   Mark: "128"= 10000000 代表位7是1 //GC20171205
+            //优化根据“标记位”数值来判断主机探头相对电缆位置    //GC20211229
+            if (packageBean.getMark() >= 192) {
+                //Mark: "192"= 11000000 位7和位6是1：有一个磁场线圈产生的信号为0 位置根据磁场信号数值和记忆的方向来判断 //GC20171205
+                if (isDraw) {
+                    isSingle = true;
+                }
+                //令位7=0
+                packageBean.setMark(packageBean.getMark() - 192);
+            } else if (packageBean.getMark() >= 128) {
+                //Mark: "128"= 10000000 位7是1：两个磁场线圈产生的信号方向不同，相对电缆位置是“右” //GC20171205
                 if (isDraw) {
                     //非“暂停”状态下才刷新位置显示    //GC20200409
                     handle.sendEmptyMessage(POSITION_RIGHT);
+                    isSingle = false;
+                    isRight = true;
                 }
                 //令位7=0
                 packageBean.setMark(packageBean.getMark() - 128);
             } else {
                 if (isDraw) {
                     handle.sendEmptyMessage(POSITION_LEFT);
+                    isSingle = false;
+                    isRight = false;
                 }
             }
             //按顺序拼接将磁场数据（从0到3，共4包，1包有100个点数据）
             for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
                 magneticArray[j] = results[i];
             }
+            //磁场信号第一包来到 //GC20220510 触发灯亮起时机更改
+            if (packageBean.getMark() == 0) {
+                //“同步指示” 灯变红
+                Message msg = new Message();
+                msg.what = LIGHT_UP;
+                handle.sendMessage(msg);
+            }
             //4个磁场包拼接完成，开始画主界面波形
             if (packageBean.getMark() == 3) {
                 //“同步指示” 灯变灰
-                Message msg = new Message();
-                msg.what = TRIGGERED;
-                handle.sendMessage(msg);
+//                Message msg = new Message();
+//                msg.what = TRIGGERED; //GC20220510
+//                handle.sendMessage(msg);
                 if (isDraw) {
                     //得到绘制的磁场数组magneticDraw
                     for (int i = 0; i < 400; i++) {
@@ -970,6 +992,41 @@ public class BaseActivity extends AppCompatActivity {
                         if (magneticArray[i] > maxMagnetic) {
                             maxMagnetic = magneticArray[i];
                         }
+                    }
+                    //根据第5个点数值判断    //GC20211229
+                    if (isDraw) {
+                        if (isSingle) {
+                            //单个线圈有信号
+                            if ( magneticDraw[5] > 2048) {
+                                if (state == 1) {
+                                    handle.sendEmptyMessage(POSITION_RIGHT);
+                                } else if (state == 2){
+                                    handle.sendEmptyMessage(POSITION_LEFT);
+                                }
+                            } else {
+                                if (state == 3) {
+                                    handle.sendEmptyMessage(POSITION_RIGHT);
+                                } else if (state == 4){
+                                    handle.sendEmptyMessage(POSITION_LEFT);
+                                }
+                            }
+                        } else {
+                            //可正常判断方向时记录状态
+                            if ( magneticDraw[5] > 2048) {
+                                if (isRight) {
+                                    state = 1;
+                                } else {
+                                    state = 2;
+                                }
+                            } else {
+                                if (isRight) {
+                                    state = 3;
+                                } else {
+                                    state = 4;
+                                }
+                            }
+                        }
+
                     }
                     //截取需要绘制的声音数组voiceDraw      //GC20180428 加上触发前50个点的数据   //GC20200103 改回触发时刻
                     System.arraycopy(tempVoice, 100, voiceDraw, 0, 400);
@@ -1799,11 +1856,11 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 0、下发磁场初始化控制命令
+     * 0、下发磁场初始化控制命令93%
      */
     public void sendMagneticInitCommand() {
-        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000、阶数22（70）—— //GC202171 阶数31.68（99%）——//GC20210730   阶数29.76（93%）
-        int[] ints = {96, 0, 128 + 29};
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000 + 底层板子初始阶数22（70%）
+        int[] ints = {96, 0, 128 + 29}; //GC20210730   改阶数为29（93%）  //GC20220326    初始命令改阶数为26（93%/以29为最高换算）
         //计算CRC校验码
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
@@ -2093,6 +2150,7 @@ public class BaseActivity extends AppCompatActivity {
                     sendAddress(customDeviceListDialog.headphonesAddress);
                     customDeviceListDialog.getAddress = false;
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.waiting_link), Toast.LENGTH_SHORT).show();
+                    handle.sendEmptyMessage(HEADPHONES_DISCONNECT_STATE);
                 }
                 llView.setClickable(true);
             }
@@ -2145,12 +2203,23 @@ public class BaseActivity extends AppCompatActivity {
     };
 
     /**
-     * 增益阶数和百分比的转化 100转32
+     * 声音增益阶数和百分比的转化 100转32
      */
     public int b2s(int b) {
         int s;
         float v = (float) b / 100.0f;
         float v1 = v * 32;
+        s = (int) v1;
+        return s;
+    }
+
+    /**
+     * 磁场增益阶数和百分比的转化 100转29
+     */
+    public int b2sM(int b) { //GC20220326
+        int s;
+        float v = (float) b / 100.0f;
+        float v1 = v * 29;
         s = (int) v1;
         return s;
     }
@@ -2229,6 +2298,7 @@ public class BaseActivity extends AppCompatActivity {
 //GC20181113    增益进度条高度显示优化
 //GC20181119    添加相关判断
 //GC20181201    声音自动定位算法优化
+
 //GC2.01.005————界面无缝切换，光标绘制更改，添加硬件关闭重连功能
 //GC20190215    界面无缝切换
 //GC20190216    界面光标绘制情况修改
@@ -2254,20 +2324,47 @@ public class BaseActivity extends AppCompatActivity {
 //GC20200103    国内习惯适配（声音波形触发时刻前去掉、用户专家界面模式按钮更改）
 //GC20200313    自动算法光标定位国内习惯改进修正BUG
 //GC20200114    重连操作延时原因——设备与APP重新连接时有一部分无用的空数据，需要处理掉 ③最终处理
-//GC20200312    磁场增益缺省值改为99%（阶数31，增益阶数0-32）       //GC202171  初始化增益阶数控制命令下发
 //GC20200409    “暂停”状态时“左右”位置不刷新
 //GC20200410    1分钟无触发信号界面提示调整      //GC20200728 后续优化
 //GC20200417    提示音改为“叮叮”，提示间隔拉长
 //GC20200519    播放暂停效果改进 / （如有虚拟按键，屏蔽）尝试
-
 //GC2.02.013————蓝牙耳机，浅色主题，初始化控制命令BUG
 //GC20210630    下发音频蓝牙重置控制命令
 //GC20210701    下发MAC地址控制命令
 //GC20210703    浅色主题
-
 //GC20210706    下发耳机MAC地址
 //GC20210707    命令发送错误BUG改进试验
 //GC20210714    利用对话框查找需要的蓝牙耳机MAC地址，然后下发给主板操作  /  蓝牙耳机状态反馈
-
 //GC20210830    暂停时点击“切换界面”按钮取消暂停，恢复至播放状态
-//GC20210730    93%（阶数29）
+//GC20210730    磁场增益缺省值改为93%（阶数29，增益阶数0-32）
+//GC20211229    优化根据“标记位”数值来判断主机探头相对电缆位置
+
+//GC2.03.001————
+//GC20220326    磁场线圈变大，增益最大阶数32和29变换的位置，目前32————————————版本调节①
+//GC20220407    蓝牙耳机按钮隐藏位置———————————————————————————版本调节②
+//GC20220510    触发灯闪烁效果优化，改正亮起后不变灰的BUG
+
+/**
+ * //                       _ooOoo_
+ * //                      o8888888o
+ * //                      88" . "88
+ * //                      (| -_- |)
+ * //                       O\ = /O
+ * //                   ____/`---'\____
+ * //                 .   ' \\| |// `.
+ * //                  / \\||| : |||// \
+ * //                / _||||| -:- |||||- \
+ * //                  | | \\\ - /// | |
+ * //                | \_| ''\---/'' | |
+ * //                 \ .-\__ `-` ___/-. /
+ * //              ______`. .' /--.--\ `. . __
+ * //           ."" '< `.___\_<|>_/___.' >'"".
+ * //          | | : `- \`.;`\ _ /`;.`/ - ` : | |
+ * //            \ \ `-. \_ __\ /__ _/ .-` / /
+ * //    ======`-.____`-.___\_____/___.-`____.-'======
+ * //                       `=---='
+ * //
+ * //    .............................................
+ * //             佛祖保佑             永无BUG
+ * =====================================================
+ */

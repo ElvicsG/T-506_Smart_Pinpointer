@@ -241,7 +241,7 @@ public class MainActivity extends BaseActivity {
         //专家界面
         seekBarMagnetic.setMax(100);
         seekBarVoice.setMax(100);
-        //GC20200312    专家界面磁场增益缺省值改为99%（阶数31，增益阶数0-32） //GC20210730    93%（阶数29）
+        //专家界面初始化，磁场增益为93%（阶数29，增益阶数0-32） //GC20210730
         seekBarMagnetic.setProgress(93);
         seekBarVoice.setProgress(70);
         tvMagneticValue.setText(93 + "%");
@@ -277,7 +277,7 @@ public class MainActivity extends BaseActivity {
         magneticFieldGainControlU.setValueColor("#d0210e");
         magneticFieldGainControlU.setCurrentValueColor("#a03225");
         magneticFieldGainControlU.setTitle(getString(R.string.gain));
-        //GC20200312    用户界面磁场增益缺省值改为99%（阶数31，增益阶数0-32） //GC20210730    93%（阶数29）
+        //用户界面初始化，磁场增益为93%（阶数29，增益阶数0-32） //GC20210730
         magneticFieldGainControlU.setTemp(0, 100, 93);
         magneticFieldGainControlU.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
             @Override
@@ -290,7 +290,7 @@ public class MainActivity extends BaseActivity {
                 MainActivity.this.seekBarMagneticInt[1] = temp;
 
                 seekBarType = 1;
-                int[] ints = {96, 0, 128 + b2s(temp)};
+                int[] ints = {96, 0, 128 + b2sM(temp)};  //·    专家界面磁场增益百分比转换后发送命令
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuilder ss = new StringBuilder();
@@ -408,7 +408,7 @@ public class MainActivity extends BaseActivity {
                 MainActivity.this.seekBarMagneticInt[1] = seekBar.getProgress();
 
                 seekBarType = 1;
-                int[] ints = {96, 0, 128 + b2s(seekBar.getProgress())};
+                int[] ints = {96, 0, 128 + b2s(seekBar.getProgress())}; //GC20220326    转换百分比为增益阶数
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuilder ss = new StringBuilder();
@@ -710,6 +710,8 @@ public class MainActivity extends BaseActivity {
                 ccvFirstU.setVisibility(View.INVISIBLE);
                 tvCurrentDelayU.setText("");
             }
+            //触发灯变灰 //GC20220510
+            timer2.start();
         }
         if (event.status == TRIGGERED) {
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
@@ -762,6 +764,12 @@ public class MainActivity extends BaseActivity {
             ivHeadphonesU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
             tvHeadphonesU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
         }
+        if (event.status == HEADPHONES_DISCONNECT_STATE) {
+            ivHeadphones.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            tvHeadphones.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            ivHeadphonesU.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            tvHeadphonesU.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        }
 
     }
 
@@ -782,6 +790,24 @@ public class MainActivity extends BaseActivity {
             tvNoticeU.setText(getString(R.string.message_notice_trigger));
             //专家界面
             tvNotice.setText(getString(R.string.message_notice_trigger));
+        }
+
+    };
+
+    /**
+     * 倒计时100ms处理触发灯变灰相关 //GC20220510
+     */
+    private CountDownTimer timer2 = new CountDownTimer(100, 1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+
+        @Override
+        public void onFinish() {
+            ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
+            timer.start();
+            timer2.cancel();
         }
 
     };
@@ -1150,7 +1176,7 @@ public class MainActivity extends BaseActivity {
                 clickFilter();
                 break;
             case R.id.ll_headphones:
-                //sendReconnectCommand();
+                sendReconnectCommand(); //GC20220221
                 //GC20210706    sendAddress();
                 clickHeadphones();
                 break;

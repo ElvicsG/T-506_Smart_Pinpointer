@@ -9,8 +9,8 @@ android {
         minSdkVersion 19
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 24
-        versionCode 12
-        versionName "2.02.013"
+        versionCode 1
+        versionName "2.03.001"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

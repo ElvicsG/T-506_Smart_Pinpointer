@@ -264,7 +264,7 @@
                 android:background="@drawable/ic_btn_expert"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:visibility="visible">
+                android:visibility="visible"><!--//GC20220407蓝牙耳机按钮android:visibility="gone"-->
 
                 <TextView
                     android:id="@+id/tv_headphones"

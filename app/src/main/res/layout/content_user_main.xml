@@ -448,7 +448,7 @@
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="visible"><!--//GC20220407蓝牙耳机按钮android:visibility="gone"-->
 
                 <ImageView
                     android:id="@+id/iv_headphones_u"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">T-506定点仪</string>
+    <string name="app_name">T-506</string>
     <string name="cichang_name">磁场</string>
     <string name="shengyin_name">声音</string>
     <string name="add">连接蓝牙设备</string>

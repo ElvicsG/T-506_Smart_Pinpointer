@@ -53,12 +53,12 @@
             android:id="@+id/tv_version2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:text="@string/version_code"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="20sp"
-            android:visibility="gone" />
+            android:textColor="@color/blue2"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <Button

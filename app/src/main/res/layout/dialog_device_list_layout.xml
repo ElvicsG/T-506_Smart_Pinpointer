@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="@color/blue6"
     android:orientation="vertical">
 
     <LinearLayout
@@ -50,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <TextView
                         android:id="@+id/title_paired_devices"
@@ -59,7 +58,7 @@
                         android:background="@color/gray10"
                         android:padding="@dimen/base_dimen_5dp"
                         android:text="@string/paired_device"
-                        android:textColor="@color/gray5"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/base_dimen_14sp" />
 
                     <ListView
@@ -75,7 +74,7 @@
                         android:background="@color/gray10"
                         android:padding="@dimen/base_dimen_5dp"
                         android:text="@string/new_device"
-                        android:textColor="@color/gray5"
+                        android:textColor="@color/white"
                         android:textSize="@dimen/base_dimen_14sp" />
 
                     <ListView
