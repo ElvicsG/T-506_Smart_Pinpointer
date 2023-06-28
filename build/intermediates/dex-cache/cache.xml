@@ -12,12 +12,39 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.13.0\a9283170b7305c8d92d25aff02a6ab7e45d06cbe\okio-1.13.0.jar"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-gson\2.3.0\9e09011e9767bb76b5e27c9b8223476b93b14631\converter-gson-2.3.0.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
-        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okio-1.13.0_0ccbaaad0d84fcd4a933723e14f3566a0d2c8491.jar" />
+        sha1="9e09011e9767bb76b5e27c9b8223476b93b14631">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\converter-gson-2.3.0_85b23794c8e9bfe7b197e25c64ca33775bf54616.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\org.greenrobot\eventbus\3.1.1\5cd91fd014f5b72292f959748c20a2cefefae77d\eventbus-3.1.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="5cd91fd014f5b72292f959748c20a2cefefae77d">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\eventbus-3.1.1_9fd8c693bf98cc42cad68c31283f966a43dd1c2a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.jakewharton\butterknife-annotations\8.8.1\bc373fb6bc7bca3035041b924f158fd2b946ee8d\butterknife-annotations-8.8.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="bc373fb6bc7bca3035041b924f158fd2b946ee8d">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\butterknife-annotations-8.8.1_4ad4365154caabd35cc0e8f19fbbcfbabbfaf62e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao-generator\3.0.0\ef03fdf4961ef0714ff37ab7480f46c4a437ba5c\greendao-generator-3.0.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="ef03fdf4961ef0714ff37ab7480f46c4a437ba5c">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-generator-3.0.0_c9a6757d7e932d76c44df08e653d4902e02d30ac.jar" />
     </item>
     <item
         is-multidex="false"
@@ -30,6 +57,15 @@
     </item>
     <item
         is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\retrofit\2.3.0\bcacde6a8ccedcc56c127403d26b76072fe6214d\retrofit-2.3.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="bcacde6a8ccedcc56c127403d26b76072fe6214d">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\retrofit-2.3.0_211d094d6b469e0890c5a5d586f7285c9e74f672.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.github.markzhai\blockcanary-android\1.4.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
@@ -39,12 +75,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao\3.0.1\20ec484d992d38d7775a22e43ac40d2d551bb886\greendao-3.0.1.jar"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-scalars\2.0.0-beta4\f8685e25bc7f076913e2b51996cbc19ef7eb05df\converter-scalars-2.0.0-beta4.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
-        sha1="20ec484d992d38d7775a22e43ac40d2d551bb886">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-3.0.1_413bd26678752a77bb8a9cdc836797b20fe4bde1.jar" />
+        sha1="f8685e25bc7f076913e2b51996cbc19ef7eb05df">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\converter-scalars-2.0.0-beta4_041627f41defda62487b103ec8144cbd5e276b02.jar" />
     </item>
     <item
         is-multidex="false"
@@ -75,30 +111,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao-generator\3.0.0\ef03fdf4961ef0714ff37ab7480f46c4a437ba5c\greendao-generator-3.0.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="ef03fdf4961ef0714ff37ab7480f46c4a437ba5c">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-generator-3.0.0_d389a121fc151f1ef37189e4a923cc69a1cfe6ac.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
         sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-24.2.1_78539e0c171186e9f7ab34e2e5aebad5e1ef6469.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\org.freemarker\freemarker\2.3.23\cd143cd8c02a9f838e3cb75a6dfe133750437f6d\freemarker-2.3.23.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="cd143cd8c02a9f838e3cb75a6dfe133750437f6d">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\freemarker-2.3.23_4913044569f68a551155761f89d6a28180df12ee.jar" />
     </item>
     <item
         is-multidex="false"
@@ -111,6 +129,15 @@
     </item>
     <item
         is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao-api\3.0.0\9170fafb15855927b2e131e4fb7ac47dede441b7\greendao-api-3.0.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="9170fafb15855927b2e131e4fb7ac47dede441b7">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-api-3.0.0_75d5f077546ce03f4af36b3b3f4647edce9717e9.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
@@ -120,30 +147,21 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao-api\3.0.0\9170fafb15855927b2e131e4fb7ac47dede441b7\greendao-api-3.0.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="9170fafb15855927b2e131e4fb7ac47dede441b7">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-api-3.0.0_4a58376e098b6f28cfa3eb58c6d6f8ef36cda203.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\org.greenrobot\eventbus\3.1.1\5cd91fd014f5b72292f959748c20a2cefefae77d\eventbus-3.1.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="5cd91fd014f5b72292f959748c20a2cefefae77d">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\eventbus-3.1.1_7fefb58092872917a8d5310eca28792c64af9207.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.pnikosis\materialish-progress\1.0\jars\classes.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
         sha1="57487745ce450899f9f250d5ae5c092a682cd041">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.pnikosis-materialish-progress-1.0_719c08185796bf2c99a1f2e553ada54bc35d1830.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.13.0\a9283170b7305c8d92d25aff02a6ab7e45d06cbe\okio-1.13.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okio-1.13.0_8d3f719350ddc28190bb0b972895257ec772f0ac.jar" />
     </item>
     <item
         is-multidex="false"
@@ -162,24 +180,6 @@
         revision="24.0.3"
         sha1="88998b1d461a43d0d81167d8da7cc6ce3cf12af9">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\com.robinhood.spark-spark-1.1.2_beb0f732a12549c3c30f9521113dea2d15e9dff9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-scalars\2.0.0-beta4\f8685e25bc7f076913e2b51996cbc19ef7eb05df\converter-scalars-2.0.0-beta4.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="f8685e25bc7f076913e2b51996cbc19ef7eb05df">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\converter-scalars-2.0.0-beta4_3c6cd7ec4bf3f8265c36881ece5dc55f186c5fc3.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.7\751f548c85fa49f330cecbb1875893f971b33c4e\gson-2.7.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\gson-2.7_1d3c8152d78d6055ed1980d851ac17d05e592bd3.jar" />
     </item>
     <item
         is-multidex="false"
@@ -228,15 +228,6 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-gson\2.3.0\9e09011e9767bb76b5e27c9b8223476b93b14631\converter-gson-2.3.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="9e09011e9767bb76b5e27c9b8223476b93b14631">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\converter-gson-2.3.0_7f15d11b492bb857a64e90d00737ca0976e71b83.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\libs\xUtils-2.6.14.jar"
         jumboMode="false"
         optimize="true"
@@ -264,6 +255,15 @@
     </item>
     <item
         is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp3\okhttp\3.8.0\5a11f020cce2d11eb71ba916700600e18c4547e7\okhttp-3.8.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="5a11f020cce2d11eb71ba916700600e18c4547e7">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okhttp-3.8.0_9a78e1b20204b7c211f338684a671685215681f5.jar" />
+    </item>
+    <item
+        is-multidex="false"
         jar="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.1\jars\classes.jar"
         jumboMode="false"
         optimize="true"
@@ -282,21 +282,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.jakewharton\butterknife-annotations\8.8.1\bc373fb6bc7bca3035041b924f158fd2b946ee8d\butterknife-annotations-8.8.1.jar"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.7\751f548c85fa49f330cecbb1875893f971b33c4e\gson-2.7.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
-        sha1="bc373fb6bc7bca3035041b924f158fd2b946ee8d">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\butterknife-annotations-8.8.1_b5c9691c4b5133942791e614261f27c7f27f5afa.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\retrofit\2.3.0\bcacde6a8ccedcc56c127403d26b76072fe6214d\retrofit-2.3.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="24.0.3"
-        sha1="bcacde6a8ccedcc56c127403d26b76072fe6214d">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\retrofit-2.3.0_424783f063458426d4f802a177039dca47fad4a0.jar" />
+        sha1="751f548c85fa49f330cecbb1875893f971b33c4e">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\gson-2.7_b722d31dae1f9ed42d2d20bb5a2d82530c8c6ea9.jar" />
     </item>
     <item
         is-multidex="false"
@@ -306,6 +297,15 @@
         revision="24.0.3"
         sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
         <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\internal_impl-24.2.1_f97ccefed06220b3e5451c4dd759a9c9fadd5d60.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\org.greenrobot\greendao\3.0.1\20ec484d992d38d7775a22e43ac40d2d551bb886\greendao-3.0.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.3"
+        sha1="20ec484d992d38d7775a22e43ac40d2d551bb886">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\greendao-3.0.1_36f9a9f14334b99aaceaa2c1859d81bbab6179fb.jar" />
     </item>
     <item
         is-multidex="false"
@@ -363,12 +363,12 @@
     </item>
     <item
         is-multidex="false"
-        jar="C:\Users\Work\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp3\okhttp\3.8.0\5a11f020cce2d11eb71ba916700600e18c4547e7\okhttp-3.8.0.jar"
+        jar="C:\Users\ELVICS-WORK\.gradle\caches\modules-2\files-2.1\org.freemarker\freemarker\2.3.23\cd143cd8c02a9f838e3cb75a6dfe133750437f6d\freemarker-2.3.23.jar"
         jumboMode="false"
         optimize="true"
         revision="24.0.3"
-        sha1="5a11f020cce2d11eb71ba916700600e18c4547e7">
-        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\okhttp-3.8.0_c072bfda41c939a7db633bc2c56e0810b89092f1.jar" />
+        sha1="cd143cd8c02a9f838e3cb75a6dfe133750437f6d">
+        <dex dex="D:\MyApplicationAS\T-506_Smart_Pinpointer\app\build\intermediates\pre-dexed\debug\freemarker-2.3.23_20d51c8641a6491ba1434a016250def71c3dc993.jar" />
     </item>
     <item
         is-multidex="false"

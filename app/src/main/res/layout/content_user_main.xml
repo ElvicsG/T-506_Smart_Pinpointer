@@ -121,7 +121,7 @@
             <!--指示框-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/base_dimen_1dp"
                 android:layout_marginEnd="@dimen/base_dimen_1dp"
                 android:layout_below="@id/ll_notice_u"
@@ -134,7 +134,7 @@
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:background="@drawable/bg_user_main_acoutstio_magnetic_delay"
                         android:gravity="center"
                         android:orientation="vertical">
@@ -164,10 +164,10 @@
 
                             <RelativeLayout
                                 android:id="@+id/rl_wave_u"
-                                android:layout_width="@dimen/base_dimen_100dp"
-                                android:layout_height="@dimen/base_dimen_100dp"
+                                android:layout_width="@dimen/base_dimen_80dp"
+                                android:layout_height="@dimen/base_dimen_80dp"
                                 android:layout_gravity="center"
-                                android:orientation="vertical">
+                                android:orientation="horizontal">
 
                                 <com.kehui.www.testapp.ui.CustomCircleView
                                     android:id="@+id/ccv_first_u"
@@ -448,7 +448,7 @@
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="visible"><!--//GC20220407蓝牙耳机按钮android:visibility="gone"-->
+                android:visibility="gone"><!--//GC20220407蓝牙耳机按钮android:visibility="gone"-->
 
                 <ImageView
                     android:id="@+id/iv_headphones_u"
@@ -475,14 +475,15 @@
                 android:layout_marginStart="5dp"
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="visible">  <!--//GC20220801-->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:drawablePadding="5dp"
                     android:drawableTop="@drawable/ic_assist"
+                    android:drawablePadding="5dp"
                     android:gravity="center"
                     android:text="@string/assist"
                     android:textColor="@color/white"

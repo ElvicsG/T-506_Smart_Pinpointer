@@ -1,12 +1,13 @@
 <?xml version ="1.0" encoding="utf-8"?>
 <resources>
-	<!--自定义适配平板的参数-->
+	<!--自定义适配平板的参数 平板设备为Q802 //GC20230531-->
 	<dimen name="base_dimen_12sp">15sp</dimen>
 	<dimen name="base_dimen_13sp">16.25sp</dimen>
 	<dimen name="base_dimen_14sp">17.5sp</dimen>
 	<dimen name="base_dimen_15sp">18.75sp</dimen>
 	<dimen name="base_dimen_16sp">20sp</dimen>
 	<dimen name="base_dimen_18sp">22.5sp</dimen>
+	<dimen name="base_dimen_24sp">30sp</dimen>
 	<dimen name="base_dimen_34sp">42.5sp</dimen>
 
 	<dimen name="base_dimen_1dp">0dp</dimen>

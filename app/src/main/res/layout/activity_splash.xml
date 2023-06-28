@@ -58,7 +58,7 @@
             android:layout_marginTop="20dp"
             android:text="@string/version_code"
             android:textColor="@color/blue2"
-            android:textSize="20sp" />
+            android:textSize="20sp" /> <!--GC20220520-->
     </LinearLayout>
 
     <Button
@@ -66,9 +66,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginBottom="15dp"
         android:background="@drawable/btn_start_selector"
         android:onClick="clickSplash"
-        android:layout_marginBottom="15dp"
         android:text="@string/start_to_use"
         android:textColor="@color/blue3"
         android:textSize="@dimen/base_dimen_18sp" />

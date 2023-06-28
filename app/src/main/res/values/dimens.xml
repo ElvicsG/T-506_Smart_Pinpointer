@@ -14,6 +14,7 @@
     <dimen name="base_dimen_15sp">7.5sp</dimen>
     <dimen name="base_dimen_16sp">8sp</dimen>
     <dimen name="base_dimen_18sp">9sp</dimen>
+    <dimen name="base_dimen_24sp">12sp</dimen>
     <dimen name="base_dimen_34sp">17sp</dimen>
 
     <dimen name="base_dimen_1dp">0dp</dimen>
@@ -33,6 +34,7 @@
     <dimen name="base_dimen_135dp">67.5dp</dimen>
     <dimen name="base_dimen_150dp">75dp</dimen>
     <dimen name="base_dimen_200dp">100dp</dimen>
+    <dimen name="base_dimen_320dp">160dp</dimen>
 
     <dimen name="base_dimen_0">0dp</dimen>
     <dimen name="base_dimen_1">0.5dp</dimen>

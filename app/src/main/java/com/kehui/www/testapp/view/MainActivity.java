@@ -32,6 +32,7 @@ import com.kehui.www.testapp.event.SendCommandFinishEvent;
 import com.kehui.www.testapp.event.SendCommandNotRespondEvent;
 import com.kehui.www.testapp.event.UiHandleEvent;
 import com.kehui.www.testapp.ui.CustomCircleView;
+import com.kehui.www.testapp.ui.KBubbleSeekBar;
 import com.kehui.www.testapp.ui.PercentLinearLayout;
 import com.kehui.www.testapp.ui.SparkView.SparkView;
 import com.kehui.www.testapp.ui.TempControlView;
@@ -50,6 +51,7 @@ import java.io.InputStream;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 /**
  * @author Gong
@@ -190,6 +192,13 @@ public class MainActivity extends BaseActivity {
     TextView tvHeadphonesU;
     @BindView(R.id.iv_headphones_u)
     ImageView ivHeadphonesU;
+    @BindView(R.id.ll_headphones_u)
+    PercentLinearLayout llHeadphonesU;
+    //GC20220620
+    @BindView(R.id.seekBarM)
+    KBubbleSeekBar seekBarM;
+    @BindView(R.id.seekBarV)
+    KBubbleSeekBar seekBarV;
 
     /**
      * 专家界面参数
@@ -246,6 +255,9 @@ public class MainActivity extends BaseActivity {
         seekBarVoice.setProgress(70);
         tvMagneticValue.setText(93 + "%");
         tvVoiceValue.setText(70 + "%");
+        //初始化seekBar控件  //GC20220620
+        seekBarM.setProgress(93);
+        seekBarV.setProgress(70);
         checkVoice();
 
         //用户界面  //GC20190215 界面无缝切换用户界面初始化
@@ -253,7 +265,7 @@ public class MainActivity extends BaseActivity {
         ccvSecondU.setVisibility(View.GONE);
         //去掉最小延时值显示    //GC20190717
         llMinDelayU.setVisibility(View.GONE);
-        //画动画1——波纹  正在测试中   ...
+        //画动画1——正在测试中   ...     波纹
         if (valueAnimator == null) {
             valueAnimator = ValueAnimator.ofInt(0, 4).setDuration(1000);
             valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
@@ -271,11 +283,11 @@ public class MainActivity extends BaseActivity {
         rlWaveU.addView(v);
 
         //设置磁场增益显示
-        magneticFieldGainControlU.setArcColor("#a03225");
-        magneticFieldGainControlU.setDialColor1("#a03225");
-        magneticFieldGainControlU.setDialColor2("#01eeff");
-        magneticFieldGainControlU.setValueColor("#d0210e");
-        magneticFieldGainControlU.setCurrentValueColor("#a03225");
+        magneticFieldGainControlU.setArcColor("#FF6600");       //刻度绿色
+        magneticFieldGainControlU.setDialColor1("#FF6600");     //弧线颜色
+        magneticFieldGainControlU.setDialColor2("#ffffff");     //进度弧线颜色改成白色   //GC20220823 01eeff
+        magneticFieldGainControlU.setValueColor("#FF6600");     //数值范围颜色
+        magneticFieldGainControlU.setCurrentValueColor("#a03225");  //当前数值颜色
         magneticFieldGainControlU.setTitle(getString(R.string.gain));
         //用户界面初始化，磁场增益为93%（阶数29，增益阶数0-32） //GC20210730
         magneticFieldGainControlU.setTemp(0, 100, 93);
@@ -284,6 +296,7 @@ public class MainActivity extends BaseActivity {
             public void change(int temp) {
                 seekBarMagnetic.setProgress(temp);
                 tvMagneticValue.setText(temp + "%");
+                seekBarM.setProgress(temp); //GC20220620
                 Constant.magneticFieldGain = temp;
                 magneticFieldGainControlU.setEnabled(false);
                 MainActivity.this.seekBarMagneticInt[0] = MainActivity.this.seekBarMagneticInt[1];
@@ -326,11 +339,11 @@ public class MainActivity extends BaseActivity {
             }
         });
         //设置声音增益显示
-        voiceGainControlU.setArcColor("#026b02");
-        voiceGainControlU.setDialColor1("#026b02");
-        voiceGainControlU.setDialColor2("#01eeff");
-        voiceGainControlU.setValueColor("#00ec03");
-        voiceGainControlU.setCurrentValueColor("#026b02");
+        voiceGainControlU.setArcColor("#00ec03");   //刻度绿色 绿
+        voiceGainControlU.setDialColor1("#00ec03"); //弧线颜色 绿
+        voiceGainControlU.setDialColor2("#ffffff"); //进度弧线颜色改成白色   //GC20220823 01eeff
+        voiceGainControlU.setValueColor("#00ec03"); //数值范围颜色 绿
+        voiceGainControlU.setCurrentValueColor("#026b02");  //当前数值颜色
         voiceGainControlU.setTitle(getString(R.string.gain));
         voiceGainControlU.setTemp(0, 100, 70);
         voiceGainControlU.setOnTempChangeListener(new TempControlView.OnTempChangeListener() {
@@ -338,6 +351,7 @@ public class MainActivity extends BaseActivity {
             public void change(int temp) {
                 seekBarVoice.setProgress(temp);
                 tvVoiceValue.setText(temp + "%");
+                seekBarV.setProgress(temp); //GC20220620
                 Constant.voiceGain = temp;
                 voiceGainControlU.setEnabled(false);
                 MainActivity.this.seekBarVoiceInt[0] = MainActivity.this.seekBarVoiceInt[1];
@@ -383,9 +397,121 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * seekBar设置，用于监听增益变化，下发相应的控制命令
+     * 专家界面seekBar设置，用于监听增益变化，并下发相应的控制命令
      */
     private void setSeekBar() {
+        //seekBarM变化监听    //GC20220620
+        seekBarM.setOnProgressChangedListener(new KBubbleSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(KBubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+                tvMagneticValue.setText(progress + "%");
+                Constant.magneticFieldGain = progress;
+                magneticFieldGainControlU.setTemp(0, 100, progress);
+            }
+
+            @Override
+            public void getProgressOnActionUp(KBubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+                MainActivity.this.seekBarMagneticInt[0] = MainActivity.this.seekBarMagneticInt[1];
+                MainActivity.this.seekBarMagneticInt[1] = progress;
+
+                seekBarType = 1;
+                int[] ints = {96, 0, 128 + b2sM(progress)}; //转换百分比为增益阶数  最高32（b2s）/ 最高29（b2sM）   //GC20220326
+                long l = getCommandCrcByte(ints);
+                String s = Long.toBinaryString((int) l);
+                StringBuilder ss = new StringBuilder();
+                if (s.length() <= 32) {
+                    for (int i = 0; i < (32 - s.length()); i++) {
+                        ss.append("0");
+                    }
+                    s = ss.toString() + s;
+                } else {
+                    s = s.substring(s.length() - 32);
+                }
+                String substring1 = s.substring(0, 8);
+                String substring2 = s.substring(8, 16);
+                String substring3 = s.substring(16, 24);
+                String substring4 = s.substring(24, 32);
+                Integer integer1 = Integer.valueOf(substring1, 2);
+                Integer integer2 = Integer.valueOf(substring2, 2);
+                Integer integer3 = Integer.valueOf(substring3, 2);
+                Integer integer4 = Integer.valueOf(substring4, 2);
+
+                byte[] request = new byte[7];
+                request[0] = (byte) ints[0];
+                request[1] = (byte) ints[1];
+                request[2] = (byte) ints[2];
+                request[3] = (byte) integer1.intValue();
+                request[4] = (byte) integer2.intValue();
+                request[5] = (byte) integer3.intValue();
+                request[6] = (byte) integer4.intValue();
+                //GC20190407 蓝牙重连功能优化
+                Constant.CurrentMagParam = request;
+                sendCommand(request);
+
+            }
+
+            @Override
+            public void getProgressOnFinally(KBubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+
+            }
+        });
+
+        //seekBarV变化监听    //GC20220620
+        seekBarV.setOnProgressChangedListener(new KBubbleSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(KBubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+                tvVoiceValue.setText(progress + "%");
+                Constant.voiceGain = progress;
+                voiceGainControlU.setTemp(0, 100, progress);
+            }
+
+            @Override
+            public void getProgressOnActionUp(KBubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+                MainActivity.this.seekBarVoiceInt[0] = MainActivity.this.seekBarVoiceInt[1];
+                MainActivity.this.seekBarVoiceInt[1] = progress;
+                //Log.e("打印-设置shengyin", seekBarVoiceInt.getProgress() + "");
+                seekBarType = 2;
+                int[] ints = {96, 0, b2s(progress)};
+                long l = getCommandCrcByte(ints);
+                String s = Long.toBinaryString((int) l);
+                StringBuilder ss = new StringBuilder();
+                if (s.length() <= 32) {
+                    for (int i = 0; i < (32 - s.length()); i++) {
+                        ss.append("0");
+                    }
+                    s = ss.toString() + s;
+                } else {
+                    s = s.substring(s.length() - 32);
+                }
+                String substring1 = s.substring(0, 8);
+                String substring2 = s.substring(8, 16);
+                String substring3 = s.substring(16, 24);
+                String substring4 = s.substring(24, 32);
+                Integer integer1 = Integer.valueOf(substring1, 2);
+                Integer integer2 = Integer.valueOf(substring2, 2);
+                Integer integer3 = Integer.valueOf(substring3, 2);
+                Integer integer4 = Integer.valueOf(substring4, 2);
+
+                byte[] request = new byte[7];
+                request[0] = (byte) ints[0];
+                request[1] = (byte) ints[1];
+                request[2] = (byte) ints[2];
+                request[3] = (byte) integer1.intValue();
+                request[4] = (byte) integer2.intValue();
+                request[5] = (byte) integer3.intValue();
+                request[6] = (byte) integer4.intValue();
+                //GC20190407 蓝牙重连功能优化
+                Constant.CurrentVoiceParam = request;
+                sendCommand(request);
+
+            }
+
+            @Override
+            public void getProgressOnFinally(KBubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+
+            }
+        });
+
         //磁场seekBar数值改变执行的回掉方法
         seekBarMagnetic.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -408,7 +534,7 @@ public class MainActivity extends BaseActivity {
                 MainActivity.this.seekBarMagneticInt[1] = seekBar.getProgress();
 
                 seekBarType = 1;
-                int[] ints = {96, 0, 128 + b2s(seekBar.getProgress())}; //GC20220326    转换百分比为增益阶数
+                int[] ints = {96, 0, 128 + b2sM(seekBar.getProgress())}; //转换百分比为增益阶数  最高32（b2s）/ 最高29（b2sM）   //GC20220326
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuilder ss = new StringBuilder();
@@ -594,17 +720,20 @@ public class MainActivity extends BaseActivity {
             public void run() {
                 if (seekBarType == 1) {
                     seekBarMagnetic.setProgress(MainActivity.this.seekBarMagneticInt[1]);
-                    //seekBarMagneticInt.setProgress(s2b(seekBarMagneticInt[0]));   //GC20170609 修改声音增益显示方式（百分比或实际阶数）
+//                    seekBarM.setProgress(MainActivity.this.seekBarMagneticInt[1]);  //GC20220620
                     MainActivity.this.seekBarMagneticInt[1] = MainActivity.this.seekBarMagneticInt[0];
                 } else if (seekBarType == 2) {
                     seekBarVoice.setProgress(MainActivity.this.seekBarVoiceInt[1]);
-                    //seekBarVoiceInt.setProgress(s2b(seekBarVoiceInt[0])); //同理 磁场
+//                    seekBarV.setProgress(MainActivity.this.seekBarVoiceInt[1]); //GC20220620
                     MainActivity.this.seekBarVoiceInt[1] = MainActivity.this.seekBarVoiceInt[0];
                 }
                 seekBarType = 0;
                 llFilter.setClickable(true);
                 seekBarMagnetic.setEnabled(true);
                 seekBarVoice.setEnabled(true);
+
+//                seekBarM.setEnabled(true);   //GC20200620
+//                seekBarV.setEnabled(true);
                 //GC20190215 界面无缝切换
                 llFilterU.setClickable(true);
                 voiceGainControlU.setEnabled(true);
@@ -622,9 +751,11 @@ public class MainActivity extends BaseActivity {
     public void onEventMainThread(SendCommandNotRespondEvent event) {
         if (seekBarType == 1) {
             seekBarMagnetic.setProgress(this.seekBarMagneticInt[0]);
+//            seekBarM.setProgress(this.seekBarMagneticInt[0]);   //GC20220620
             this.seekBarMagneticInt[1] = this.seekBarMagneticInt[0];
         } else if (seekBarType == 2) {
             seekBarVoice.setProgress(this.seekBarVoiceInt[0]);
+//            seekBarV.setProgress(this.seekBarVoiceInt[0]);  //GC20220620
             this.seekBarVoiceInt[1] = this.seekBarVoiceInt[0];
         }
     }
@@ -670,6 +801,8 @@ public class MainActivity extends BaseActivity {
                     llFilter.setClickable(true);
                     seekBarMagnetic.setEnabled(true);
                     seekBarVoice.setEnabled(true);
+//                    seekBarM.setEnabled(true);   //GC20220620
+//                    seekBarV.setEnabled(true);
                     //GC20190215 界面无缝切换     命令发送失败
                     llFilterU.setClickable(true);
                     voiceGainControlU.setEnabled(true);
@@ -1045,8 +1178,8 @@ public class MainActivity extends BaseActivity {
                 }
             }, 3000);
             //是故障，判断“已发现故障”
-            tvNotice.setText(getString(R.string.message_notice_7));
-            tvNoticeU.setText(getString(R.string.message_notice_7));
+            tvNotice.setText(getString(R.string.message_notice_8)); //GC20220708 改提示为“接近故障点”
+            tvNoticeU.setText(getString(R.string.message_notice_8));
 
             if (isRelatedCount == 0) {
                 //第一次相关 延时值显示
@@ -1218,6 +1351,17 @@ public class MainActivity extends BaseActivity {
             default:
                 break;
         }
+    }
+
+
+    /**
+     * 长按更新按键弹出设备编号弹窗   //GC20220709
+     */
+    @OnLongClick({R.id.ll_settings})
+    public boolean onLongClick(View view) {
+        llHeadphones.setVisibility(View.VISIBLE);
+        llHeadphonesU.setVisibility(View.VISIBLE);
+        return true;
     }
 
     //点击静音

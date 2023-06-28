@@ -7,7 +7,7 @@
     <string name="delete">Disconnect the Bluetooth device</string>
     <string name="block_canary_display_activity_label">Blocks</string>
     <string name="start_to_use">start</string>
-    <string name="version_code">version : </string>
+    <string name="version_code">version:</string>
     <string name="does_not_find_device">The machine does not find Bluetooth hardware or drivers</string>
     <string name="open_bluetooth_ing">Opening Bluetooth</string>
     <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">Waiting for Bluetooth to open, re-try after 5s!</string>
@@ -29,7 +29,7 @@
     <string name="company_website">WEBSITE:：www.kehui.cn</string>
     <string name="ok">OK</string>
     <string name="confirm">Confirm</string>
-    <string name="find_device">Find the device</string>
+    <string name="find_device">Find headphones</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
     <string name="note">prompt</string>
@@ -77,7 +77,7 @@
     <string name="commit">Submit</string>
     <string name="magnetic_field">Magnetic</string>
     <string name="app_name2">Kehui Smart Pinpointer V2.0</string>
-    <string name="setting">Setup</string>
+    <string name="setting">Settings</string>
     <string name="cancel">Cancel</string>
     <string name="company">Kehui International Ltd.</string>
     <string name="company_address">Address : Studio 206, Mill Studio Business Centre, Crane Mead, Ware, Hertfordshire SQ12 9PY, UK</string>
@@ -107,9 +107,9 @@
     <string name="software_new">Your software is the latest version!</string>
     <string name="synchronize_light">Trigger</string>
     <string name="status">Status</string>
-    <string name="play">Resume</string>
+    <string name="play">Play</string>
     <string name="mute">Mute</string>
-    <string name="pause">Hold/run</string>
+    <string name="pause">Pause</string>
     <string name="memory">Memory</string>
     <string name="compare">Compare</string>
     <string name="filter">Filter</string>
@@ -134,7 +134,7 @@
     <string name="paired_device">Paired device</string>
     <string name="new_device">Unpaired device</string>
     <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
-    <string name="please_find_device">Please find a device!</string>
+    <string name="please_find_device">Please pair T-506 in Android system settings!</string>
     <string name="min_delay">Minimum delay</string>
     <string name="pinpointer_position">Pinpointer Position</string>
     <string name="connecting_wait">Connecting, please wait…</string>
@@ -158,7 +158,7 @@
     <string name="no_data">No data</string>
     <string name="no_net">No network</string>
     <string name="follow_sys">Auto</string>
-    <string name="demo_notice">Eingegebenen Demo-Modus!</string>
+    <string name="demo_notice">Entered demo_notice!</string>
     <string name="triggered">Triggered</string>
     <string name="Link_Lost_Reconnect">Disconnected to sensor, please check the instrument!</string>
     <string name="cichang_value_max">32</string>

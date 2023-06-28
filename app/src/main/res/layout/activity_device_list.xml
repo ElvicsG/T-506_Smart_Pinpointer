@@ -66,13 +66,15 @@
                 android:padding="@dimen/base_dimen_5dp"
                 android:text="@string/new_device"
                 android:textColor="@color/gray5"
-                android:textSize="@dimen/base_dimen_14sp" />
+                android:textSize="@dimen/base_dimen_14sp"
+                android:visibility="gone" />    <!--初始配对界面//GC20220801-->
 
             <ListView
                 android:id="@+id/new_devices"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:visibility="gone" />    <!--初始配对界面//GC20220801-->
         </LinearLayout>
 
         <LinearLayout
@@ -94,8 +96,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="@string/please_find_device"
-                android:textColor="@color/gray6"
-                android:textSize="@dimen/base_dimen_14sp" />
+                android:textColor="@color/blue2"
+                android:textSize="@dimen/base_dimen_24sp" />
 
         </LinearLayout>
 
@@ -115,17 +117,18 @@
             android:background="@drawable/btn_seek_device"
             android:text="@string/find_device"
             android:textColor="@color/blue2"
-            android:textSize="@dimen/base_dimen_14sp"/>
+            android:textSize="@dimen/base_dimen_14sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/button_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/base_dimen_15dp"
             android:background="@drawable/btn_seek_device"
             android:onClick="onCancel"
             android:text="@string/cancel"
-            android:layout_marginEnd="@dimen/base_dimen_15dp"
             android:textColor="@color/blue2"
-            android:textSize="@dimen/base_dimen_14sp" />
+            android:textSize="@dimen/base_dimen_14sp" />    <!--//GC20220801-->
     </LinearLayout>
 </LinearLayout>

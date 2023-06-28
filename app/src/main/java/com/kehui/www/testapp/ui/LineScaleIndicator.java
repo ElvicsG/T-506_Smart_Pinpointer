@@ -6,7 +6,6 @@ import android.graphics.RectF;
 
 import android.animation.ValueAnimator;
 
-
 import java.util.ArrayList;
 
 /**

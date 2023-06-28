@@ -10,8 +10,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextPaint;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 
 import com.kehui.www.testapp.R;
 import com.kehui.www.testapp.adpter.DeviceListAdapter;
+import com.kehui.www.testapp.application.MyApplication;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -253,6 +256,29 @@ public class DeviceListActivity extends BaseActivity {
 
     public void onCancel(View v) {
         finish();
+        showSplash();   //GC20220801
+    }
+
+    private void showSplash() {
+        Intent intent = new Intent(this, SplashActivity.class);
+        startActivityForResult(intent, 100);
+        finish();
+    }
+
+    /**
+     * 双击返回键退出  //GC20220801
+     */
+
+
+    //GC20181117 静音按钮状态监听
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            finish();
+            showSplash();   //GC20220801
+        }
+        return false;
+
     }
 
 }

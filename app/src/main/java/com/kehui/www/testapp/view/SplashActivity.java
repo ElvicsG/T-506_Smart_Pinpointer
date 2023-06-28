@@ -13,8 +13,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -119,7 +121,7 @@ public class SplashActivity extends BaseActivity {
 
         //检测版本更新
         initUpdateApk();
-        //当前软件版本名称
+        //显示当前软件版本号
         TextView tvVersion = (TextView) this.findViewById(R.id.tv_version2);
         tvVersion.setText(this.getResources().getString(R.string.version_code) + getVersionName(this));
         //设置字体
@@ -412,6 +414,36 @@ public class SplashActivity extends BaseActivity {
             Log.e("msg", e.getMessage());
         }
         return versionName;
+    }
+
+    /**
+     * 双击返回键退出  //GC20220801
+     */
+    private boolean mIsExit;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mIsExit) {
+                Intent home = new Intent(Intent.ACTION_MAIN);
+                home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                home.addCategory(Intent.CATEGORY_HOME);
+                startActivity(home);
+                return true;
+
+            } else {
+                Toast.makeText(this, "再按一次回到桌面", Toast.LENGTH_SHORT).show();
+                mIsExit = true;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mIsExit = false;
+                    }
+                }, 5000);
+
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

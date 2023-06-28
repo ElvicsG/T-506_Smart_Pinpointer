@@ -7,6 +7,7 @@
 	<dimen name="base_dimen_15sp">18.75sp</dimen>
 	<dimen name="base_dimen_16sp">20sp</dimen>
 	<dimen name="base_dimen_18sp">18sp</dimen>
+	<dimen name="base_dimen_24sp">24sp</dimen>
 	<dimen name="base_dimen_34sp">34sp</dimen>
 
 	<dimen name="base_dimen_1dp">0dp</dimen>
@@ -25,5 +26,6 @@
     <dimen name="base_dimen_135dp">168.75dp</dimen>
     <dimen name="base_dimen_150dp">200dp</dimen>
     <dimen name="base_dimen_200dp">262.5dp</dimen>
+	<dimen name="base_dimen_320dp">430dp</dimen>
 
 </resources>

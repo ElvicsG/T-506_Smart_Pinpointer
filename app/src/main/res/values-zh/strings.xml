@@ -5,7 +5,7 @@
     <string name="add">连接蓝牙设备</string>
     <string name="block_canary_display_activity_label">Blocks</string>
     <string name="start_to_use">开始使用</string>
-    <string name="version_code">版本号 :</string>
+    <string name="version_code">版本号：</string>
     <string name="does_not_find_device">本机没有找到蓝牙硬件或驱动</string>
     <string name="open_bluetooth_ing">打开蓝牙中</string>
     <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">等待蓝牙打开，5秒后，尝试连接！
@@ -29,7 +29,7 @@
     <string name="company_name2">山东科汇电力自动化股份有限公司</string>
     <string name="company_website">公司网址：www.kehui.cn</string>
     <string name="confirm">确认</string>
-    <string name="find_device">查找设备</string>
+    <string name="find_device">查找耳机</string>
     <string name="left">左</string>
     <string name="right">右</string>
     <string name="note">提示</string>
@@ -103,7 +103,7 @@
     <string name="no_net_wait_uploader">成功保存到本地,可等待网络可用时上传</string>
     <string name="confirm_cancel_assist">确定要取消协助请求吗?</string>
     <string name="switch_text">切换</string>
-    <string name="switch_language_success_restart_app">语言切换成功,重启App后生效是否立即重启?</string>
+    <string name="switch_language_success_restart_app">语言切换成功,重启App后生效,是否立即重启?</string>
     <string name="yes">是</string>
     <string name="no">否</string>
     <string name="software_new">您的软件已是最新版本!</string>
@@ -137,7 +137,7 @@
     <string name="paired_device">已配对设备</string>
     <string name="new_device">未配对设备</string>
     <string name="no_paired_device_find_device">未有配对设备,请查找设备!</string>
-    <string name="please_find_device">请查找设备!</string>
+    <string name="please_find_device">请到系统设置配对T-506!</string>
     <string name="min_delay">最小延迟</string>
     <string name="pinpointer_position">探头位置</string>
     <string name="connecting_wait">正在连接,请稍后…</string>

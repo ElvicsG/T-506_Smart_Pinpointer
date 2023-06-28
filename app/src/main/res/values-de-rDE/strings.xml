@@ -11,9 +11,9 @@
     <string name="delete">断开蓝牙设备</string>
     <string name="block_canary_display_activity_label">Blocks</string>
     <string name="start_to_use">Start</string>
-    <string name="version_code">"version : "</string>
+    <string name="version_code">"version:"</string>
     <string name="does_not_find_device">The machine does not find Bluetooth hardware or drivers</string>
-    <string name="open_bluetooth_ing">Opening</string>
+    <string name="open_bluetooth_ing">Opening Bluetooth</string>
     <string name="wait_for_Bluetooth_to_open_5seconds_after_trying_to_connect">Warte auf Bluetooth, nach 5 Sek. erneut versuchen!
     </string>
     <string name="Automatically_open_Bluetooth_failure_please_manually_open_the_Bluetooth">Automatically open Bluetooth failure, please manually open the Bluetooth!</string>
@@ -21,7 +21,7 @@
     <string name="Connection_failed_unable_to_get_Socket">Connection failed, unable to get Socket!</string>
     <string name="connect">Verbindung zu</string>
     <string name="success">erfolgreich!</string>
-    <string name="Connection_failed">"        Bluetooth socket, please reopen the application to connect"</string>
+    <string name="Connection_failed">"Connection failed!"</string>
     <string name="Device_address">Device address</string>
     <string name="Automatic_connection_please_wait">Automatic connection, please wait …</string>
     <string name="Find_the_device">Finding the device …</string>
@@ -35,8 +35,8 @@
     <string name="ok">OK</string>
     <string name="confirm">Bestätigen</string>
     <string name="find_device">Find the device</string>
-    <string name="left">links</string>
-    <string name="right">rechts</string>
+    <string name="left">Links</string>
+    <string name="right">Rechts</string>
     <string name="note">prompt</string>
     <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
     <string name="Exit_application">Ausgang</string>
@@ -103,7 +103,7 @@
     <string name="no_net_wait_uploader">Successfully saved locally for uploading when the network is available</string>
     <string name="confirm_cancel_assist">Sind Sie sicher, dass Sie Remote-Hilfe abbrechen möchten ?</string>
     <string name="switch_text">Ändern</string>
-    <string name="switch_language_success_restart_app">Sprachänderung erfolgreich. Starten Sie die APP neu, um die neue Sprache anzuwenden.Jetzt neu starten?</string>
+    <string name="switch_language_success_restart_app">Language change successful. Restart the APP to apply the new language.Restart now?</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="software_new">Ihre Software ist auf dem neuesten Stand!</string>
@@ -112,12 +112,12 @@
     <string name="play">Fortsetzen</string>
     <string name="mute">Stumm</string>
     <string name="pause">Anhalten</string>
-    <string name="memory">Speichern</string>
+    <string name="memory">Speicher</string>
     <string name="compare">Vergleichen</string>
     <string name="filter">Filter</string>
     <string name="assist">Hilfe</string>
     <string name="user_mode">Bedienoberfläche</string>
-    <string name="expert_mode">Wellenformanalyse</string>
+    <string name="expert_mode">Waveform</string>
     <string name="ditong">Tiefpass</string>
     <string name="daitong">Bandpass</string>
     <string name="gaotong">Hochpass</string>
@@ -139,13 +139,13 @@
     <string name="paired_device">Paired device</string>
     <string name="new_device">Unpaired device</string>
     <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
-    <string name="please_find_device">Please find a device!</string>
+    <string name="please_find_device">Please pair T-506 in Android system settings!</string>
     <string name="min_delay">Minimum delay</string>
     <string name="pinpointer_position">Pinpointer Position</string>
     <string name="connecting_wait">Connecting, please wait…</string>
-    <string name="please_choose">Bitte wählen Sie</string>
-    <string name="fault_type_1">Low impedance</string>
-    <string name="fault_type_2">High impedance</string>
+    <string name="please_choose">Bitte wählen</string>
+    <string name="fault_type_1">Geringer Widerstand</string>
+    <string name="fault_type_2">Hohe Beständigkeit</string>
     <string name="fault_type_3">Flashing</string>
     <string name="fault_type_4">Open conductor</string>
     <string name="message_notice_1">Increase the sound gain</string>

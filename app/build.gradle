@@ -2,15 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 29
     buildToolsVersion "24.0.3"
     defaultConfig {
         applicationId "com.kehui.www.testapp"
-        minSdkVersion 19
+        minSdkVersion 21
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 24
-        versionCode 1
-        versionName "2.03.001"
+        targetSdkVersion 29
+        versionCode 2
+        versionName "2.02.017"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

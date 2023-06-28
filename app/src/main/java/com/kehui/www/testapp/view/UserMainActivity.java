@@ -757,6 +757,7 @@ public class UserMainActivity extends BaseActivity {
         return false;
 
     }
+
     public void checkVoice() {
         int streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         if (streamVolume <= 0) {

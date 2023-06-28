@@ -160,7 +160,6 @@ public class SeekDeviceActivity extends BaseActivity {
         }
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 

@@ -50,6 +50,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.UUID;
 
 import libsvm.svm;
@@ -282,10 +284,10 @@ public class BaseActivity extends AppCompatActivity {
     public void setAudioTrack() {
         //内部的音频缓冲区的大小
         int minBufferSize = AudioTrack.getMinBufferSize(8000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);  //GC20230601
         //音频设置——指定流的类型、音频数据的采样频率、输出声道、音频数据块、bufferSizeInBytes、模式类型
         mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,  8000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,   //ENCODING_PCM_8BIT    ENCODING_PCM_16BIT   ENCODING_PCM_FLOAT
                 minBufferSize, AudioTrack.MODE_STREAM);
         // 播放模式有MODE_STATIC和MODE_STREAM两种分类：
         // STREAM方式表示由用户通过write方式把数据一次一次得写到audioTrack中，
@@ -482,6 +484,7 @@ public class BaseActivity extends AppCompatActivity {
                         //GC20200114    重新连接时——输入流先是一个长度很长的数据，然后紧跟着许多连续的长度为127的数据
                         if (len > 700) {
                             Log.e(TAG, "处理掉无效空数据>700" + " len:" + len);
+//                            return; //小米重连操作    //GC20220727
                         } else {
                             if ((len == 127) && (lastLen == 127)) {
                                 emptyCount++;
@@ -1149,29 +1152,54 @@ public class BaseActivity extends AppCompatActivity {
      * @param results   声音数据转化和播放    //GT20200309
      */
     public void playSound(int[] results) {
+        byte[] pcm16 = new byte[results.length * 2];    //采样位数转化为16位    //一、ENCODING_PCM_16BIT 成功播放
+        byte[] pcm8 = new byte[results.length];         //采样位数转化为8位     //二、ENCODING_PCM_8BIT 成功播放
+        byte[] pcm24 = new byte[results.length * 3];
+        byte[] bytes = new byte[results.length * 4];
+        float[] floats = new float[results.length * 3];
+        float[] floats2 = new float[results.length];                            //三、ENCODING_PCM_FLOAT 成功播放   AudioFormat格式音频
         int max = 0;
-        byte[] bytes = new byte[results.length * 2];
+        //原始采样位数为12位，改变位数最终转换成字节去播放  //GC20230601
         for (int i = 0; i < results.length; i++) {
-            short sh = (short) ((results[i] - 2048) * 16);
+            //转化为16位  变为short后是2个字节 表数范围-2^15 - 2^15 -1 (-32768到32767)
+            short sh = (short) ((results[i] - 2048) * 16);  //  * 2^4
+            //方法③
+            floats2[i] = sh / 32768;
+            byte[] bytes1 = shortToByte(sh);
+            pcm16[i * 2] = bytes1[0];       //低8位
+            pcm16[i * 2 + 1] = bytes1[1];   //高8位
             //GT20200402
             int sh1 = Math.abs(sh);
             if (sh1 > max) {
                 max = sh1;
                 maxVoicePlay = max;
             }
-            byte[] bytes1 = shortToByte(sh);
-//            Log.e("FILE", "byte.length:  " + bytes1.length);
-            bytes[i * 2] = bytes1[0];
-            bytes[i * 2 + 1] = bytes1[1];
-          /*  int sh = (int) ((results[i] - 2048) * 16 * 256);
-            byte[] bytes1 = intToByte(sh);
-            bytes[i * 4] = bytes1[0];
-            bytes[i * 4 + 1] = bytes1[1];
-            bytes[i * 4 + 2] = bytes1[2];
-            bytes[i * 4 + 3] = bytes1[3];*/
+            //转化为8位 变为byte后是1个字节 表数范围-128 - 127
+            pcm8[i] = (byte) ((results[i]) / 16);           //  / 2^4
+            /*//转化为24位  变为int是4个字节 表数范围-2^31 - 2^31-1
+            int in = (results[i] - 2048) * 16 * 256;  //2^12
+            byte[] bytes2 = intToByte(in);
+            bytes[i * 4] = bytes2[0];
+            bytes[i * 4 + 1] = bytes2[1];
+            bytes[i * 4 + 2] = bytes2[2];
+            bytes[i * 4 + 3] = bytes2[3];
+            //24位PCM数据 有效数据只占3个字节
+            pcm24[i * 3] = bytes2[0];
+            pcm24[i * 3 + 1] = bytes2[1];
+            pcm24[i * 3 + 2] = bytes2[2];*/
         }
+        /*//方法①
+        for(int i = 0,j = 0; j < pcm24.length; i++){
+            //24bit pcm转成浮点数    float 3.4*10^-38 ~3.4*10^38
+            float n = ((pcm24[j++] | (pcm24[j++]<<8) | (pcm24[j++]<<16))<<8)>>8;
+            n = n/16777216/2;
+            floats[i] = n;
+        }*/
+        //方法②
+//        floats = bytesToFloats(pcm8, pcm8.length,false);
         if (!isExit) {
-            mAudioTrack.write(bytes, 0, bytes.length);
+            mAudioTrack.write(pcm16, 0, pcm16.length);  //GC20230601    pcm16   pcm8
+//            mAudioTrack.write(floats2, 0, floats2.length, AudioTrack.WRITE_BLOCKING);    //WRITE_NON_BLOCKING
         }
     }
 
@@ -1195,13 +1223,69 @@ public class BaseActivity extends AppCompatActivity {
     public static byte[] intToByte(int number) {
         int temp = number;
         byte[] b = new byte[4];
-        for (int i = 0; i < b.length; i++) {
+        //for (int i = 0; i < b.length; i++) {
+        for (int i = 0; i < 4; i++) {
             b[i] = Integer.valueOf(temp & 0xff).byteValue();
             // 向右移8位
             temp = temp >> 8;
         }
         return b;
     }
+
+    // 将byte[] 数组转换成float[]数组
+    public static float[] bytesToFloats(byte[] bytes,int len,boolean isBe) {
+        if(bytes==null){
+            return null;
+        }
+        float[] floats = new float[len/4];
+        // 大端序
+        if (isBe) {
+            ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).asFloatBuffer().get(floats);
+        } else {
+            ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer().get(floats);
+        }
+        return floats;
+    }
+
+    private byte[] convertTo16Bit(float[] data) {
+        short[] shortValue = new short[data.length];
+        byte[] byte16bit = new byte[shortValue.length * 2];
+        for (int i = 0; i < data.length; i++) {
+            shortValue[i] = (short) (32768 * data[i]);
+        }
+        byte16bit = toByteArray(shortValue);
+        return byte16bit;
+    }
+
+    private byte[] toByteArray(short[] src) {
+        int count = src.length;
+        byte[] dest = new byte[count << 1];
+        for (int i = 0; i < count; i++) {
+            dest[i * 2] = (byte) (src[i]);
+            dest[i * 2 + 1] = (byte) (src[i] >> 8);
+        }
+        return dest;
+    }
+
+    /**
+     * 字节转换为浮点
+     *
+     * @param b 字节（至少4个字节）
+     * @param index 开始位置
+     * @return
+     */
+    public static float byte2float(byte[] b, int index) {
+        int l;
+        l = b[index + 0];
+        l &= 0xff;
+        l |= ((long) b[index + 1] << 8);
+        l &= 0xffff;
+        l |= ((long) b[index + 2] << 16);
+        l &= 0xffffff;
+        l |= ((long) b[index + 3] << 24);
+        return Float.intBitsToFloat(l);
+    }
+
 
     /**
      * 获取当前声音数据的特征值    //GC20180412
@@ -1546,7 +1630,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * 3、下发高通控制命令     数字滤波200Hz-1500Hz    （硬件改参数，实际效果200Hz-800Hz）
+     * 3、下发高通控制命令     数字滤波200Hz-1500Hz    （硬件改参数，实际效果10Hz-800Hz）
      */
     public void clickGaotong() {
         clickTongNum = 3;
@@ -1860,7 +1944,8 @@ public class BaseActivity extends AppCompatActivity {
      */
     public void sendMagneticInitCommand() {
         //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000 + 底层板子初始阶数22（70%）
-        int[] ints = {96, 0, 128 + 29}; //GC20210730   改阶数为29（93%）  //GC20220326    初始命令改阶数为26（93%/以29为最高换算）
+//        int[] ints = {96, 0, 128 + 29}; //阶数为29（93%）    //GC20210730
+        int[] ints = {96, 0, 128 + 26}; //阶数为26（93%/以29为最高换算）   //GC20220326
         //计算CRC校验码
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
@@ -2283,13 +2368,12 @@ public class BaseActivity extends AppCompatActivity {
 //        String str = formatter.format(curDate);
 //        Log.e("TAG4playSound", str);
 //GT20180321 蓝牙输入流解读
-//GT20200309 声音数据转化和播放
+//GT20200309 声音数据转化和播放  //GC20230601    位数修改后播放效果测试
 //GT20200402 查看播放的音量数据
 //G?    增益下发
 //GT20210705    延时操作运用
 
 /*更改记录*/
-//GC20170609    增益显示方式（百分比或实际阶数）
 //GC20171205    添加探头相对电缆位置的左右方向判断显示
 //GC20180412    截取800个点的声音数据并计算其特征值
 //GC20180428    画声音波形的位置改变，提前50个点————后恢复//GC20200103
@@ -2339,11 +2423,6 @@ public class BaseActivity extends AppCompatActivity {
 //GC20210730    磁场增益缺省值改为93%（阶数29，增益阶数0-32）
 //GC20211229    优化根据“标记位”数值来判断主机探头相对电缆位置
 
-//GC2.03.001————
-//GC20220326    磁场线圈变大，增益最大阶数32和29变换的位置，目前32————————————版本调节①
-//GC20220407    蓝牙耳机按钮隐藏位置———————————————————————————版本调节②
-//GC20220510    触发灯闪烁效果优化，改正亮起后不变灰的BUG
-
 /**
  * //                       _ooOoo_
  * //                      o8888888o
@@ -2368,3 +2447,20 @@ public class BaseActivity extends AppCompatActivity {
  * //             佛祖保佑             永无BUG
  * =====================================================
  */
+//GC2.02.014————
+//GC20220326    磁场线圈变大，增益最大阶数32和29变换的位置，目前29————————————版本调节①   2.02.014（阶数最高29）/ 2.02.013（阶数最高32）
+//GC20220407    蓝牙耳机按钮隐藏位置———————————————————————————版本调节②      2.02.014
+//GC20220510    触发灯闪烁效果优化，改正亮起后不变灰的BUG
+//GC20220520    显示版本号
+//GC2.02.015————
+//GC20220620    seekBar更换
+//GC20220708    改提示为“接近故障点”/去掉箭头波形显示区箭头
+//GC20220709    长按设置“耳机”按钮调出
+
+//GC2.02.016————
+//GC20220727    小米重连BUG解决
+//GC2.02.017————
+//GC20220801    国外无协助功能、初始配对界面优化
+//GC20220823    用户界面增益控制颜色修改
+
+//GC20230531    设备适配型号

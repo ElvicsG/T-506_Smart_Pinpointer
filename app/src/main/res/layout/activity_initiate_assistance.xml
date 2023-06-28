@@ -482,7 +482,7 @@
                     android:layout_gravity="center_vertical"
                     android:drawableStart="@drawable/ic_assist_no_reply"
                     android:drawablePadding="@dimen/base_dimen_5dp"
-                    android:text="@string/short_note"
+                    android:text="@string/short_note_info"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_16sp" />
 

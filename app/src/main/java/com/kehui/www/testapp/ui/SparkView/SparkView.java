@@ -386,12 +386,11 @@ public class SparkView extends View implements ScrubGestureDetector.ScrubListene
             //GC20200103 setScrubLine2(50);
         }
         if(!startMove && scrubEnabled) {
-            //红色虚光标初始位置
-            //GC20200103 setScrubLine3(70);·
+            //红色虚光标初始位置     //GC20200103 setScrubLine3(70);·
             setScrubLine3(20);
         }
         //绘制灰色箭头图像
-        drawTria(canvas, xPoints.get(startPoint), getHeight() - getPaddingBottom(), xPoints.get(startPoint), getPaddingTop(), 30, 10);
+        drawTria(canvas, xPoints.get(startPoint), getHeight() - getPaddingBottom(), xPoints.get(startPoint), getPaddingTop(), 0, 0);    //GC20220708 30 10 去掉箭头
 
     }
 
