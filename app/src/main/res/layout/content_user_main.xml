@@ -164,8 +164,8 @@
 
                             <RelativeLayout
                                 android:id="@+id/rl_wave_u"
-                                android:layout_width="@dimen/base_dimen_80dp"
-                                android:layout_height="@dimen/base_dimen_80dp"
+                                android:layout_width="@dimen/base_dimen_170"
+                                android:layout_height="@dimen/base_dimen_170"
                                 android:layout_gravity="center"
                                 android:orientation="horizontal">
 
@@ -200,7 +200,7 @@
                                     android:text="@string/message_notice_5"
                                     android:textColor="@color/blue2"
                                     android:textStyle="bold"
-                                    android:textSize="@dimen/base_dimen_14sp" />
+                                    android:textSize="@dimen/base_dimen_14sp" />   <!--//GT20240131android:visibility="invisible"-->
 
                                 <ImageView
                                     android:id="@+id/iv_scan_u"
@@ -284,6 +284,15 @@
                         android:background="@drawable/bg_user_main_position">
 
                         <ImageView
+                            android:id="@+id/iv_position"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="bottom"
+                            android:src="@drawable/bg_right_away"
+                            android:visibility="invisible" />   <!--//GC20240304添加位置显示-->
+
+                        <ImageView
                             android:id="@+id/iv_position_left"
                             android:layout_width="@dimen/base_dimen_15dp"
                             android:layout_height="@dimen/base_dimen_80dp"
@@ -291,7 +300,7 @@
                             android:layout_gravity="bottom"
                             android:paddingBottom="@dimen/base_dimen_20dp"
                             android:src="@drawable/ic_user_main_notice_point2"
-                            android:visibility="invisible" />
+                            android:visibility="gone" />
 
                         <ImageView
                             android:id="@+id/iv_position_right"
@@ -301,7 +310,7 @@
                             android:layout_gravity="bottom"
                             android:paddingBottom="@dimen/base_dimen_20dp"
                             android:src="@drawable/ic_user_main_notice_point2"
-                            android:visibility="visible" />
+                            android:visibility="gone" /><!--屏蔽：左右显示//GC20240304-->
                     </LinearLayout>
 
                     <TextView
@@ -367,6 +376,17 @@
                     android:layout_height="0dp"
                     android:layout_weight="1.2"
                     android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tv_intensity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="100"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/base_dimen_18sp"
+                        android:visibility="gone"
+                        tools:visibility="gone" /><!--//GC20240307磁场强度值-->
 
                     <ImageView
                         android:id="@+id/iv_magnetic_field_gain_u"
@@ -476,7 +496,7 @@
                 android:background="@drawable/btn_user_main_bg_2"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="visible">  <!--//GC20220801-->
+                android:visibility="gone">  <!--gone//GC20220801--><!--//GN20240306旧visible-->
 
                 <TextView
                     android:layout_width="wrap_content"

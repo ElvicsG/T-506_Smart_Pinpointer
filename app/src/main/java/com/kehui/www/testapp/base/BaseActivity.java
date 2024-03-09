@@ -13,7 +13,6 @@ import android.media.AudioTrack;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,7 +38,6 @@ import com.kehui.www.testapp.ui.CustomDialog;
 import com.kehui.www.testapp.ui.CustomDeviceListDialog;
 import com.kehui.www.testapp.util.SoundUtils;
 import com.kehui.www.testapp.util.Utils;
-import com.kehui.www.testapp.view.DeviceListActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -115,25 +113,38 @@ public class BaseActivity extends AppCompatActivity {
      * 解码packageBean需要的解析常量数组
      */
     public int[] indexTable = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
-    public int[] stepSizeTable = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60, 66, 73, 80,
-            88, 97, 107, 118, 130, 143, 157, 173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963,
-            1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484, 7132,
-            7845, 8630, 9493, 10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
+    public int[] stepSizeTable = {
+            7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
+            50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209, 230, 253, 279, 307, 337, 371,
+            408, 449, 494, 544, 598, 658, 724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066,
+            2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493,
+            10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767,
+    };
     /**
      * 是否开始获取声音包的标志
      */
     public boolean isVoicePack;
+    public boolean isVoicePackStart; //GC20231020
     public int triggeredPosition;
     public int voicePackCount;
-    public int[] voiceDraw;
+    public int voicePackCount2;     //GC20231020
+    public int voicePackCount3;     //GC20231023
+    public int[] voiceDraw; //GT20240308
     public int[] compareDraw;
     public int[] magneticArray;
+    public int[] magneticArray2;    //GC20240222    //水平线圈磁场数据缓存数组
+    public int[] magTemp1;    //GT20240228 用于调试，竖直线圈磁场数据临时缓存数组
+    public int[] magTemp2;    //GT20240228 用于调试，水平线圈磁场数据临时缓存数组
     public int[] magneticDraw;
     public boolean isDraw;
+    public boolean isAmplify;   //是否数字放大处理状态    //GC20231019
+    public boolean isPlay;      //是否播放的状态    //GC20231023
+
     /**
      * 声音特征训练
      */
-    private double[] readFeature = new double[2000];
+//    private double[] readFeature = new double[2000];  //4*500
+    private double[] readFeature = new double[6000];    //特征向量缓存数组增大    //GC20231120
     private boolean svmTrainThread;
     private svm_model model;
     /**
@@ -142,7 +153,12 @@ public class BaseActivity extends AppCompatActivity {
     public int maxVoice;
     public int maxVoicePlay;
     public int maxMagnetic;
+    public int maxMagnetic2; //水平线圈磁场数据的最大值  //GC20240226
     private int[] tempVoice;
+    private int[] tempVoiceTrigger;         //用于找极小值    //GC20231022
+    private int[] tempVoiceBeforeTrigger;   //用于找极小值    //GC20231022
+    private int[] tempResults = new int[400];       //GC20231020
+    private int[] tempResultsMax = new int[400];    //GC20231020
     private int[] svmData;
     private int[] autoLocate;
     private double[] feature;
@@ -184,6 +200,16 @@ public class BaseActivity extends AppCompatActivity {
      */
     public int clickTime;
     public boolean mute;
+    /**
+     * 磁场增益相关
+     */
+    public int gainState;           //增益大小的状态    //GC20240226
+    public boolean suitableGain;    //增益是否合适的判断  //GC20240226
+    public int gainM;   //磁场增益阶数    //GC20240227
+    public boolean isChangeMag; //GT20240228 用于调试，磁场数据显示来源判断
+    public boolean isTooSmall;  //GC20240304 增益过小状态记录
+    public boolean isRightOld;  //GC20240304 上一次触发方向记录
+    public double magIntensity = 0; //GC20240304 上一次磁场强度记录
     /**
      * 全局的handler对象用来执行UI更新
      */
@@ -248,12 +274,24 @@ public class BaseActivity extends AppCompatActivity {
         //触发时刻数据点所在的位置
         triggeredPosition = 0;
         voicePackCount = 0;
+        voicePackCount2 = 0;    //GC20231020
+        voicePackCount3 = 0;    //GC20231023
         voiceDraw = new int[400];
         magneticArray = new int[400];
+        magneticArray2 = new int[400];  //GC20240222    //初始化
+        for (int i = 0; i < 400; i++) {
+            magneticArray2[i] = 2048;  //初始化为2048  避免影响自动增益 //GT20240309
+        }
+        magTemp1 = new int[400];  //GT20240228 用于调试，初始化
+        magTemp2 = new int[400];  //GT20240228 用于调试，初始化
         magneticDraw = new int[400];
         compareDraw = new int[400];
         isDraw = true;
+        isAmplify = false;  //是否数字放大处理状态    //GC20231019
+        isPlay = false;     //是否播放的状态           //GC20231023
         tempVoice = new int[900];
+        tempVoiceTrigger = new int[100];        //用于找极小值    //GC20231022
+        tempVoiceBeforeTrigger = new int[100];  //用于找极小值    //GC20231022
         svmData = new int[800];
         autoLocate = new int[800];
         feature = new double[4];
@@ -275,6 +313,7 @@ public class BaseActivity extends AppCompatActivity {
         clickTongNum = 0;
         //GC20191221 触摸静音功能
         int clickTime = 0;
+        gainState = 0;   //GC20240226   增益大小初始状态为0
 
     }
 
@@ -302,7 +341,9 @@ public class BaseActivity extends AppCompatActivity {
      * 从assets文件夹中获取声音特征数据     //GC20180504 注意读取文本文件的编码格式为ANSI
      */
     private void getFeatureData() {
-        InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "feature.txt");
+//        InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "feature.txt");
+//        InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "01.txt");    //GC20231120    新特征值添加
+        InputStream mResourceAsStream = this.getClassLoader().getResourceAsStream("assets/" + "02.txt");    //GC20231206    新特征值添加
         BufferedInputStream bis = new BufferedInputStream(mResourceAsStream);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int c;
@@ -344,20 +385,30 @@ public class BaseActivity extends AppCompatActivity {
      * 训练生成model
      * @param readFeature   读取的声音特征
      */
-    private void voiceSvmTrain(double[] readFeature) {
+    private void voiceSvmTrain(double[] readFeature) {  //支持向量机参数以及训练调整位置   //GC20231026
         svm_problem sp = new svm_problem();
-        svm_node[][] x = new svm_node[500][4];
+//        svm_node[][] x = new svm_node[500][4];  //将特征值载入，共500组
+//        svm_node[][] x = new svm_node[554][4];  //将特征值载入，共554组   //GC20231120    新特征值添加
+        svm_node[][] x = new svm_node[609][4];  //将特征值载入，共609组   //GC20231206    新特征值添加
         int k = 0;
-        for (int i = 0; i < 500; i++) {
+//        for (int i = 0; i < 500; i++) {
+//        for (int i = 0; i < 554; i++) { //GC20231120    新特征值添加
+        for (int i = 0; i < 609; i++) { //GC20231206    新特征值添加
             for (int j = 0; j < 4; j++, k++) {
                 x[i][j] = new svm_node();
                 x[i][j].index = j + 1;
                 x[i][j].value = readFeature[k];
             }
         }
-        double[] labels = new double[500];
-        for (int i = 0; i < 500; i++) {
-            if (i <= 222) {
+//        double[] labels = new double[500];
+//        for (int i = 0; i < 500; i++) {   //前223是故障声，后面不是故障声
+//            if (i <= 222) {
+//        double[] labels = new double[554];  //GC20231120    新特征值添加
+//        for (int i = 0; i < 554; i++) { //前277组特征值是故障声，后面不是故障声
+//            if (i <= 276) {
+        double[] labels = new double[609];  //GC20231206    新特征值添加
+        for (int i = 0; i < 609; i++) { //前332组特征值是故障声，后面不是故障声
+            if (i <= 331) {
                 labels[i] = 1;
             } else {
                 labels[i] = -1;
@@ -368,7 +419,9 @@ public class BaseActivity extends AppCompatActivity {
         //训练数据的类别
         sp.y = labels;
         //训练数据的个数
-        sp.l = 500;
+//        sp.l = 500;
+//        sp.l = 554; //GC20231120    新特征值添加
+        sp.l = 609; //GC20231206    新特征值添加
 
         svm_parameter prm = new svm_parameter();
         //SVM的类型——分类问题(包括C-SVC、n-SVC)、回归问题(包括e-SVR、n-SVR)以及分布估计(one-class-SVM )
@@ -392,7 +445,7 @@ public class BaseActivity extends AppCompatActivity {
         //prm.p = 0.1;             //for EPSILON_SVR (默认0.1)
         //prm.shrinking = 1;      //是否使用启发式，0或1(默认1)
         //prm.probability = 0;
-        model = svm.svm_train(sp, prm);
+        model = svm.svm_train(sp, prm); //生成模型  //GC20231108
     }
 
     /**
@@ -684,7 +737,7 @@ public class BaseActivity extends AppCompatActivity {
  	Crc：占4个字节*/
 
     /**
-     * @param temp 需要处理的蓝牙数据    //G?
+     * @param temp 需要处理的蓝牙数据
      * @param tempLength   数据长度
      */
     private void doStream(int[] temp, int tempLength) {
@@ -701,7 +754,7 @@ public class BaseActivity extends AppCompatActivity {
             }
             for (int i1 = 0; i1 < 59; i1++) {
                 //找数据头（0x53：声音  0x4d：磁场  0x60：DEVICE  0x54：声音静音状态） //GC20191220
-                if (streamLeft[i1] == 83 || streamLeft[i1] == 77 || streamLeft[i1] == 96 || streamLeft[i1] == 84) {
+                if (streamLeft[i1] == 83 || streamLeft[i1] == 77 || streamLeft[i1] == 96 || streamLeft[i1] == 84 || streamLeft[i1] == 78) { //GC20240222    78=0x4e：数据截取时水平磁场数据头添加
                     for (int i2 = 0, j = i1; i2 < 59; i2++, j++) {
                         if (j >= 59) {
                             receivedBean[i2] = temp[i + j - leftLen];
@@ -730,8 +783,8 @@ public class BaseActivity extends AppCompatActivity {
                                     //第三个字节Respond：0，命令未响应;1，命令已响应      //蓝牙耳机状态反馈：2连接；3断开  //GC20210714
                                     if (receivedCommand[2] == 0) {
                                         //Respond：响应值为0，命令未响应
-                                        handle.sendEmptyMessage(SEND_ERROR);
-                                        EventBus.getDefault().post(new SendCommandNotRespondEvent());
+//                                        handle.sendEmptyMessage(SEND_ERROR);  //GT20240301 屏蔽测试效果
+                                        EventBus.getDefault().post(new SendCommandNotRespondEvent());   //GT20240301
                                         seekBarType = 0;
                                     } else if (receivedCommand[2] == 1) {
 //                                        if (receivedCommand[1] == sendCommand[1]) {   //GC20210707    命令发送错误BUG改进试验
@@ -754,7 +807,7 @@ public class BaseActivity extends AppCompatActivity {
         //开始遍历处理
         for (; i < tempLength - 59; i++) {
             //找数据头（0x53：声音  0x4d：磁场  0x60：DEVICE  0x54：声音静音状态） //GC20191220
-            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96 || temp[i] == 84) {
+            if (temp[i] == 83 || temp[i] == 77 || temp[i] == 96 || temp[i] == 84 || temp[i] == 78) { //GC20240222    78=0x4e：数据截取时水平磁场数据头添加
                 //截取数据包长度的数据
                 for (int j = i, k = 0; j < (i + 59); j++, k++) {
                     receivedBean[k] = temp[j];
@@ -777,8 +830,8 @@ public class BaseActivity extends AppCompatActivity {
                             i += 6;
                             //第三个字节Respond：0，命令未响应;1，命令已响应      //蓝牙耳机状态反馈：2连接；3断开  //GC20210714
                             if (receivedCommand[2] == 0) {
-                                handle.sendEmptyMessage(SEND_ERROR);
-                                EventBus.getDefault().post(new SendCommandNotRespondEvent());
+//                                handle.sendEmptyMessage(SEND_ERROR);  //GT20240301 屏蔽测试效果
+                                EventBus.getDefault().post(new SendCommandNotRespondEvent());   //GT20240301
                                 seekBarType = 0;
                             } else if (receivedCommand[2] == 1) {
 //                                if (receivedCommand[1] == sendCommand[1]) {   //GC20210707    命令发送错误BUG改进试验
@@ -860,6 +913,7 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * @param tempBean  对59个字节数据进行bean对象的处理
      */
+    int[] resultsMag;   //GN20240305 蓝牙数据无ADOCM编码，用于查看磁场数据
     private void doTempBean(int[] tempBean) {
         PackageBean packageBean = new PackageBean();
         packageBean.setSM(tempBean[0]);
@@ -869,6 +923,10 @@ public class BaseActivity extends AppCompatActivity {
         int[] date = new int[50];
         for (int i1 = 5, j = 0; i1 < 55; i1++, j++) {
             date[j] = tempBean[i1];
+        }
+        resultsMag = new int[25];
+        for (int i = 0; i < 25; i++) {
+            resultsMag[i] = date[2*i] * 256 + date[2*i+1];   //GN20240305 50个点的8位数据转为25个点的16位数据
         }
         packageBean.setDate(date);
         doPackageBean(packageBean);
@@ -880,24 +938,84 @@ public class BaseActivity extends AppCompatActivity {
     public boolean isRight = false;
     public boolean isSingle = false;
     public int state = 1;
+    public double amplify = 1;    //放大倍数  //GC20231019
     public void doPackageBean(PackageBean packageBean) {
-        int[] results = decodeData(packageBean);
+        int[] results = decodeData(packageBean);    //GN20240305 原来的数据需要先解码
         //1、是声音数据——SM: "83" = 0x53（正常状态）；"84" = 0x54（静音状态）
         if (packageBean.getSM() == 83 || packageBean.getSM() == 84) {
             int mark = packageBean.getMark();
             //判断声音状态并显示    //GC20191220
             if (packageBean.getSM() == 84) {
-                Log.i(TAG, "静音状态");
+//                Log.i(TAG, "静音状态");
                 handle.sendEmptyMessage(MUTE_STATE);
             } else {
                 handle.sendEmptyMessage(NO_MUTE_STATE);
             }
+            //放大处理方式①：每一包声音数据直接放大   //GC20231019
+            /*if (isAmplify) {
+                int[] tempResults = new int[100];
+                int[] tempResultsMax = new int[100];
+                int maxTempResults = 0;
+                for (int i = 0; i < 100; i++) {
+                    //找到声音信号去直流分量后的最大值maxTempResults   //GC20231019
+                    tempResults[i] = results[i];
+                    tempResults[i] = tempResults[i] - 2048; //去直流分量
+                    if (tempResults[i] > 2047) {            //去坏点
+                        tempResults[i] = 2047;
+                    } else if (tempResults[i] < -2048) {
+                        tempResults[i] = -2048;
+                    }
+                    tempResultsMax[i] = Math.abs(tempResults[i]);   //取绝对值
+                    if (tempResultsMax[i] > maxTempResults) {
+                        maxTempResults = tempResultsMax[i];
+                    }
+                }
+                amplify = (double) (2048 / maxTempResults);    //根据最大值算放大倍数
+                Log.e("声音播放放大1", "最大值maxTempResults: " + maxTempResults + " 放大倍数m: " + amplify);
+                for (int i = 0; i < 100; i++) {
+                    tempResults[i] = (int) (amplify * tempResults[i]);
+                    results[i] = tempResults[i] + 2048;         //得到放大后的原始数据
+                }
+            }*/
             //截取需要绘制的声音数据
             if (binaryStartsWithOne(mark)) {
                 //Mark最高位是1——代表仪器在这一包声音数据内触发
 //                Message msg = new Message();
 //                msg.what = LIGHT_UP;  //GC20220510
 //                handle.sendMessage(msg);
+                /*//找触发后第一包的极小值点  //GC20231022
+                for (int i = 0; i < 100; i++) {
+                    tempVoiceTrigger[i] = results[i];
+                }
+                findExtremePoint(); */
+                //放大处理方式③：触发后的几个包才放大——过程1   //GC20231021
+                if (isAmplify) {
+                    //触发这一包声音数据的放大处理   //GC20231021
+                    int[] tempResults = new int[100];
+                    int[] tempResultsMax = new int[100];
+                    int maxTempResults = 0;
+                    for (int i = 0; i < 100; i++) {
+                        //找到声音信号去直流分量后的最大值maxTempResults
+                        tempResults[i] = results[i];
+                        tempResults[i] = tempResults[i] - 2048; //去直流分量
+                        if (tempResults[i] > 2047) {            //去坏点
+                            tempResults[i] = 2047;
+                        } else if (tempResults[i] < -2048) {
+                            tempResults[i] = -2048;
+                        }
+                        tempResultsMax[i] = Math.abs(tempResults[i]);   //取绝对值
+                        if (tempResultsMax[i] > maxTempResults) {
+                            maxTempResults = tempResultsMax[i];
+                        }
+                    }
+                    amplify = (double) (2048 / maxTempResults);    //根据最大值算放大倍数
+                    Log.e("声音播放放大3", "触发那一包maxTempResults: " + maxTempResults + " 放大倍数m: " + amplify);
+                    for (int i = 0; i < 100; i++) {
+                        tempResults[i] = (int) (amplify * tempResults[i]);
+                        results[i] = tempResults[i] + 2048;         //得到放大后的原始数据
+                    }
+                }
+//                isPlay = true;  //GC20231023
                 isVoicePack = true;
                 //Mark后7位，找到触发时刻声音数据点所在的位置
                 triggeredPosition = getMarkLastSeven(mark);
@@ -912,92 +1030,302 @@ public class BaseActivity extends AppCompatActivity {
                 }
                 //截取声音包的个数
                 voicePackCount++;
+                //放大处理方式②：触发后的几个包合并后再放大——过程1  //GC20231020
+                /*isVoicePackStart = true;
+                for (int i = 0; i < 100; i++) {
+                    tempResults[i] = results[i];    //缓存触发后的第1包 //GC20231020
+                }*/
+                voicePackCount2++;  //GC20231020  //计算处理到第几包  //GC20231021
             } else {
                 if (isVoicePack) {
+                    //放大处理方式③：触发后的几个包才放大——过程2   //GC20231021
+                    if (isAmplify) {
+                        //触发后续包声音数据的放大处理   //GC20231021
+                        int[] tempResults = new int[100];
+                        int[] tempResultsMax = new int[100];
+                        int maxTempResults = 0;
+                        for (int i = 0; i < 100; i++) {
+                            //找到声音信号去直流分量后的最大值maxTempResults
+                            tempResults[i] = results[i];
+                            tempResults[i] = tempResults[i] - 2048; //去直流分量
+                            if (tempResults[i] > 2047) {            //去坏点
+                                tempResults[i] = 2047;
+                            } else if (tempResults[i] < -2048) {
+                                tempResults[i] = -2048;
+                            }
+                            tempResultsMax[i] = Math.abs(tempResults[i]);   //取绝对值
+                            if (tempResultsMax[i] > maxTempResults) {
+                                maxTempResults = tempResultsMax[i];
+                            }
+                        }
+//                        amplify = (double) (2048 / maxTempResults);    //根据最大值算放大倍数
+//                        Log.e("声音播放放大3", "触发后续包maxTempResults: " + maxTempResults + "放大倍数m: " + amplify);
+                        //上面屏蔽后统一用第一包的放大倍数
+                        //放大触发后的几个包
+                        for (int i = 0; i < 100; i++) {
+                            tempResults[i] = (int) (amplify * tempResults[i]);
+                            results[i] = tempResults[i] + 2048;         //得到放大后的原始数据
+                        }
+                        Log.e("声音播放放大3", "触发后续包maxTempResults: " + maxTempResults);
+                        //改为只放大前3包，用于观察分界处
+//                        if (voicePackCount2 < 3) {
+//                            for (int i = 0; i < 100; i++) {
+//                                tempResults[i] = (int) (amplify * tempResults[i]);
+//                                results[i] = tempResults[i] + 2048;         //得到放大后的原始数据
+//                            }
+//                            voicePackCount2++;  //GC20231021
+//                        }
+//                        Log.e("声音播放放大3", "voicePackCount2: " + voicePackCount2 + "voicePackCount: " + voicePackCount);
+                    }
+                    //放大处理方式②：触发后的几个包合并后再放大——过程2（4包）  //GC20231020
+                    /*if (voicePackCount2 < 4) {
+                        //这是需要放大的声音后续的包，拼4包 //GC20231020
+                        for (int i = 100 * voicePackCount2, j = 0; j < 100; i++, j++) {
+                            tempResults[i] = results[j];
+                        }
+                        voicePackCount2++;
+                    } else {
+                        isVoicePackStart = false;   //缓存需要放大的声音包完毕，拼4包 //GC20231020
+                        voicePackCount2 = 0;
+                    }*/
                     //已经开始截取声音包
                     if (voicePackCount <= 7) {
                         //凑足触发时刻后700个点的声音数据   //GC20180412 截取声音数据步骤3
                         for (int i = 100 - triggeredPosition + voicePackCount * 100, j = 0; j < 100; i++, j++) {
-                            tempVoice[i] = results[j];
+                            tempVoice[i] = results[j];  //缓存声音数据    //GC20231118
                         }
+                        /*//放大处理方式②：触发后的几个包合并后再放大——过程2（8包）  //GC20231020
+                        //这是需要放大的声音后续的包，拼8包 //GC20231020
+                        for (int i = 100 * voicePackCount, j = 0; j < 100; i++, j++) {
+                            tempResults[i] = results[j];
+                        }*/
                         voicePackCount++;
                     } else {
                         isVoicePack = false;
                         voicePackCount = 0;
+//                        isVoicePackStart = false;   //缓存需要放大的声音包完毕，拼8包 //GC20231020
+                        voicePackCount2 = 0;    //GC20231020    //计算处理到第几包后清零 //GC20231021
+//                        isPlay = false;  //GC20231023
                     }
                 } else {
                     //未开始截取声音包
                     for (int i = 0, j = 0; j < 100; i++, j++) {
                         //先缓存1包数据，用于凑足触发时刻前100个点的声音数据   //GC20180412 截取声音数据步骤1
-                        tempVoice[i] = results[j];
+                        tempVoice[i] = results[j];  //缓存声音数据    //GC20231118
+//                        tempVoiceBeforeTrigger[i] = results[j];   //用于找极小值    //GC20231022
                     }
                 }
             }
-            playSound(results);
-//            Log.e("FILE", "maxVoicePlay:  " + maxVoicePlay ); //GT20200402 查看播放的音量数据
-        }
-        //2、是磁场数据——SM: "77" = 0x4d
-        else if (packageBean.getSM() == 77) {
-            //优化根据“标记位”数值来判断主机探头相对电缆位置    //GC20211229
-            if (packageBean.getMark() >= 192) {
-                //Mark: "192"= 11000000 位7和位6是1：有一个磁场线圈产生的信号为0 位置根据磁场信号数值和记忆的方向来判断 //GC20171205
-                if (isDraw) {
-                    isSingle = true;
+            //GC20231023
+            if (voicePackCount3 < 10) {
+//                int[] tempResults = new int[100];
+//                int[] tempResultsMax = new int[100];
+//                int maxTempResults = 0;
+//                for (int i = 0; i < 100; i++) {
+//                    //找到声音信号去直流分量后的最大值maxTempResults   //GC20231019
+//                    tempResults[i] = results[i];
+//                    tempResults[i] = tempResults[i] - 2048; //去直流分量
+//                    if (tempResults[i] > 2047) {            //去坏点
+//                        tempResults[i] = 2047;
+//                    } else if (tempResults[i] < -2048) {
+//                        tempResults[i] = -2048;
+//                    }
+//                    tempResultsMax[i] = Math.abs(tempResults[i]);   //取绝对值
+//                    if (tempResultsMax[i] > maxTempResults) {
+//                        maxTempResults = tempResultsMax[i];
+//                    }
+//                }
+//                amplify = (double) (2048 / maxTempResults);    //根据最大值算放大倍数
+//                Log.e("声音播放放大0", "最大值maxTempResults: " +
+//                        maxTempResults + " 放大倍数m: " + amplify + " 计数voicePackCount3: " + voicePackCount3);
+//                for (int i = 0; i < 100; i++) {
+//                    tempResults[i] = (int) (amplify * tempResults[i]);
+//                    results[i] = tempResults[i] + 2048;         //得到放大后的原始数据
+//                }
+                for (int i = 0; i < 100; i++) {
+                    results[i] = (int) (1.5 * results[i]);
                 }
-                //令位7=0
-                packageBean.setMark(packageBean.getMark() - 192);
-            } else if (packageBean.getMark() >= 128) {
-                //Mark: "128"= 10000000 位7是1：两个磁场线圈产生的信号方向不同，相对电缆位置是“右” //GC20171205
-                if (isDraw) {
-                    //非“暂停”状态下才刷新位置显示    //GC20200409
-                    handle.sendEmptyMessage(POSITION_RIGHT);
-                    isSingle = false;
-                    isRight = true;
-                }
-                //令位7=0
-                packageBean.setMark(packageBean.getMark() - 128);
+//                Log.e("声音播放放大0", " 计数voicePackCount3: " + voicePackCount3);
+                voicePackCount3++;
+                isPlay = true;
             } else {
-                if (isDraw) {
-                    handle.sendEmptyMessage(POSITION_LEFT);
-                    isSingle = false;
-                    isRight = false;
-                }
+                voicePackCount3 = 0;
+                isPlay = false;
+//                Log.e("声音播放放大0", " 计数voicePackCount3: " + voicePackCount3);
             }
-            //按顺序拼接将磁场数据（从0到3，共4包，1包有100个点数据）
-            for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
-                magneticArray[j] = results[i];
-            }
-            //磁场信号第一包来到 //GC20220510 触发灯亮起时机更改
-            if (packageBean.getMark() == 0) {
-                //“同步指示” 灯变红
-                Message msg = new Message();
-                msg.what = LIGHT_UP;
-                handle.sendMessage(msg);
-            }
-            //4个磁场包拼接完成，开始画主界面波形
-            if (packageBean.getMark() == 3) {
-                //“同步指示” 灯变灰
-//                Message msg = new Message();
-//                msg.what = TRIGGERED; //GC20220510
-//                handle.sendMessage(msg);
-                if (isDraw) {
-                    //得到绘制的磁场数组magneticDraw
+            //1、声音数据解码之后立刻播放
+            playSound(results);
+            //2、只播放触发那一段  //GC20231023
+//            if (isAmplify) {
+//                if (isPlay) {
+//                    playSound(results);
+//                }
+//            }
+            //3、触发后的几个包合并后再放大——播放   //GC20231020
+            /*if (isAmplify) {    //放大时声音数据需要处理
+                if (!isVoicePackStart) {    //凑足声音包了    //GC20231020
+                    int maxTempResults = 0;
                     for (int i = 0; i < 400; i++) {
-                        magneticDraw[i] = magneticArray[i];
-                        //找到磁场信号幅值最大值maxMagnetic用于用户界面画进度条高度   //GC20181113
-                        magneticArray[i] = magneticArray[i] - 2048;
-                        if (magneticArray[i] > 2047) {
-                            magneticArray[i] = 2047;
-                        } else if (magneticArray[i] < -2048) {
-                            magneticArray[i] = -2048;
+                        //找到声音信号去直流分量后的最大值maxTempResults
+                        tempResults[i] = tempResults[i] - 2048; //去直流分量
+                        if (tempResults[i] > 2047) {            //去坏点
+                            tempResults[i] = 2047;
+                        } else if (tempResults[i] < -2048) {
+                            tempResults[i] = -2048;
                         }
-                        magneticArray[i] = Math.abs(magneticArray[i]);
-                        if (magneticArray[i] > maxMagnetic) {
-                            maxMagnetic = magneticArray[i];
+                        tempResultsMax[i] = Math.abs(tempResults[i]);   //取绝对值
+                        if (tempResultsMax[i] > maxTempResults) {
+                            maxTempResults = tempResultsMax[i];
                         }
                     }
-                    //根据第5个点数值判断    //GC20211229
+                    amplify = (double) (2047 / maxTempResults);    //根据最大值算放大倍数
+                    Log.e("声音播放放大2", "最大值maxTempResults: " + maxTempResults + " 放大倍数m: " + amplify);
+                    for (int i = 0; i < 400; i++) {
+                        tempResults[i] = (int) (amplify * tempResults[i]);    //放大对应的倍数
+                        tempResults[i] = tempResults[i] + 2048;         //还原数据准备播放
+//                        tempVoice[i] = tempResults[i];  //绘制波形也改变
+                    }
+                    for (int i = 0; i < 4; i++) {   //逐包播放
+                        //将tempResults从100 * i开始复制100个数到results数组
+                        System.arraycopy(tempResults, 100 * i, results, 0, 100);
+                        playSound(results);
+                    }
+                }
+                else {  //不需要处理的数据包，直接播放
+                    playSound(results);
+                }
+            } else {
+                playSound(results); //不放大时声音数据解码之后立刻播放
+            }*/
+        }
+        //2、是磁场数据——SM: "77" = 0x4d  "78" = 0x4e
+        else if (packageBean.getSM() == 77 || packageBean.getSM() == 78) {  //GC20240222    78=0x4e：数据包解码时水平磁场数据头添加
+            if (packageBean.getSM() == 78) {    //"78" = 0x4e：是水平线圈的磁场数据  //GC20240222 APP兼容旧底板程序的写法
+                if (packageBean.getMark() >= 128) {
+                    //Mark: "128"= 10000000 位7是1：两个磁场线圈产生的信号方向不同，相对电缆位置是“右” //GC20171205
+                    //令位7=0
+                    packageBean.setMark(packageBean.getMark() - 128);
+                }
+                //按顺序拼接磁场数据（从0到3，共4包，1包有100个点数据）
+                /*for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
+                    magneticArray2[j] = results[i];  //缓存磁场数据  //GC20231118
+                }*/ //GN20240305 现在不用解码直接拿来用
+                //按顺序拼接磁场数据（从0到3，共4包，1包有50个点数据,解码出25个有效数据）
+                for (int i = 0, j = packageBean.getMark() * 25; i < 25; i++, j++) {
+                    magneticArray2[j] = resultsMag[i];  //缓存磁场数据前100个点数据
+                }
+                if (packageBean.getMark() == 3){
+                    for (int i = 0, j = 100; i < 300; i++, j++) {
+                        magneticArray2[j] = 2048;  //后300个点赋值为2048  避免影响自动增益 //GT20240309
+                    }
+                }
+            }
+            else {
+                //优化根据“标记位”数值来判断主机探头相对电缆位置    //GC20211229
+                /*if (packageBean.getMark() >= 192) {
+                    //Mark: "192"= 11000000 位7和位6是1：有一个磁场线圈产生的信号为0 位置根据磁场信号数值和记忆的方向来判断 //GC20171205
                     if (isDraw) {
+                        isSingle = true;
+                    }
+                    //令位7=0
+                    packageBean.setMark(packageBean.getMark() - 192);
+                } else */   //GC20240225    ①不用了
+                if (packageBean.getMark() >= 128) {
+                    //Mark: "128"= 10000000 位7是1：两个磁场线圈产生的信号方向不同，相对电缆位置是“右” //GC20171205    //GN20240227 (同相左，异向右)
+                    if (isDraw) {
+                        //非“暂停”状态下才刷新位置显示    //GC20200409
+//                        handle.sendEmptyMessage(POSITION_RIGHT);  //GN20240227 主板程序上传的“左右”结果需要再判断下（有时电缆过远，判断结果不对）
+//                        isSingle = false; //GC20240225    ①不用了
+                        isRight = true;
+                    }
+                    //令位7=0
+                    packageBean.setMark(packageBean.getMark() - 128);
+                } else {
+                    if (isDraw) {
+//                        handle.sendEmptyMessage(POSITION_LEFT);   //GN20240227
+//                        isSingle = false; //GC20240225    ①不用了
+                        isRight = false;
+                    }
+                }
+                //按顺序拼接磁场数据（从0到3，共4包，1包有100个点数据）
+                /*for (int i = 0, j = packageBean.getMark() * 100; i < 100; i++, j++) {
+                    magneticArray[j] = results[i];  //缓存磁场数据  //GC20231118
+                }*/ //GN20240305 现在不用解码直接拿来用
+                //按顺序拼接磁场数据（从0到3，共4包，1包有50个点数据,解码出25个有效数据）
+                for (int i = 0, j = packageBean.getMark() * 25; i < 25; i++, j++) {
+                    magneticArray[j] = resultsMag[i];  //缓存磁场数据前100个点数据
+                }
+                if (packageBean.getMark() == 3){
+                    for (int i = 0, j = 100; i < 300; i++, j++) {
+                        magneticArray[j] = 2048;  //后300个点赋值为2048  避免影响自动增益 //GT20240309
+                    }
+                }
+                //磁场信号第一包来到 //GC20220510 触发灯亮起时机更改
+                if (packageBean.getMark() == 0) {
+                    //“同步指示” 灯变红
+                    Message msg = new Message();
+                    msg.what = LIGHT_UP;
+                    handle.sendMessage(msg);
+                }
+                //4个磁场包拼接完成，开始画主界面波形
+                if (packageBean.getMark() == 3) {
+                    //“同步指示” 灯变灰
+//                Message msg = new Message();
+//                msg.what = TRIGGERED; //GC20220510    //GC20240225    ②不用了
+//                handle.sendMessage(msg);
+                    if (isDraw) {
+                        //得到绘制的磁场数组magneticDraw
+                        for (int i = 0; i < 400; i++) {
+                            if (!isChangeMag) {
+                                magneticDraw[i] = magneticArray[i]; //magneticDraw绘制的磁场数据    //GC20231118
+                            } else {
+                                magneticDraw[i] = magneticArray2[i]; //GT20240228 用于调试，magneticDraw绘制水平磁场数据
+                            }
+                            if (i >= 50) {  //GT20240307 增益大小判断去除前50个点
+                                //找到磁场信号幅值最大值maxMagnetic用于用户界面画进度条高度   //GC20181113
+                                magTemp1[i] = magneticArray[i] - 2048; //找maxMagnetic  //GC20231118
+                                if (magTemp1[i] > 2047) {
+                                    magTemp1[i] = 2047;
+                                } else if (magTemp1[i] < -2048) {
+                                    magTemp1[i] = -2048;
+                                }
+                                magTemp1[i] = Math.abs(magTemp1[i]);
+                                if (magTemp1[i] > maxMagnetic) {
+                                    maxMagnetic = magTemp1[i];
+                                }
+                                magTemp2[i] = magneticArray2[i] - 2048; //找水平线圈最大值maxMagnetic2  //GC20240226
+                                if (magTemp2[i] > 2047) {
+                                    magTemp2[i] = 2047;
+                                } else if (magTemp2[i] < -2048) {
+                                    magTemp2[i] = -2048;
+                                }
+                                magTemp2[i] = Math.abs(magTemp2[i]);
+                                if (magTemp2[i] > maxMagnetic2) {
+                                    maxMagnetic2 = magTemp2[i];
+                                }
+                            }
+                        }
+                        Log.e(TAG, "增益判断" + " /maxMagnetic=" + maxMagnetic + " /maxMagnetic2=" + maxMagnetic2);
+                        autoGain(); //GC20240226
+                        if ((maxMagnetic < 102) | (maxMagnetic2 < 102)) {   //GN20240227    线圈增益过小，认为其方向判断无效——如果最大值小于 2048*5%=102
+                            isTooSmall = true;  //增益过小状态记录  //GC20240304
+                            //判断无效不改变之前的结果  //GC20240304 之前的结果是isRightOld
+                            if (isRightOld) {
+                                handle.sendEmptyMessage(POSITION_RIGHT);
+                            } else {
+                                handle.sendEmptyMessage(POSITION_LEFT);
+                            }
+                        } else {    //线圈增益不过小，判断的“左右”结果才采纳   //GN20240227
+                            isTooSmall = false;  //增益过小状态记录  //GC20240304
+                            if (isRight) {
+                                handle.sendEmptyMessage(POSITION_RIGHT);  //GN20240227
+                                isRightOld = true;  //GC20240304
+                            } else {
+                                handle.sendEmptyMessage(POSITION_LEFT);  //GN20240227
+                                isRightOld = false; //GC20240304
+                            }
+                        }
+                        /*//根据第5个点数值判断    //GC20211229
                         if (isSingle) {
                             //单个线圈有信号
                             if ( magneticDraw[5] > 2048) {
@@ -1028,29 +1356,138 @@ public class BaseActivity extends AppCompatActivity {
                                     state = 4;
                                 }
                             }
+                        }*/   //GC20240225    ①不用了
+                        //截取需要绘制的声音数组voiceDraw      //GC20180428 加上触发前50个点的数据   //GC20200103 改回触发时刻
+                        System.arraycopy(tempVoice, 100, voiceDraw, 0, 400);    //voiceDraw绘制的声音 //GC20231118
+                        //用于声音自动识别定位的数组
+                        for (int i = 0; i < 800; i++) {
+                            //用于计算特征值的声音数据  //GC20180412    //GC20231118
+                            svmData[i] = tempVoice[i];
+                            //用于自动定位的声音数据   //GC20181201    //GC20231118
+                            autoLocate[i] = tempVoice[i];
                         }
+                        //获取声音特征
+                        obtainFeature();
+                        //根据声音特征预测
+                        if (svmTrainThread) {
+                            voiceSvmPredict(feature);
+                        }
+                        Log.e("声音播放", "触发后的isAmplify状态:  " + isAmplify );   //GC20231019
+//                    Log.e("声音播放", "maxVoicePlay:  " + maxVoicePlay ); //GT20200402 查看播放的音量数据
+                    }
+                    Message message = new Message();
+                    message.what = WHAT_REFRESH;
+                    handle.sendMessage(message);
+                }
+            }
+        }
 
-                    }
-                    //截取需要绘制的声音数组voiceDraw      //GC20180428 加上触发前50个点的数据   //GC20200103 改回触发时刻
-                    System.arraycopy(tempVoice, 100, voiceDraw, 0, 400);
-                    //用于声音自动识别定位的数组
-                    for (int i = 0; i < 800; i++) {
-                        //用于计算特征值的声音数据  //GC20180412
-                        svmData[i] = tempVoice[i];
-                        //用于自动定位的声音数据   //GC20181201
-                        autoLocate[i] = tempVoice[i];
-                    }
-                    //获取声音特征
-                    obtainFeature();
-                    //根据声音特征预测
-                    if (svmTrainThread) {
-                        voiceSvmPredict(feature);
+    }
+
+    /**
+     * 1判断增益，①和②的关系是或，有1路大都无法判断强度大小了    //GC20240226
+     */
+    private void autoGain() {
+        //①竖直线圈磁场数据的增益判断    //GC20240226
+        if (maxMagnetic <= 164) {
+            //判断增益过小——如果最大值小于 2048*8%
+            gainState = 2;  //增益过小
+            Log.e(TAG, "增益判断" + " /竖直线圈增益过小，maxMagnetic=" + maxMagnetic);
+        }
+        if (maxMagnetic >= 1884) {
+            //判断增益过小——如果最大值小于 2048*92%
+            gainState = 1;  //增益过大
+            Log.e(TAG, "增益判断" + " /竖直线圈增益过大，maxMagnetic=" + maxMagnetic);
+        }
+        //②水平线圈磁场数据的增益判断    //GC20240226
+        if (maxMagnetic2 <= 164) {
+            //判断增益过小——如果最大值小于 2048*15%
+            gainState = 2;  //增益过小
+            Log.e(TAG, "增益判断" + " /水平线圈增益过小，maxMagnetic2=" + maxMagnetic2);
+        }
+        if (maxMagnetic2 >= 1884) {
+            //判断增益过小——如果最大值小于 2048*85%
+            gainState = 1;  //增益过大
+            Log.e(TAG, "增益判断" + " /水平线圈增益过大，maxMagnetic2=" + maxMagnetic2);
+        }
+
+    }
+
+    /**
+     * 找最小极小值和第二极小值 //GC20231022
+     */
+    public int min = 4096;
+    public int minSecond = 4096;
+    private void findExtremePoint() {
+        /*//求触发之前那一包数据后50个点的均值
+        double ave = 0;
+        for (int i = 50; i < 100; i++) {
+            ave += tempVoiceBeforeTrigger[i];
+        }
+        ave = ave / 50;
+        //方差
+        double var = 0;
+        for (int i = 50; i < 100; i++) {
+            var += (tempVoiceBeforeTrigger[i] - ave) * (tempVoiceBeforeTrigger[i] - ave);
+        }
+        var = var / 50;
+        //标准差
+        double sta = Math.sqrt(var);
+        if (sta < 1) {
+            sta = 1;
+        }*/
+
+        //极小值点
+        int minNum = 0;
+        int[] minData = new int[100];
+        int[] minDataPos = new int[100];
+        min = 4096;
+        minSecond = 4096;
+        int minPos = minDataPos[0];
+        int minPosSecond = minDataPos[0];
+        /*//去头去尾
+        for (int i = 1; i < 99; i++) {
+            if ( tempVoiceTrigger[i] < (ave - sta * 5) ){
+                if ((tempVoiceTrigger[i] < tempVoiceTrigger[i - 1]) && (tempVoiceTrigger[i] <= tempVoiceTrigger[i + 1])) {
+                    //只找极小值点
+                    minData[minNum] = tempVoiceTrigger[i];  //极小值数值
+                    minDataPos[minNum] = i;                 //极小值位置
+                    minNum++;
+                }
+            }
+        }*/
+        for (int i = 3; i < 97; i++) {
+            if ((tempVoiceTrigger[i] < tempVoiceTrigger[i - 1]) && (tempVoiceTrigger[i] <= tempVoiceTrigger[i + 1])) {
+                if (tempVoiceTrigger[i - 1] <= tempVoiceTrigger[i - 2]) {
+                    if (tempVoiceTrigger[i - 2] <= tempVoiceTrigger[i - 3]) {
+                        minData[minNum] = tempVoiceTrigger[i];  //极小值数值
+                        minDataPos[minNum] = i;                 //极小值位置
+                        minNum++;
                     }
                 }
-                Message message = new Message();
-                message.what = WHAT_REFRESH;
-                handle.sendMessage(message);
             }
+        }
+        //找最小极小值和第二极小值
+        if (minNum == 0) {
+            Log.e("声音播放", "没有极小值");
+        } else if (minNum == 1){
+            min = minData[1];
+            minPos = minDataPos[1];
+            Log.e("声音播放", "极小值只有一个 /min = " + min);
+        } else {
+            for (int k = 0; k < minNum; k++) {
+                if (minData[k] <= min) {
+                    min = minData[k];       //最小极小值数值
+                    minPos = minDataPos[k]; //最小极小值位置
+                }
+            }
+            for (int k = 0; k < minNum; k++) {
+                if ((minData[k] < minSecond) & (minData[k] > min)) {
+                    minSecond = minData[k];       //第二极小值数值
+                    minPosSecond = minDataPos[k]; //第二极小值位置
+                }
+            }
+            Log.e("声音播放", "极小值 /min = " + min + "第二极小值 /minSecond = " + minSecond);
         }
 
     }
@@ -1063,7 +1500,7 @@ public class BaseActivity extends AppCompatActivity {
         int[] predsample = bean1.getPredsample();
         int predsample1 = predsample[0];
         int predsample2 = predsample[1];
-        int pred = predsample1 * 256 + predsample2;
+        int pred = predsample1 * 256 + predsample2; //数据解码的原始位置 //GC20231118
         int[] date = bean1.getDate();
         /* for (int i : date) {
             Log.e("FILE", i+"");
@@ -1108,7 +1545,13 @@ public class BaseActivity extends AppCompatActivity {
                 PREDSAMPLE = PREDSAMPLE + diffq;
             }
 
-            if (PREDSAMPLE > 4095) {
+            if (PREDSAMPLE > 5000) {    //解码数据有大于5000的   //GC20231205
+                Constant.isDataOver = true; //GC20231205
+            } else {
+                Constant.isDataOver = false;
+            }
+
+            if (PREDSAMPLE > 4095) {    //数据二次解码的原始位置 //GC20231118
                 PREDSAMPLE = 4095;
             }
             if (PREDSAMPLE < 0) {
@@ -1291,10 +1734,10 @@ public class BaseActivity extends AppCompatActivity {
      * 获取当前声音数据的特征值    //GC20180412
      */
     private void obtainFeature() {
-        //声音数据归一化
+        //0、声音数据归一化
         int max = 0;
         for (int i = 0; i < 800; i++) {
-            svmData[i] = svmData[i] - 2048;
+            svmData[i] = svmData[i] - 2048; //找maxVoice  //GC20231118
             if (svmData[i] > 2047) {
                 svmData[i] = 2047;
             } else if (svmData[i] < -2048) {
@@ -1311,7 +1754,7 @@ public class BaseActivity extends AppCompatActivity {
             //强制转换类型，int运算得double
             normalization[i] = svmData[i] / (max * 1.0);
         }
-        //短时能量分布处理  （短时步长为50）
+        //1、获取短时能量分布处理 （短时步长为50）   //特征获取  //GC20231108
         double[] mED = new double[751];
         for (int i = 0; i < 751; i++) {
             double mtemp = 0.0;
@@ -1320,7 +1763,7 @@ public class BaseActivity extends AppCompatActivity {
             }
             mED[i] = mtemp / 50;
         }
-        //短时过零率 //阈值
+        //2、获取短时过零率 //阈值0.5 //特征获取  //GC20231108
         double threshold = 0.5;
         double[] mZCR = new double[750];
         for (int i = 0; i < 750; i++) {
@@ -1328,26 +1771,24 @@ public class BaseActivity extends AppCompatActivity {
             for (int j = 0; j < 50; j++) {
                 mtemp = mtemp + Math.abs(Math.signum(normalization[i + j + 1] - threshold) - Math.signum(normalization[i + j] - threshold))
                         + Math.abs(Math.signum(normalization[i + j + 1] + threshold) - Math.signum(normalization[i + j] + threshold));
-            }
+            }   //符号函数 1 0 -1
             mZCR[i] = mtemp / 2;
         }
-        //短时能量分布脉冲的宽度、高宽比、位置特征值
-        //是否是脉冲宽度的起始
-        int isStart = 0;
-        //数据序数
-        int Nu = 1;
+        //3、根据短时能量分布得到：脉冲宽度、脉冲高宽比、位置特征值
+        int isStart = 0;    //是否是脉冲宽度的起始
+        int Nu = 1;         //数据序数
         int widthFirst = 0;
         int widthLast = 0;
         double max2 = 0.0;
-        //求均值
+        //求能量分布数组的均值
         double sum = 0.0;
         double meanValue;
         for (int i = 0; i < 751; i++) {
             sum += mED[i];
         }
-
         meanValue = sum / 751;
         for (int i = 0; i < 751; i++) {
+            //找超过均值的最小序数和最大序数
             if (mED[i] > meanValue) {
                 if (isStart == 0) {
                     widthFirst = Nu;
@@ -1357,22 +1798,27 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
             Nu++;
+            //找短时能量分布数组的最大值
             if (mED[i] > max2) {
                 max2 = mED[i];
             }
         }
-        //脉冲宽度（大于均值的元素中，最小序数元素与最大序数元素序数的差值）
+        //①脉冲宽度观测值----大于均值的元素中，最小序数元素与最大序数元素序数的差值
         feature[0] = widthLast - widthFirst;
-        //脉冲高宽比观测值
+        //②脉冲高宽比观测值----短时能量分布数组的最大值除以脉冲宽度得到高宽比
         feature[1] = max2 / (widthLast - widthFirst);
-        //脉冲位置取整观测值
+        //③脉冲位置取整观测值
         feature[2] = Math.round((widthLast + widthFirst) / 2);
-        //短时过零率特征值
-        //求均值
+        //4、根据短时过零率得到过零率特征值（可以用于反映信号的频率信息）
+        //求短时过零率数组的均值
         double sum2 = 0.0;
         double meanValue2;
-        for (int i = 0; i < 751; i++) {
-            sum2 += mED[i];
+//        for (int i = 0; i < 751; i++) {
+//            sum2 += mED[i];
+//        }
+        //之前错误使用mED[i]   //GC20231115
+        for (int i = 0; i < 750; i++) {
+            sum2 += mZCR[i];
         }
         meanValue2 = sum2 / 750;
         double temp = 0.0;
@@ -1381,13 +1827,21 @@ public class BaseActivity extends AppCompatActivity {
                 temp = temp + mZCR[i];
             }
         }
-        //数组中大于均值的元素和为过零率特征值
+        //④过零率特征值----数组中大于均值的元素和为过零率特征值
         feature[3] = temp;
-        //特征值归一化（参考已采数据特征的最大最小值进行归一化）   //GC20180707
+        //5、特征值归一化（参考已采数据特征的最大最小值进行归一化）   //GC20180707  //可以优化写法?
+        //%500组（750/39 0.0047/7.6523e-5 732/105 4871/7）
         feature[0] = Math.abs(feature[0] - 39) / (750 - 39);
-        feature[1] = Math.abs(feature[1] - 7.6523e-5) / (0.0047 - 7.6523e-5);
+//        feature[1] = Math.abs(feature[1] - 7.6523e-5) / (0.0047 - 7.6523e-5);
         feature[2] = Math.abs(feature[2] - 105) / (732 - 105);
-        feature[3] = Math.abs(feature[3] - 7) / (4871 - 7);
+//        feature[3] = Math.abs(feature[3] - 7) / (4871 - 7); //选取的数字特征   //GC20231108
+
+        //%554组（750/39 0.0053/7.6523e-5 732/105 5301/7）（加入001/020/008/013）  //GC20231120    新特征值添加 极值有变化
+        feature[1] = Math.abs(feature[1] - 7.6523e-5) / (0.0053 - 7.6523e-5);
+//        feature[3] = Math.abs(feature[3] - 7) / (5301 - 7);
+
+        //%609组（750/39 0.0053/7.6523e-5 732/105 7063/7） //GC20231206    新特征值添加 极值有变化
+        feature[3] = Math.abs(feature[3] - 7) / (7063 - 7);
 
     }
 
@@ -1410,23 +1864,25 @@ public class BaseActivity extends AppCompatActivity {
         double result = svm.svm_predict(model, test);
         if (result == 1.0) {
             //是故障点
-            EventBus.getDefault().post(new ResultOfSvmEvent(true));
+            EventBus.getDefault().post(new ResultOfSvmEvent(true)); //1、SVM预测结果结果为是 //GC20231201
             //连续两次判断为故障声开始进行相关
             if(svmPredictCount > 0){
                 //相关判断
-                correlationCalculation();
-                if(p > 0.9){
+                correlationCalculation();   //相关计算  //GC20231108
+                if(p > 0.4){    //调整相关参数阈值，旧0.9    //GC20231204
                     //相关之后再光标定位、计算延时值
-                    autoLocate();
+                    autoLocate();   //光标定位计算  //GC20231108
                     //相关——判断是故障,虚光标位置和声磁延时值传递   //GC20190218
-                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,true, position));
+                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,true, position, p));   //添加p //GC20231130
                 }else{
                     //不相关——判断不是故障
-                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,false, position));
+//                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,false, position));
+//                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,true, position, p)); //不相关也认为是，看是否有相关系数低的识别故障声 //GC20231130
+                    EventBus.getDefault().post(new ResultOfRelevantEvent(timeDelay,false, position, p)); //相关后无论结果如何显示相关系数  //GC20231204
                 }
             }
             //保留上次预测结果为是的声音数据用做相关计算 //GC20181119
-            System.arraycopy(normalization, 0, normalization2, 0, 800);
+            System.arraycopy(normalization, 0, normalization2, 0, 800);     //相关计算  //GC20231108
             svmPredictCount++;
 
         } else {
@@ -1479,7 +1935,7 @@ public class BaseActivity extends AppCompatActivity {
      */
     private void autoLocate() {
         //求触发时刻前50个点的均值    //20190720
-        double ave = 0;
+        /*double ave = 0;
         for (int i = 50; i < 100; i++) {
             ave += autoLocate[i];
         }
@@ -1489,7 +1945,19 @@ public class BaseActivity extends AppCompatActivity {
         for (int i = 50; i < 100; i++) {
             var += (autoLocate[i] - ave) * (autoLocate[i] - ave);
         }
-        var = var / 50;
+        var = var / 50;*/
+        //求触发时刻前100个点的均值    //GC20231206
+        double ave = 0;
+        for (int i = 0; i < 100; i++) {
+            ave += autoLocate[i];
+        }
+        ave = ave / 100;
+        //方差
+        double var = 0;
+        for (int i = 0; i < 100; i++) {
+            var += (autoLocate[i] - ave) * (autoLocate[i] - ave);
+        }
+        var = var / 100;
         //标准差
         double sta = Math.sqrt(var);
         //GC20190720
@@ -1497,28 +1965,63 @@ public class BaseActivity extends AppCompatActivity {
             sta = 1;
         }
 
-        //从触发时刻（第101个点i=100）之后，找出越出置信边界的第一个极值点（屏幕波形显示触发时刻前50个点和后349个点）
+        //从触发时刻（第101个点i=100）之后，找出越出置信边界的第一个极值点（屏幕波形显示触发时刻后400个点）
+        int m = 0;  //极大值位置 //GC20231206
         int n = 0;
+        int index = 0;  //极值位置  //GC20231206
         //去头去尾
-        for (int i = 101; i < 449; i++) {
+        for (int i = 101; i < 498; i++) {
             //置信边界  //GC20181201 只求极小值
-            if ( autoLocate[i] < (ave - sta * 5) ){
+            /*if ( autoLocate[i] < (ave - sta * 5) ){
                 if ((autoLocate[i] < autoLocate[i - 1]) && (autoLocate[i] <= autoLocate[i + 1])) {
                     //极小值点
                     n = i;
                 }
             }
             if ( n > 0 ) {
+                //对于极小值，上坡到坡顶
+                while (autoLocate[n] < autoLocate[n - 1]) { //定位算法修改  //GC20231206
+                    n = n - 1;
+                }
+                break;
+            }*/
+            //置信边界  //定位算法修改  //GC20231206
+            if ( autoLocate[i] > (ave + sta * 5) || autoLocate[i] < (ave - sta * 5) ){
+                //有极大值点
+                if ((autoLocate[i] > autoLocate[i - 1]) && (autoLocate[i] >= autoLocate[i + 1])) {
+                    m = i;
+                }
+                //有极小值点
+                if ((autoLocate[i] < autoLocate[i - 1]) && (autoLocate[i] <= autoLocate[i + 1])) {
+                    n = i;
+                }
+            }
+            if ( (m > 0) || ( n > 0 )){
                 break;
             }
         }
-        if (n > 0) {
-            position = n - 50;
-            timeDelay = (position - 50) * 0.125;
-            //GC20200313    自动算法光标定位国内习惯改进修正BUG
-            position = position - 50;
-            Log.e("test", position + "点数");
-            Log.e("test",timeDelay + "ms");
+        //根据极值点找到故障放电声波形起始点(定位光标所在位置)
+        if ( m > 0 ) {
+            //对于极大值，下坡到坡底   //GC20231206
+            while (autoLocate[m] > autoLocate[m - 1]) {
+                m = m - 1;
+            }
+            index = m;
+            Log.e("test2", "m = " + m);
+        }
+        if ( n > 0 ) {
+            //对于极小值，上坡到坡顶   //GC20231206
+            while (autoLocate[n] < autoLocate[n - 1]) {
+                n = n - 1;
+            }
+            index = n;
+            Log.e("test2", "n = " + n);
+        }
+        if (index > 0) {
+            position = index - 50;
+            position = position - 50;   //GC20200313    自动算法光标定位国内习惯改进修正BUG
+            timeDelay = position * 0.125;   //光标位置最终是在触发时刻后开始计算 //GC20231206
+            Log.e("test", "点数 = " + position + " /ms = " + timeDelay);
         }
 
     }
@@ -1905,8 +2408,46 @@ public class BaseActivity extends AppCompatActivity {
      * 0、下发声音增益初始化命令
      */
     public void sendVoiceInitCommand() {
-        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：声音0、阶数22
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：阶数22
         int[] ints = {96, 0, 22};
+        //计算CRC校验码
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+        //下发命令
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 01、下发声音增益命令  //GC20240227 （声音增益控制命令预留，还未启用）
+     */
+    public void sendVoiceCommand(int gainV) {
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：声音“0”= 二进制0000 0000 + 阶数XX
+        int[] ints = {96, 0, gainV};
         //计算CRC校验码
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
@@ -1945,7 +2486,48 @@ public class BaseActivity extends AppCompatActivity {
     public void sendMagneticInitCommand() {
         //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000 + 底层板子初始阶数22（70%）
 //        int[] ints = {96, 0, 128 + 29}; //阶数为29（93%）    //GC20210730
-        int[] ints = {96, 0, 128 + 26}; //阶数为26（93%/以29为最高换算）   //GC20220326
+        int[] ints = {96, 0, 128 + 27}; //阶数为27（93%/以29为最高换算）   //GC20220326
+        gainM = 27; //GC20240227    磁场增益阶数的初始化值
+        //计算CRC校验码
+        long l = getCommandCrcByte(ints);
+        String s = Long.toBinaryString((int) l);
+        StringBuilder ss = new StringBuilder();
+        if (s.length() <= 32) {
+            for (int i = 0; i < (32 - s.length()); i++) {
+                ss.append("0");
+            }
+            s = ss.toString() + s;
+        } else {
+            s = s.substring(s.length() - 32);
+        }
+        String substring1 = s.substring(0, 8);
+        String substring2 = s.substring(8, 16);
+        String substring3 = s.substring(16, 24);
+        String substring4 = s.substring(24, 32);
+        Integer integer1 = Integer.valueOf(substring1, 2);
+        Integer integer2 = Integer.valueOf(substring2, 2);
+        Integer integer3 = Integer.valueOf(substring3, 2);
+        Integer integer4 = Integer.valueOf(substring4, 2);
+        //下发命令
+        byte[] request = new byte[7];
+        request[0] = (byte) ints[0];
+        request[1] = (byte) ints[1];
+        request[2] = (byte) ints[2];
+        request[3] = (byte) integer1.intValue();
+        request[4] = (byte) integer2.intValue();
+        request[5] = (byte) integer3.intValue();
+        request[6] = (byte) integer4.intValue();
+        sendCommand(request);
+    }
+
+    /**
+     * 01、下发磁场增益命令  //GC20240227
+     */
+    public void sendMagneticCommand(int gainM) {
+        //①设备地址：“96”= 0x60；②声音/磁场增益调整：0；③增益：磁场“128”= 二进制1000 0000 + 底层板子初始阶数22（70%）
+//        int[] ints = {96, 0, 128 + 29}; //阶数为29（93%）    //GC20210730
+//        int[] ints = {96, 0, 128 + 27}; //阶数为27（93%/以29为最高换算）   //GC20220326
+        int[] ints = {96, 0, 128 + gainM};     //GC20240227
         //计算CRC校验码
         long l = getCommandCrcByte(ints);
         String s = Long.toBinaryString((int) l);
@@ -2295,6 +2877,7 @@ public class BaseActivity extends AppCompatActivity {
         float v = (float) b / 100.0f;
         float v1 = v * 32;
         s = (int) v1;
+        s = Math.round(v1);   //改为四舍五入，之前不准确  //GC20240227
         return s;
     }
 
@@ -2305,8 +2888,22 @@ public class BaseActivity extends AppCompatActivity {
         int s;
         float v = (float) b / 100.0f;
         float v1 = v * 29;
-        s = (int) v1;
+//        s = (int) v1;
+        s = Math.round(v1); //改为四舍五入，之前不准确  //GC20240227
+        gainM = s;  //GC20240227    记录调整进度条后磁场增益下发的阶数
         return s;
+    }
+
+    /**
+     * 29转100
+     */
+    public int s2bM(int s) {
+        int b;
+        float v = (float) s / 29.0f;
+        float v1 = v * 100;
+//        b = (int) v1;
+        b = Math.round(v1); //改为四舍五入，之前不准确  //GC20240227    磁场阶数变化后转化为百分比
+        return b;
     }
 
     /**
@@ -2317,6 +2914,7 @@ public class BaseActivity extends AppCompatActivity {
         float v = (float) s / 32.0f;
         float v1 = v * 100;
         b = (int) v1;
+        b = Math.round(v1); //改为四舍五入，之前不准确  //GC20240227
         return b;
     }
 
@@ -2368,9 +2966,16 @@ public class BaseActivity extends AppCompatActivity {
 //        String str = formatter.format(curDate);
 //        Log.e("TAG4playSound", str);
 //GT20180321 蓝牙输入流解读
-//GT20200309 声音数据转化和播放  //GC20230601    位数修改后播放效果测试
-//GT20200402 查看播放的音量数据
-//G?    增益下发
+//GT20200309    声音数据转化和播放
+//GT20200402    查看播放的音量数据
+//GC20230601    位数修改后播放效果测试
+//GC20231019    放大处理方式①：每一包声音数据直接放大
+//GC20231020    放大处理方式②：触发后的几个包合并后再放大------>结论：会有延时
+//GC20231021    放大处理方式③：触发后的几个包才放大
+//GC20231022    最小极小值和第二极小值显示
+//GC20231024    UI屏蔽声音数字放大处理调试部分
+
+//G?    增益下发 / 保存生成的model
 //GT20210705    延时操作运用
 
 /*更改记录*/
@@ -2417,7 +3022,6 @@ public class BaseActivity extends AppCompatActivity {
 //GC20210701    下发MAC地址控制命令
 //GC20210703    浅色主题
 //GC20210706    下发耳机MAC地址
-//GC20210707    命令发送错误BUG改进试验
 //GC20210714    利用对话框查找需要的蓝牙耳机MAC地址，然后下发给主板操作  /  蓝牙耳机状态反馈
 //GC20210830    暂停时点击“切换界面”按钮取消暂停，恢复至播放状态
 //GC20210730    磁场增益缺省值改为93%（阶数29，增益阶数0-32）
@@ -2459,8 +3063,48 @@ public class BaseActivity extends AppCompatActivity {
 
 //GC2.02.016————
 //GC20220727    小米重连BUG解决
+
 //GC2.02.017————
 //GC20220801    国外无协助功能、初始配对界面优化
 //GC20220823    用户界面增益控制颜色修改
 
-//GC20230531    设备适配型号
+//GC20230531————————设备适配型号 平板设备为Q802 / 平板设备为Q86————————
+
+/*————————智能算法改进————————*/
+//GC20231108    SVM算法相关
+//GC20231115    SVM算法错误及改进
+//GC20231118    解码数据错误 超出0到4095 范围 12位AD 2^12  APP未修正解码错乱问题
+
+//GC20231120    新特征值554组添加
+//GC20231130    显示相关系数
+//GC20231201    算法给出结果的逻辑（先SVM预测，后相关判断，第一次SVM预测是的时候先显示磁场触发）
+
+//GC20231204    相关后无论结果如何显示相关系数 / 调整相关参数阈值，优化最终结果显示
+//GC20231205    刷新波形时显示数据是否错乱显示——————————————————————————————（待修改）
+//GC20231206    新特征值609组添加 / 光标定位重新计算
+//GC20231209    延时显示逻辑优化 /  自动定位光标位置显示  //GC20231225
+/*————————智能算法改进————————*/
+
+//GC20231207    网络框架相关  服务器
+//GC20231215    版本
+//GC20231224    系统时间时间获取
+//GT20240301    命令发送失败 屏蔽测试     旧尝试：//GC20210707    命令发送错误BUG改进试验
+/*————————用户界面升级，底板程序有修改，兼容旧底板程序————————*/
+//GC20240222    水平线圈磁场数据接收：截取和解码
+//GC20240223    用户界面磁场进度条UI改为绿色进度条
+//GC20240226    磁场增益大小判断处理
+//GC20240227    磁场增益自动调整：下发磁场增益命令 / 增益百分比和阶数转化bug
+//GN20240227    “左右”方向判断BUG修改   //GC20240225    不用了程序段整理
+//GC20240228    长时间不触发磁场增益调到初始阶数27（93%）
+//GT20240228    2路磁场线圈数据切换、最大值数据查看、强度值观察
+//GC20240229    根据增益阶数和最大值判断强度
+//GC20240304    添加位置显示
+//GT20240304    磁场增益加减改为只有一档
+//GT20240307    增益大小判断去除前50个点
+/*————————用户界面升级，底板程序有修改，兼容旧底板程序————————*/
+
+//GN20240306    屏蔽协助
+
+//GT20240308    声音显示水平磁场数据
+//GN20240305    磁场数据显不用解码ADPCM编码
+//GT20240309    赋值为2048  避免影响自动增益

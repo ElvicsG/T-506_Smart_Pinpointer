@@ -207,7 +207,6 @@ public class SeekDeviceActivity extends BaseActivity {
                 }
                 break;
             case 100:
-                //G?
                 disconnect();
                 try {
                     MyApplication.getInstances().getBluetoothSocket().close();

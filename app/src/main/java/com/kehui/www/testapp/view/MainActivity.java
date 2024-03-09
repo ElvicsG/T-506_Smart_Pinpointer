@@ -47,6 +47,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,6 +111,10 @@ public class MainActivity extends BaseActivity {
     TextView tvPlay;
     @BindView(R.id.iv_play)
     ImageView ivPlay;
+    @BindView(R.id.tv_amplify)
+    TextView tvAmplify;
+    @BindView(R.id.iv_play2)
+    ImageView ivPlay2;
     @BindView(R.id.tv_cichang_value)
     TextView tvMagneticValue;
     @BindView(R.id.tv_shengyin_value)
@@ -118,6 +123,20 @@ public class MainActivity extends BaseActivity {
     ImageView ivSynchronizeStatus;
     @BindView(R.id.tv_yan_shi)
     TextView tvYanShi;
+    //相关系数显示  //GC20231130
+    @BindView(R.id.tv_p)
+    TextView tvP;
+    //错乱信息显示    //GC20231205
+    @BindView(R.id.tv_v)
+    TextView tvV;
+    //光标位置  //GC20231225
+    @BindView(R.id.tv_pos)
+    TextView tvPos;
+    //log信息显示//GC20231022
+    @BindView(R.id.tv_min)
+    TextView tvMin;
+    @BindView(R.id.tv_minSecond)
+    TextView tvMinSecond;
     @BindView(R.id.tv_position)
     TextView tvPosition;
     @BindView(R.id.iv_mode_u)
@@ -177,6 +196,8 @@ public class MainActivity extends BaseActivity {
     ImageView ivMode;
     @BindView(R.id.tv_mode)
     TextView tvMode;
+    @BindView(R.id.tv_intensity)    //GC20240307 强度指示
+    TextView tvIntensity;
 
     public static MainActivity instance;
     /**
@@ -199,6 +220,21 @@ public class MainActivity extends BaseActivity {
     KBubbleSeekBar seekBarM;
     @BindView(R.id.seekBarV)
     KBubbleSeekBar seekBarV;
+    /**
+     * //GC20240304 位置显示UI
+     */
+    @BindView(R.id.iv_position)
+    ImageView ivPosition;
+    /**
+     * 增益判断结果显示UI //GC20240226
+     */
+    @BindView(R.id.tv_gain)
+    TextView tvGain;
+    /**
+     * 磁场来源指示和点击位置 //GT20240228
+     */
+    @BindView(R.id.tv_magnetic)
+    TextView tvMagnetic;
 
     /**
      * 专家界面参数
@@ -235,7 +271,7 @@ public class MainActivity extends BaseActivity {
         soundSystem = new SoundUtils(this);
         //开始倒计时   //GC20200728
         if (Constant.BluetoothState) {
-            timer.start();
+            timer.start();  //初始化
         }
     }
 
@@ -282,6 +318,19 @@ public class MainActivity extends BaseActivity {
         v.setFillWaveSourceShapeRadius(10);
         rlWaveU.addView(v);
 
+        /*//GT //GC20190717
+        //去动画1——波纹  正在测试中   ...
+        rlWaveU.removeView(v);
+        tvScanU.setVisibility(View.GONE);
+        ivScanU.setVisibility(View.GONE);
+        //画动画2
+        //颜色改动之前——灰色"#555555"  "黄色#e1de04"
+        ccvFirstU.updateView("#00ffde", 8, 75); //最大80
+        ccvFirstU.setVisibility(View.VISIBLE);
+        //GC20190724
+        tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
+        tvCurrentDelayU.setText(getString(R.string.current) + currentDelayValue + "ms");*/
+
         //设置磁场增益显示
         magneticFieldGainControlU.setArcColor("#FF6600");       //刻度绿色
         magneticFieldGainControlU.setDialColor1("#FF6600");     //弧线颜色
@@ -303,7 +352,7 @@ public class MainActivity extends BaseActivity {
                 MainActivity.this.seekBarMagneticInt[1] = temp;
 
                 seekBarType = 1;
-                int[] ints = {96, 0, 128 + b2sM(temp)};  //·    专家界面磁场增益百分比转换后发送命令
+                int[] ints = {96, 0, 128 + b2sM(temp)};  //专家界面磁场增益百分比转换后发送命令
                 long l = getCommandCrcByte(ints);
                 String s = Long.toBinaryString((int) l);
                 StringBuilder ss = new StringBuilder();
@@ -711,10 +760,10 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * @param event 发送控制命令事件    //G?
+     * @param event 发送控制命令事件
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(SendCommandFinishEvent event) {
+    public void onEventMainThread(SendCommandFinishEvent event) {   //GT20240301
         handle.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -748,7 +797,7 @@ public class MainActivity extends BaseActivity {
      * 接收控制命令反馈
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(SendCommandNotRespondEvent event) {
+    public void onEventMainThread(SendCommandNotRespondEvent event) {   //GT20240301
         if (seekBarType == 1) {
             seekBarMagnetic.setProgress(this.seekBarMagneticInt[0]);
 //            seekBarM.setProgress(this.seekBarMagneticInt[0]);   //GC20220620
@@ -810,19 +859,25 @@ public class MainActivity extends BaseActivity {
                 }
             }, 500);
             Toast.makeText(MainActivity.this, getResources().getString(R.string
-                    .The_sending_data_failed_and_was_being_resent), Toast.LENGTH_SHORT).show();
+                    .The_sending_data_failed_and_was_being_resent), Toast.LENGTH_SHORT).show(); //GT20240301 发送数据失败，正在重新发送
         }
         if (event.status == POSITION_RIGHT) {
             tvPosition.setText(getResources().getString(R.string.right));
             //设置用户界面探头位置在右边     //GC20191011
-            ivPositionRight.setVisibility(View.VISIBLE);
-            ivPositionLeft.setVisibility(View.INVISIBLE);
+//            ivPositionRight.setVisibility(View.VISIBLE);
+//            ivPositionLeft.setVisibility(View.INVISIBLE); //屏蔽：左右显示//GC20240304
+            //ivPosition
+            ivPosition.setVisibility(View.VISIBLE);
+            ivPosition.setImageResource(R.drawable.bg_right);   //探头位于电缆右侧  //GC20240304
         }
         if (event.status == POSITION_LEFT) {
             tvPosition.setText(getResources().getString(R.string.left));
             //设置用户界面探头位置在左边
-            ivPositionRight.setVisibility(View.INVISIBLE);
-            ivPositionLeft.setVisibility(View.VISIBLE);
+//            ivPositionRight.setVisibility(View.INVISIBLE);
+//            ivPositionLeft.setVisibility(View.VISIBLE);   //屏蔽：左右显示//GC20240304
+            //ivPosition
+            ivPosition.setVisibility(View.VISIBLE);
+            ivPosition.setImageResource(R.drawable.bg_left);    //探头位于电缆左侧  //GC20240304
         }
 
         if (event.status == LIGHT_UP) {
@@ -846,22 +901,248 @@ public class MainActivity extends BaseActivity {
             //触发灯变灰 //GC20220510
             timer2.start();
         }
-        if (event.status == TRIGGERED) {
+        if (event.status == TRIGGERED) {//GC20240225    ②不用了
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
             //重新开始倒计时   //GC20200410
             timer.start();
         }
         if (event.status == WHAT_REFRESH) {
+            //log显示最小极小值和第二极小值 //GC20231022
+            /*tvMin.setText(" /min" + min);
+            tvMinSecond.setText(" /minSecond" + minSecond);*/ //屏蔽LOG信息显示//GC20231024
             if (isDraw) {
-                myChartAdapterVoice.setmTempArray(voiceDraw);
+//                myChartAdapterVoice.setmTempArray(voiceDraw);   //GC20231205
+                myChartAdapterVoice.setmTempArray(magneticArray2); //GT20240308
                 myChartAdapterVoice.setShowCompareLine(isCom);
                 if (isCom) {
                     myChartAdapterVoice.setmCompareArray(compareDraw);
                 }
                 myChartAdapterVoice.notifyDataSetChanged();
-                myChartAdapterMagnetic.setmTempArray(magneticDraw);
+                myChartAdapterMagnetic.setmTempArray(magneticDraw); //GC20231205
                 myChartAdapterMagnetic.notifyDataSetChanged();
 
+            }
+            //观察声音而和磁场波形刷新时是否有数据超出5000（错乱）   //GC20231205
+            if (Constant.isDataOver) {
+                tvV.setText("有错乱");
+            } else {
+                tvV.setText(" ");
+            }
+            //③综合两路磁场的最大值结果判断增益   //GC20240226
+            switch (gainState) {
+                case 0:
+                    suitableGain = true;
+                    tvGain.setVisibility(View.VISIBLE); //GT20240228 调试改提示语为可见
+                    Log.e(TAG, "增益判断" + " /增益合适");
+                    //2-1增益合适就计算信号的原始强度 //GC20240229    根据增益阶数和最大值判断强度
+                    double magneticFieldIntensity = 0;
+                    magneticFieldIntensity = Math.sqrt((double) maxMagnetic * maxMagnetic + (double)maxMagnetic2 * maxMagnetic2);
+//                    magneticFieldIntensity = (double) 2 / Math.pow((double)10,(double)(-6/20));//负数的平方根需要用到复数，这不在math的处理范围内
+//                    magneticFieldIntensity =  (double) 2 / 0.501187; 测试运算结果
+                    double k = 0;
+                    switch (gainM) {    //-6dB = 20lg(A/B)      //上电是-20dB，对应位置10（底板初始step是22） 初始发送29增益变动29-22-1次，所以最高是-8db
+                        case 29:    //-6dB
+                            k = 0.501187;
+                            break;
+                        case 28:    //-8dB
+                            k = 0.398107;
+                            break;
+                        case 27:    //-10dB
+                            k = 0.316228;
+                            break;
+                        case 26:    //-12dB
+                            k = 0.251189;
+                            break;
+                        case 25:    //-14dB
+                            k = 0.199526;
+                            break;
+                        case 24:    //-16dB
+                            k = 0.158489;
+                            break;
+                        case 23:    //-18dB
+                            k = 0.125893;
+                            break;
+                        case 22:    //-20dB
+                            k = 0.1;
+                            break;
+                        case 21:    //-22dB
+                            k = 0.079433;
+                            break;
+                        case 20:    //-24dB
+                            k = 0.063096;
+                            break;
+                        case 19:    //-26dB
+                            k = 0.050119;
+                            break;
+                        case 18:    //-28dB
+                            k = 0.039811;
+                            break;
+                        case 17:    //-30dB
+                            k = 0.031623;
+                            break;
+                        case 16:    //-32dB
+                            k = 0.025119;
+                            break;
+                        case 15:    //-34dB
+                            k = 0.019953;
+                            break;
+                        case 14:    //-36dB
+                            k = 0.015849;
+                            break;
+                        case 13:    //-38dB
+                            k = 0.012589;
+                            break;
+                        case 12:    //-40dB
+                            k = 0.01;
+                            break;
+                        case 11:    //-42dB
+                            k = 0.007943;
+                            break;
+                        case 10:    //-44dB
+                            k = 0.006310;
+                            break;
+                        case 9:    //-46dB
+                            k = 0.005012;
+                            break;
+                        case 8:    //-48dB
+                            k = 0.003981;
+                            break;
+                        case 7:    //-50dB
+                            k = 0.003163;
+                            break;
+                        case 6:    //-52dB
+                            k = 0.002512;
+                            break;
+                        case 5:    //-56dB
+                            k = 0.001585;
+                            break;
+                        case 4:    //-60dB
+                            k = 0.001;
+                            break;
+                        case 3:    //-64dB
+                            k = 0.000631;
+                            break;
+                        case 2:    //-68dB
+                            k = 0.000398;
+                            break;
+                        case 1:    //-72dB
+                            k = 0.000251;
+                            break;
+                        case 0:    //-90dB
+                            k = 0.000032;
+                            break;
+                        default:
+                            break;
+                    }
+                    magneticFieldIntensity = magneticFieldIntensity / k / 100;    //自定义的磁场强度值 //GC20240229    根据增益档位和最大值判断强度
+                    tvGain.setText(" /竖" + maxMagnetic + "-强度" + new DecimalFormat("0.00").format(maxMagnetic/k/100) +
+                            " /平" + maxMagnetic2 + "-强度" + new DecimalFormat("0.00").format(maxMagnetic2/k/100) +
+                            " /总强度" + new DecimalFormat("0.00").format(magneticFieldIntensity)
+                            + " /上次强度" + new DecimalFormat("0.00").format(magIntensity));   //GT20240228 用于调试，观察线圈数值  + " /阶数" + gainM + "换算为" + s2bM(gainM)+ "%"
+                    //用户界面磁场自定义强度值UI实现    //GC20240304 ？
+                    if (magIntensity != 0) {    //GC20240304 记录的磁场自定义强度不是0
+                        double temp = magneticFieldIntensity - magIntensity;
+                        if (temp > 30) { //认为磁场强度变大，接近电缆
+                            //专家界面
+                            tvNotice.setText("接近电缆");
+                            //用户界面
+                            tvNoticeU.setText("接近电缆");
+                            ivPosition.setVisibility(View.VISIBLE);
+                            if (isTooSmall) {
+                                if (isRightOld) {
+                                    ivPosition.setImageResource(R.drawable.bg_right_close);
+                                } else {
+                                    ivPosition.setImageResource(R.drawable.bg_left_close);
+                                }
+                            } else {
+                                if (isRight) {
+                                    ivPosition.setImageResource(R.drawable.bg_right_close);
+                                } else {
+                                    ivPosition.setImageResource(R.drawable.bg_left_close);
+                                }
+                            }
+                        } else if (temp < -30) { //认为磁场强度变小，远离电缆
+                            //专家界面
+                            tvNotice.setText("远离电缆");
+                            //用户界面
+                            tvNoticeU.setText("远离电缆");
+                            ivPosition.setVisibility(View.VISIBLE);
+                            if (isTooSmall) {
+                                if (isRightOld) {
+                                    ivPosition.setImageResource(R.drawable.bg_right_away);
+                                } else {
+                                    ivPosition.setImageResource(R.drawable.bg_left_away);
+                                }
+                            } else {
+                                if (isRight) {
+                                    ivPosition.setImageResource(R.drawable.bg_right_away);
+                                } else {
+                                    ivPosition.setImageResource(R.drawable.bg_left_away);
+                                }
+                            }
+                        } else {    //认为不变
+                            //专家界面
+                            tvNotice.setText("位置变动较小");
+                            //用户界面
+                            tvNoticeU.setText("位置变动较小");
+                        }
+                    }
+                    magIntensity = magneticFieldIntensity;  //GC20240304 判断结束后，记录当前的磁场自定义强度值
+                    break;
+                case 1:
+                    suitableGain = false;
+                    //显示增益过大
+                    tvGain.setVisibility(View.VISIBLE);
+                    tvGain.setText(getResources().getString(R.string.gain_too_high) + " /竖直" + maxMagnetic + " /水平" + maxMagnetic2
+                            ); //GT20240228 用于调试，观察线圈最大值    + " /阶数" + gainM + "换算为" + s2bM(gainM)+ "%"
+//                    Log.e(TAG, "增益判断" + " /增益过大");
+                    gainState = 0;  //判断结束后，重置判断结果
+                    //2-2增益过大自动调整增益   //GC20240227
+                    if (gainM > 1) {  //阶数自动调整减少到0后就不再减小了
+                        /*if (gainM >2) {
+                            gainM = gainM - 2;  //阶数较大时1次调整2档
+                        } else {
+                            gainM = gainM - 1;
+                        }*/gainM = gainM - 1;   //GT20240304
+                        sendMagneticCommand(gainM);
+                        //专家界面UI
+                        seekBarMagnetic.setProgress(s2bM(gainM));
+                        tvMagneticValue.setText(s2bM(gainM) + "%");
+                        //用户界面UI
+                        seekBarM.setProgress(s2bM(gainM));
+                        Log.e(TAG, "增益调整" + " /调整增益到" + s2bM(gainM) + "% /阶数" + gainM);
+                    } else {
+                        Log.e(TAG, "增益调整" + " /增益百分比已经最小！");
+                    }
+                    break;
+                case 2:
+                    suitableGain = false;
+                    //显示增益过小
+                    tvGain.setVisibility(View.VISIBLE);
+                    tvGain.setText(getResources().getString(R.string.gain_too_low) + " /竖直" + maxMagnetic + " /水平" + maxMagnetic2
+                            ); //GT20240228 用于调试，观察线圈最大值    + " /阶数" + gainM + "换算为" + s2bM(gainM)+ "%"
+//                    Log.e(TAG, "增益判断" + " /增益过小");
+                    gainState = 0;
+                    //2-2增益过小自动调整增益   //GC20240227
+                    if (gainM < 29) {  //在最大阶数29内增加增益阶数
+                        /*if (gainM <= 27) {
+                            gainM = gainM + 2;
+                        } else {
+                            gainM = gainM + 1;
+                        }*/gainM = gainM + 1;   //GT20240304
+                        sendMagneticCommand(gainM);
+                        //专家界面UI
+                        seekBarMagnetic.setProgress(s2bM(gainM));
+                        tvMagneticValue.setText(s2bM(gainM) + "%");
+                        //用户界面UI
+                        seekBarM.setProgress(s2bM(gainM));
+                        Log.e(TAG, "增益调整" + " /调整增益到" + s2bM(gainM) + "% /阶数" + gainM);
+                    } else {
+                        Log.e(TAG, "增益调整" + " /增益百分比已经最大！");
+                    }
+                    break;
+                default:
+                    break;
             }
             //上下语句顺序调整，否则影响进度条回落功能  //GC20181113
             handleGainView(maxVoice, ivVoiceGainU, 1);
@@ -880,7 +1161,7 @@ public class MainActivity extends BaseActivity {
             tvNotice.setText(getString(R.string.message_notice_5));
             tvNoticeU.setText(getString(R.string.message_notice_5));
             //重新开始倒计时   //GC20200728
-            timer.start();
+            timer.start();  //重新连接后
         }
         //蓝牙耳机这状态反馈 //GC20210714
         if (event.status == HEADPHONES_CONNECT) {
@@ -909,7 +1190,7 @@ public class MainActivity extends BaseActivity {
     /**
      * 倒计时60s处理    //GC20200410     //GT20210705
      */
-    private CountDownTimer timer = new CountDownTimer(60000, 1000) {
+    private CountDownTimer timer = new CountDownTimer(45000, 1000) {    //时间60000改为45000，缩短不触发等待时间  //GC20240228
 
         @Override
         public void onTick(long millisUntilFinished) {
@@ -923,6 +1204,20 @@ public class MainActivity extends BaseActivity {
             tvNoticeU.setText(getString(R.string.message_notice_trigger));
             //专家界面
             tvNotice.setText(getString(R.string.message_notice_trigger));
+            timer.start();  //取消计时后再次启动
+            //长时间不触发增益调到初始值27(93%)  //GC20240228
+            if (gainM < 27) {
+                gainM = 27;  //GC20240228   磁场增益阶数赋值
+                sendMagneticCommand(27);
+                //专家界面UI
+                seekBarMagnetic.setProgress(s2bM(27));
+                tvMagneticValue.setText(s2bM(27) + "%");
+                //用户界面UI
+                seekBarM.setProgress(s2bM(27));
+                Log.e(TAG, "增益调整" + " /调整增益到" + s2bM(27) + "% /阶数" + 27);
+            }
+            ivPosition.setVisibility(View.INVISIBLE);   //GC20240304 长时间不触发，UI没有电缆
+
         }
 
     };
@@ -939,7 +1234,7 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onFinish() {
             ivSynchronizeStatus.setImageResource(R.drawable.light_gray);
-            timer.start();
+            timer.start();  //触发灯变灰后
             timer2.cancel();
         }
 
@@ -981,23 +1276,32 @@ public class MainActivity extends BaseActivity {
         }
         //判断控制哪个进度条
         if (type == 0) {
-            changeMagneticGainView(imageView, gainPosition);
-            maxMagnetic = 0;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = gainPosition - 1; i >= 0; i--) {
-                        SystemClock.sleep(200);
-                        Message message = new Message();
-                        message.what = 1;
-                        message.obj = i;
-                        mHandler.sendMessage(message);
+            if (suitableGain) {
+                //用户界面显示磁场强度值   //GC20240307
+                tvIntensity.setVisibility(View.VISIBLE);
+                tvIntensity.setText("" + magIntensity);
+                changeMagneticGainView2(imageView, gainPosition);   //磁场增益合适后绘制强度指示UI  //GC20240229
+            } else {
+                //用户界面不显示磁场强度值   //GC20240307
+                tvIntensity.setVisibility(View.GONE);
+                changeMagneticGainView(imageView, gainPosition);    //磁场增益不合适进度条落下  //GC20240229
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = gainPosition - 1; i >= 0; i--) {
+                            SystemClock.sleep(200);
+                            Message message = new Message();
+                            message.what = 1;
+                            message.obj = i;
+                            mHandler.sendMessage(message);
+                        }
                     }
-                }
-            }).start();
+                }).start();
+            }
+            maxMagnetic = 0;
+            maxMagnetic2 = 0;   //水平线圈磁场数据的最大值重置  //GC20240226
         } else if (type == 1) {
             changeVoiceGainView(ivVoiceGainU, gainPosition);
-            maxVoice = 0;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -1010,6 +1314,7 @@ public class MainActivity extends BaseActivity {
                     }
                 }
             }).start();
+            maxVoice = 0;
         }
 
     }
@@ -1032,7 +1337,7 @@ public class MainActivity extends BaseActivity {
 
     public void changeMagneticGainView(ImageView imageView, int position) {
         switch (position) {
-            case 0:
+            /*case 0:
                 imageView.setImageResource(R.drawable.ic_magnetic_field_gain_0);
                 break;
             case 1:
@@ -1064,6 +1369,85 @@ public class MainActivity extends BaseActivity {
                 break;
             case 10:
                 imageView.setImageResource(R.drawable.ic_magnetic_field_gain_10);
+                break;*/    //GC20240223    改磁场进度条颜色为绿色
+            case 0:
+                imageView.setImageResource(R.drawable.ic_voice_gain_0);
+                break;
+            case 1:
+                imageView.setImageResource(R.drawable.ic_voice_gain_1);
+                break;
+            case 2:
+                imageView.setImageResource(R.drawable.ic_voice_gain_2);
+                break;
+            case 3:
+                imageView.setImageResource(R.drawable.ic_voice_gain_3);
+                break;
+            case 4:
+                imageView.setImageResource(R.drawable.ic_voice_gain_4);
+                break;
+            case 5:
+                imageView.setImageResource(R.drawable.ic_voice_gain_5);
+                break;
+            case 6:
+                imageView.setImageResource(R.drawable.ic_voice_gain_6);
+                break;
+            case 7:
+                imageView.setImageResource(R.drawable.ic_voice_gain_7);
+                break;
+            case 8:
+                imageView.setImageResource(R.drawable.ic_voice_gain_8);
+                break;
+            case 9:
+                imageView.setImageResource(R.drawable.ic_voice_gain_9);
+                break;
+            case 10:
+                imageView.setImageResource(R.drawable.ic_voice_gain_10);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    /**
+     * //GC20240223    强度指示UI
+     * @param imageView
+     * @param position
+     */
+    public void changeMagneticGainView2(ImageView imageView, int position) {
+        switch (position) {
+            case 0:
+                imageView.setImageResource(R.drawable.ic_magnetic_0);
+                break;
+            case 1:
+                imageView.setImageResource(R.drawable.ic_magnetic_1);
+                break;
+            case 2:
+                imageView.setImageResource(R.drawable.ic_magnetic_2);
+                break;
+            case 3:
+                imageView.setImageResource(R.drawable.ic_magnetic_3);
+                break;
+            case 4:
+                imageView.setImageResource(R.drawable.ic_magnetic_4);
+                break;
+            case 5:
+                imageView.setImageResource(R.drawable.ic_magnetic_5);
+                break;
+            case 6:
+                imageView.setImageResource(R.drawable.ic_magnetic_6);
+                break;
+            case 7:
+                imageView.setImageResource(R.drawable.ic_magnetic_7);
+                break;
+            case 8:
+                imageView.setImageResource(R.drawable.ic_magnetic_8);
+                break;
+            case 9:
+                imageView.setImageResource(R.drawable.ic_magnetic_9);
+                break;
+            case 10:
+                imageView.setImageResource(R.drawable.ic_magnetic_10);
                 break;
             default:
                 break;
@@ -1120,8 +1504,8 @@ public class MainActivity extends BaseActivity {
     public void onEventMainThread(ResultOfSvmEvent event) {
         if (event.isFault) {
             //从svm认为不是故障声到是故障声，需要再测试一次用来做相关 //GC20181119
-            if (firstFind) {
-                //不是故障，判断“磁场触发”
+            if (firstFind) {    //1、第一次SVM预测是的时候先显示磁场触发  //GC20231201
+                //显示“磁场触发”
                 tvNotice.setText(getString(R.string.triggered));
                 tvNoticeU.setText(getString(R.string.triggered));
                 //延时值显示
@@ -1133,7 +1517,6 @@ public class MainActivity extends BaseActivity {
                 tvCurrentDelayU.setText("");
                 firstFind = false;
             }
-
         } else {
             //不是故障，判断“磁场触发”
             tvNotice.setText(getString(R.string.triggered));
@@ -1148,6 +1531,9 @@ public class MainActivity extends BaseActivity {
             //去动画2
             ccvFirstU.setVisibility(View.GONE);
             ccvSecondU.setVisibility(View.GONE);
+
+            tvP.setText(" ");  //1、认为不是故障声，相关系数不显示 //GC20231130
+            tvPos.setText(" ");  //1、认为不是故障声，不显示 //GC20231225
             //GC20190724
             isDrawCircle = false;
             //画动画1——波纹  正在测试中   ...
@@ -1168,7 +1554,7 @@ public class MainActivity extends BaseActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(ResultOfRelevantEvent event) {
-        if (event.isRelated) {
+        if (event.isRelated) {  //2、相关判断通过，算法认为是故障声  //GC20231201
             //发现故障提示音播放     //GC20200417 延时播放
             handle.postDelayed(new Runnable() {
                 @Override
@@ -1181,7 +1567,11 @@ public class MainActivity extends BaseActivity {
             tvNotice.setText(getString(R.string.message_notice_8)); //GC20220708 改提示为“接近故障点”
             tvNoticeU.setText(getString(R.string.message_notice_8));
 
-            if (isRelatedCount == 0) {
+            tvP.setText("p = " + new DecimalFormat("0.00").format(event.p));    //2、p > 0.4认为相关，DecimalFormat限制小数点   //GC20231130
+            tvPos.setText("位置 = " + event.cursorPosition);    //2、p > 0.4认为相关，刷新cursorPosition //GC20231225
+            Log.e("test2", " /位置 = " + event.cursorPosition);
+//            if (isRelatedCount == 0) {
+//            if (event.p <= 0.8) {  //p的值不高，需要实时显示当前的声磁延时值  //延时显示可优化部分 //GC20231209    //GC20231225
                 //第一次相关 延时值显示
                 tvCurrentDelayU.setText(getString(R.string.current) + event.timeDelay + "ms");
                 if (lastDelayValue > 0) {
@@ -1192,24 +1582,26 @@ public class MainActivity extends BaseActivity {
                 //专家界面延时值显示和光标定位 //GC20190218
                 tvYanShi.setText(event.timeDelay + "ms");
                 lineChartVoice.setScrubLine3(event.cursorPosition);
+//                tvPos.setText("位置 = " + event.cursorPosition);    //2、p > 0.4而且 p <= 0.8  刷新cursorPosition //GC20231225
                 //保存故障结果
                 lastDelayValue = event.timeDelay;
                 cursorPosition = event.cursorPosition;
 
-            } else if (isRelatedCount > 0) {
+//            } else if (isRelatedCount > 0) {
+            /*} else if (event.p > 0.8) { //GC20231209
                 //继续相关  延时值显示   //GC20190717
                 tvCurrentDelayU.setText(getString(R.string.current) + lastDelayValue + "ms");
                 tvLastDelayU.setText(getString(R.string.last) + lastDelayValue + "ms");
                 //专家界面延时值显示和光标定位 //GC20190218
                 tvYanShi.setText(lastDelayValue + "ms");
                 lineChartVoice.setScrubLine3(cursorPosition);
-            }
+            }*/ //相关后实时显示延时值显示和光标定位 //GC20231225
             //刻度圆圈动画2绘制 //GC20190625
             currentDelayValue = lastDelayValue;
             drawCircle();
             isRelatedCount++;
 
-        } else {
+        } else {    //2、相关判断不通过，算法认为不是故障声  //GC20231201
             isRelatedCount = 0;
             //不是故障，判断“磁场触发”
             tvNotice.setText(getString(R.string.triggered));
@@ -1217,6 +1609,9 @@ public class MainActivity extends BaseActivity {
             //去动画2
             ccvFirstU.setVisibility(View.GONE);
             ccvSecondU.setVisibility(View.GONE);
+
+            tvP.setText("p = " + new DecimalFormat("0.00").format(event.p));    //2、认为不相关 //GC20231130            tvPos.setText("位置 = " + event.cursorPosition);    //2、p > 0.4认为相关，刷新cursorPosition //GC20231225
+            tvPos.setText(" ");    //2、p <= 0.4认为不相关 //GC20231225
             //GC20190724
             isDrawCircle = false;
             //画动画1——波纹  正在测试中   ...
@@ -1250,40 +1645,61 @@ public class MainActivity extends BaseActivity {
             //颜色改动之前——灰色"#555555"  "黄色#e1de04"  //GC20190717
             ccvFirstU.updateView("#00ffde", 8, 5);
         } else if ((currentDelayValue > 1) && (currentDelayValue <= 2)) {
-            ccvFirstU.updateView("#00ffde", 8, 19);
+            ccvFirstU.updateView("#00ffde", 8, 13);
         } else if ((currentDelayValue > 2) && (currentDelayValue <= 3)) {
-            ccvFirstU.updateView("#00ffde", 8, 33);
+            ccvFirstU.updateView("#00ffde", 8, 21);
         } else if ((currentDelayValue > 3) && (currentDelayValue <= 4)) {
-            ccvFirstU.updateView("#00ffde", 8, 47);
-        } else if ((currentDelayValue > 1) && (currentDelayValue <= 5)) {
+            ccvFirstU.updateView("#00ffde", 8, 29);
+        } else if ((currentDelayValue > 4) && (currentDelayValue <= 5)) {
+            ccvFirstU.updateView("#00ffde", 8, 37);
+        } else if ((currentDelayValue > 5) && (currentDelayValue <= 6)) {
+            ccvFirstU.updateView("#00ffde", 8, 45);
+        } else if ((currentDelayValue > 6) && (currentDelayValue <= 7)) {
+            ccvFirstU.updateView("#00ffde", 8, 53);
+        } else if ((currentDelayValue > 7) && (currentDelayValue <= 8)) {
             ccvFirstU.updateView("#00ffde", 8, 61);
-        } else if ((currentDelayValue > 1) && (currentDelayValue <= 6)) {
-            ccvFirstU.updateView("#00ffde", 8, 75);
-        } else if ((currentDelayValue > 1) && (currentDelayValue <= 7)) {
-            ccvFirstU.updateView("#00ffde", 8, 89);
-        } else if ((currentDelayValue > 1) && (currentDelayValue <= 8)) {
-            ccvFirstU.updateView("#00ffde", 8, 103);
-        } else if ((currentDelayValue > 1) && (currentDelayValue <= 9)) {
-            ccvFirstU.updateView("#00ffde", 8, 117);
-        } else if ((currentDelayValue > 1) && (currentDelayValue <= 10)) {
-            ccvFirstU.updateView("#00ffde", 8, 131);
+        } else if ((currentDelayValue > 8) && (currentDelayValue <= 9)) {
+            ccvFirstU.updateView("#00ffde", 8, 68);
+        } else if ((currentDelayValue > 9) && (currentDelayValue <= 10)) {
+            ccvFirstU.updateView("#00ffde", 8, 74);
         } else if (currentDelayValue > 10) {
-            ccvFirstU.updateView("#00ffde", 8, 145);
+            ccvFirstU.updateView("#00ffde", 8, 80);
         }
         //GC20190724
         isDrawCircle = true;
         ccvFirstU.setVisibility(View.VISIBLE);
     }
 
-    @OnClick({R.id.ll_silence, R.id.ll_pause, R.id.ll_memory, R.id.ll_compare, R.id.ll_filter, R.id.ll_headphones, R.id.ll_assist, R.id.ll_settings,
-            R.id.ll_mode, R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_headphones_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u})
+    @OnClick({R.id.ll_silence, R.id.ll_pause, R.id.ll_amplify, R.id.ll_memory, R.id.ll_compare, R.id.ll_filter, R.id.ll_headphones, R.id.ll_assist, R.id.ll_settings,
+            R.id.ll_mode, R.id.ll_voice_u, R.id.ll_filter_u, R.id.ll_headphones_u, R.id.ll_assist_u, R.id.ll_settings_u, R.id.ll_mode_u, R.id.change_magnetic})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.change_magnetic:    //GT20240228 用于调试，点击磁场字样，改变磁场数据显示来源
+                isChangeMag = !isChangeMag;
+                if (isChangeMag) {
+                    tvMagnetic.setText("磁场/水平");
+                } else {
+                    tvMagnetic.setText("磁场/竖直");
+                }
+                //GT20240228 用于调试，绘制更改后的磁场数据
+                for (int i = 0; i < 400; i++) {
+                    if (!isChangeMag) {
+                        magneticDraw[i] = magneticArray[i]; //magneticDraw绘制的磁场数据    //GC20231118
+                    } else {
+                        magneticDraw[i] = magneticArray2[i]; //GT20240228 用于调试，magneticDraw绘制水平磁场数据
+                    }
+                }
+                myChartAdapterMagnetic.setmTempArray(magneticDraw); //GC20231205
+                myChartAdapterMagnetic.notifyDataSetChanged();
+                break;
             case R.id.ll_silence:
                 clickSilence();
                 break;
             case R.id.ll_pause:
                 clickPause();
+                break;
+            case R.id.ll_amplify:
+                clickAmplify(); //GC20231019
                 break;
             case R.id.ll_memory:
                 clickMemory();
@@ -1429,6 +1845,27 @@ public class MainActivity extends BaseActivity {
             //播放暂停效果改进  //GC20200519
             ivPlay.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
             tvPlay.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        }
+
+    }
+
+    //点击“放大”按钮  //GC20231019
+    public void clickAmplify() {
+        isAmplify = !isAmplify;
+        if (isAmplify) {
+            //放大状态
+            ivPlay2.setImageResource(R.drawable.ic_play);
+            tvAmplify.setText(getString(R.string.amplify));
+            //红色
+            ivPlay2.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red3));
+            tvAmplify.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.red3));
+        } else {
+            //取消状态
+            ivPlay2.setImageResource(R.drawable.ic_stop);
+            tvAmplify.setText(getString(R.string.no_amplify));
+            //白色
+            ivPlay2.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.white));
+            tvAmplify.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.white));
         }
 
     }

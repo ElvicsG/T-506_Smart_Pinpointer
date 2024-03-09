@@ -32,4 +32,6 @@ public class Constant {
 
     public static Boolean BluetoothState;
 
+    public static Boolean isDataOver;   //GC20231205
+
 }

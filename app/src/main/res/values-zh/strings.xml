@@ -24,7 +24,7 @@
     <string name="Select_the_device_to_connect_to">选择要连接的设备</string>
     <string name="No_new_equipment_found">没有找到新设备</string>
     <string name="Find_a_Bluetooth_device">查找蓝牙设备</string>
-    <string name="t_506">软件名称：T—506电缆故障定点仪</string>
+    <string name="t_506">软件名称：T-506电缆故障定点仪</string>
     <string name="company_name">公司名称：山东科汇电力自动化股份有限公司</string>
     <string name="company_name2">山东科汇电力自动化股份有限公司</string>
     <string name="company_website">公司网址：www.kehui.cn</string>
@@ -32,6 +32,8 @@
     <string name="find_device">查找耳机</string>
     <string name="left">左</string>
     <string name="right">右</string>
+    <string name="gain_too_high">增益过大</string>
+    <string name="gain_too_low">增益过小</string><!--//GC20240226-->
     <string name="note">提示</string>
     <string name="Bluetooth_disconnected_please_reconnect">蓝牙断开,请重新连接</string>
     <string name="Exit_application">退出应用</string>
@@ -136,10 +138,10 @@
     <string name="uploading_waiting">上传中,请稍后</string>
     <string name="paired_device">已配对设备</string>
     <string name="new_device">未配对设备</string>
-    <string name="no_paired_device_find_device">未有配对设备,请查找设备!</string>
+    <string name="no_paired_device_find_device">无已配对设备,请查找设备!</string>
     <string name="please_find_device">请到系统设置配对T-506!</string>
     <string name="min_delay">最小延迟</string>
-    <string name="pinpointer_position">探头位置</string>
+    <string name="pinpointer_position">电缆位置</string>
     <string name="connecting_wait">正在连接,请稍后…</string>
     <string name="please_choose">请选择</string>
     <string name="fault_type_1">低阻</string>
@@ -184,5 +186,7 @@
     <string name="waiting_link">连接中，请保持耳机处于可被查找状态…</string>
     <string name="headphones_connected">蓝牙耳机已连接！</string>
     <string name="headphones_disconnected">蓝牙耳机已断开！</string>
+    <string name="amplify">放大</string>
+    <string name="no_amplify">取消</string>
 
 </resources>

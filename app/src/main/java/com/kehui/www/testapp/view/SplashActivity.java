@@ -215,6 +215,7 @@ public class SplashActivity extends BaseActivity {
                 try {
                     // 1、封装url地址
                     URL url = new URL(URLs.AppUrl + URLs.AppPort + "/updatePad.json");
+//                    URL url = new URL(URLs.AppUrl + URLs.AppPort + "/updatePad506.json");  //这是服务器里面的位置  //GC20231207
                     // 2、开启一个链接
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     // 3、设置常见请求参数(请求头)  // 请求方法

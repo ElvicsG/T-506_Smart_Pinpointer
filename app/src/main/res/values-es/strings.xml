@@ -37,6 +37,8 @@
     <string name="find_device">Find headphones</string>
     <string name="left">Izquierda</string>
     <string name="right">Derecha</string>
+    <string name="gain_too_high">Gain too high</string>
+    <string name="gain_too_low">Gain too low</string><!--//GC20240226-->
     <string name="note">prompt</string>
     <string name="Bluetooth_disconnected_please_reconnect">Bluetooth disconnected, please reconnect</string>
     <string name="Exit_application">Salir</string>
@@ -145,7 +147,7 @@
     <string name="no_paired_device_find_device">No paired devices, please find the device!</string>
     <string name="please_find_device">Please pair T-506 in Android system settings!</string>
     <string name="min_delay">Minimum delay</string>
-    <string name="pinpointer_position">Pinpointer Position</string>
+    <string name="pinpointer_position">Cable Position</string>
     <string name="connecting_wait">Connecting, please wait…</string>
     <string name="please_choose">Por favor, elija</string>
     <string name="fault_type_1">Baja resistencia</string>
@@ -181,5 +183,7 @@
     <string name="waiting_link">In connection, please keep the headset in searchable state</string>
     <string name="headphones_connected">蓝牙耳机已连接！</string>
     <string name="headphones_disconnected">蓝牙耳机已断开！</string>
+    <string name="amplify">放大</string>
+    <string name="no_amplify">取消</string>
 
 </resources>

@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_expert">
 
+    <!--16%-->
     <com.kehui.www.testapp.ui.PercentLinearLayout
         android:id="@+id/ll_right"
         android:layout_width="0dp"
@@ -91,8 +92,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:text="@string/mute"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
@@ -118,8 +119,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:text="@string/pause"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
@@ -144,8 +145,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:text="@string/memory"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
@@ -170,8 +171,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/compare"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
                 <!-- GC20210703 blue3-->
@@ -195,8 +196,8 @@
                     android:layout_height="wrap_content"
                     android:drawablePadding="10dp"
                     android:gravity="center"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:text="@string/filter"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
@@ -215,14 +216,14 @@
                 android:background="@drawable/ic_btn_expert"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:visibility="visible">  <!--gone//GC20220801-->
+                android:visibility="gone">  <!--gone//GC20220801--><!--//GN20240306旧visible-->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:text="@string/assist"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
@@ -247,8 +248,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/setting"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_70dp"
+                    android:minWidth="@dimen/base_dimen_70dp"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
                 <!-- GC20210703 blue3-->
@@ -256,6 +257,34 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_setting" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_amplify"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/ic_btn_expert"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone"><!--屏蔽放大按钮//GC20231024-->
+
+                <TextView
+                    android:id="@+id/tv_amplify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxWidth="@dimen/base_dimen_65dp"
+                    android:minWidth="@dimen/base_dimen_65dp"
+                    android:text="@string/no_amplify"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/base_dimen_13sp" />
+                <!-- GC20210703 blue3-->
+                <ImageView
+                    android:id="@+id/iv_play2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_play" />
             </LinearLayout>
 
             <LinearLayout
@@ -273,8 +302,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:maxWidth="@dimen/base_dimen_55dp"
-                    android:minWidth="@dimen/base_dimen_55dp"
+                    android:maxWidth="@dimen/base_dimen_65dp"
+                    android:minWidth="@dimen/base_dimen_65dp"
                     android:text="@string/headphones"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_13sp" />
@@ -369,13 +398,16 @@
             android:paddingBottom="5dp"
             android:baselineAligned="false">
 
+            <!--//GT20240228用于调试，改变磁场数据显示来源按钮-->
             <LinearLayout
+                android:id="@+id/change_magnetic"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center">
 
                 <TextView
+                    android:id="@+id/tv_magnetic"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -383,10 +415,10 @@
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
                     android:paddingStart="15dp"
-                    android:text="@string/magnetic_field"
+                    android:text="磁场/竖直"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_15sp"
-                    tools:ignore="RtlSymmetry" />
+                    tools:ignore="RtlSymmetry" /><!--@string/magnetic_field//GT20240228用于调试，磁场数据来源显示-->
             </LinearLayout>
 
             <LinearLayout
@@ -469,6 +501,18 @@
                 android:textSize="@dimen/base_dimen_16sp"
                 tools:text="@string/left"
                 tools:ignore="RelativeOverlap" />
+
+            <TextView
+                android:id="@+id/tv_gain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="25dp"
+                android:text=""
+                android:textColor="@color/yellow2"
+                android:textSize="@dimen/base_dimen_16sp"
+                tools:text=""
+                tools:ignore="RelativeOverlap" /><!--增益判断结果显示UI//GC20240226-->
         </RelativeLayout>
         <!-- GC20210703 blue3-->
         <LinearLayout
@@ -496,10 +540,10 @@
                     android:drawablePadding="20dp"
                     android:gravity="center_vertical"
                     android:paddingStart="15dp"
-                    android:text="@string/shengyin_name"
+                    android:text="磁场/水平"
                     android:textColor="@color/white"
                     android:textSize="@dimen/base_dimen_15sp"
-                    tools:ignore="RtlSymmetry" />
+                    tools:ignore="RtlSymmetry" /><!--//GT20240308磁场/水平@string/shengyin_name-->
             </LinearLayout>
 
             <LinearLayout
@@ -585,6 +629,7 @@
                     android:textColor="@color/yellow2"
                     android:textSize="@dimen/base_dimen_16sp" />
                 <!-- GC20210703 blue3-->
+
                 <TextView
                     android:id="@+id/tv_yan_shi"
                     android:layout_width="wrap_content"
@@ -592,7 +637,52 @@
                     android:text="2.5ms"
                     android:textColor="@color/yellow2"
                     android:textSize="@dimen/base_dimen_16sp"/>
+
+                <TextView
+                    android:id="@+id/tv_p"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text=""
+                    android:textColor="@color/yellow2"
+                    android:textSize="@dimen/base_dimen_16sp"/><!--相关系数//GC20231130-->
+
+                <TextView
+                    android:id="@+id/tv_pos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text=""
+                    android:textColor="@color/yellow2"
+                    android:textSize="@dimen/base_dimen_16sp" /><!--自动定位光标位置显示//GC20231225-->
+
+                <TextView
+                    android:id="@+id/tv_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" /min"
+                    android:textColor="@color/yellow2"
+                    android:textSize="@dimen/base_dimen_16sp"
+                    android:visibility="gone" /><!--屏蔽LOG信息显示//GC20231024-->
+
+                <TextView
+                    android:id="@+id/tv_minSecond"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" /minSecond"
+                    android:textColor="@color/yellow2"
+                    android:textSize="@dimen/base_dimen_16sp"
+                    android:visibility="gone" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_v"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text=""
+                android:textColor="@color/yellow2"
+                android:textSize="@dimen/base_dimen_16sp"/><!--//GC20231205-->
         </RelativeLayout>
 
         <LinearLayout
